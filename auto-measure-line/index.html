@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Measure Line</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #b0b0b0;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .options-section {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .options-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .option-group {
+            margin-bottom: 20px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(53, 53, 53, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-container:hover {
+            background: rgba(60, 60, 60, 0.7);
+            border-color: #00d4ff;
+        }
+
+        .checkbox-container.processing {
+            border-color: #00d4ff;
+            background: rgba(60, 60, 60, 0.7);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 15px;
+            accent-color: #00d4ff;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .checkbox-description {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            margin-top: 5px;
+            margin-left: 33px;
+        }
+
+        .checkbox-status {
+            font-size: 0.8rem;
+            color: #00d4ff;
+            margin-left: 10px;
+            display: none;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, rgba(42, 42, 42, 0.9) 0%, rgba(35, 35, 35, 0.9) 100%);
+            border: 3px dashed rgba(0, 212, 255, 0.4);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .upload-section:hover {
+            border-color: #00d4ff;
+            background: linear-gradient(135deg, rgba(46, 46, 46, 0.95) 0%, rgba(38, 38, 38, 0.95) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .upload-section:hover::before {
+            opacity: 1;
+        }
+
+        .upload-section.dragover {
+            border-color: #00d4ff;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 122, 204, 0.15) 100%);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.4);
+            transform: scale(1.02);
+            border-width: 4px;
+        }
+
+        .upload-section.dragover::before {
+            opacity: 1;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0, 122, 204, 0.4);
+            position: relative;
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 122, 204, 0.6);
+            background: linear-gradient(135deg, #00e5ff 0%, #0086d9 100%);
+        }
+
+        .upload-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .upload-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .upload-text {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #ffffff 50%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-section:hover .upload-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .upload-hints {
+            margin-top: 25px;
+            color: #b0b0b0;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .upload-feature-icon {
+            color: #00d4ff;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 204, 0.4);
+        }
+
+        .btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .results-section {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-count {
+            background: linear-gradient(135deg, #00d4ff 0%, #007acc 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+        }
+
+        .linestring-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .linestring-item {
+            background: rgba(53, 53, 53, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00d4ff;
+            transition: all 0.3s ease;
+        }
+
+        .linestring-item:hover {
+            background: rgba(60, 60, 60, 0.9);
+            transform: translateX(5px);
+        }
+
+        .linestring-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            word-break: break-word;
+            font-size: 1.1rem;
+        }
+
+        .linestring-length {
+            color: #b0b0b0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .linestring-type {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .download-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status.processing {
+            background: rgba(42, 58, 26, 0.8);
+            color: #90ee90;
+            border: 1px solid rgba(144, 238, 144, 0.3);
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(58, 26, 26, 0.8);
+            color: #ff9090;
+            border: 1px solid rgba(255, 144, 144, 0.3);
+            display: block;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #007acc);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(53, 53, 53, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            color: #b0b0b0;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Auto Measure Line</h1>
+            <p>Upload file KML atau KMZ untuk menghitung panjang LineString dan Polygon</p>
+        </div>
+
+        <div class="options-section">
+            <div class="options-title">⚙️ Opsi Pemrosesan</div>
+            
+            <div class="option-group">
+                <label class="checkbox-container" id="deleteStylesContainer">
+                    <input type="checkbox" id="deleteStyles">
+                    <div>
+                        <div class="checkbox-label">Delete All Styles & Descriptions</div>
+                        <div class="checkbox-description">Menghapus semua style dan deskripsi dari placemark</div>
+                    </div>
+                    <div class="checkbox-status" id="deleteStylesStatus">Memproses...</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="upload-section" id="uploadArea">
+            <div class="upload-icon">☁️</div>
+            <div class="upload-text">Drop your KML/KMZ file here</div>
+            <input type="file" id="fileInput" class="file-input" accept=".kml,.kmz">
+            <button class="upload-btn" id="uploadBtn">
+                📁 Choose File
+            </button>
+            <div class="upload-hints">
+                or drag and drop your file anywhere on this area
+            </div>
+            <div class="upload-features">
+                <div class="upload-feature">
+                    <span class="upload-feature-icon">⚡</span>
+                    <span>Max 100MB</span>
+                </div>
+                <div class="upload-feature">
+                    <span class="upload-feature-icon">🗺️</span>
+                    <span>KML & KMZ</span>
+                </div>
+                <div class="upload-feature">
+                    <span class="upload-feature-icon">🚀</span>
+                    <span>30k+ geometries</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="status" class="status">
+            <div id="statusText"></div>
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <div class="results-title">Hasil Pemrosesan</div>
+                <div class="results-count" id="resultsCount">0</div>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <div class="linestring-list" id="linestringList"></div>
+            
+            <div class="download-section">
+                <div class="download-buttons">
+                    <button class="btn" id="downloadKMLBtn">📄 Download KML</button>
+                    <button class="btn btn-secondary" id="downloadKMZBtn">📦 Download KMZ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        class EnhancedKMLProcessor {
+            constructor() {
+                this.originalFileName = '';
+                this.isKMZ = false;
+                this.processedKMLContent = '';
+                this.originalKMLContent = ''; // Store original content for reprocessing
+                this.geometries = [];
+                this.kmzAssets = new Map();
+                this.originalKMZStructure = null;
+                this.isReprocessing = false; // Flag to prevent multiple simultaneous processing
+                this.setupEventListeners();
+                console.log('KML Processor initialized');
+            }
+
+            setupEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                const uploadBtn = document.getElementById('uploadBtn');
+                const downloadKMLBtn = document.getElementById('downloadKMLBtn');
+                const downloadKMZBtn = document.getElementById('downloadKMZBtn');
+                const deleteStylesCheckbox = document.getElementById('deleteStyles');
+
+                // Upload button click
+                uploadBtn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                // File input handler
+                fileInput.addEventListener('change', (e) => {
+                    console.log('File input changed');
+                    this.handleFileSelect(e);
+                });
+
+                // Drag and drop on upload area
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    if (!uploadArea.contains(e.relatedTarget)) {
+                        uploadArea.classList.remove('dragover');
+                    }
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleDrop(e);
+                });
+
+                // Also support drag and drop on entire document
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.handleDrop(e);
+                });
+
+                // Download handlers
+                downloadKMLBtn.addEventListener('click', () => this.downloadFile('kml'));
+                downloadKMZBtn.addEventListener('click', () => this.downloadFile('kmz'));
+
+                // AUTO REPROCESS: Listen to checkbox changes for immediate reprocessing
+                deleteStylesCheckbox.addEventListener('change', () => {
+                    this.handleOptionChange();
+                });
+
+                console.log('Event listeners attached');
+            }
+
+            // NEW: Handle option changes with immediate reprocessing
+            async handleOptionChange() {
+                if (!this.originalKMLContent) {
+                    console.log('No file loaded, ignoring option change');
+                    return;
+                }
+
+                if (this.isReprocessing) {
+                    console.log('Already reprocessing, ignoring option change');
+                    return;
+                }
+
+                console.log('Option changed, starting auto reprocess...');
+                this.showOptionProcessing(true);
+                
+                try {
+                    await this.reprocessFile();
+                } finally {
+                    this.showOptionProcessing(false);
+                }
+            }
+
+            // NEW: Show processing indicator for options
+            showOptionProcessing(show) {
+                const container = document.getElementById('deleteStylesContainer');
+                const status = document.getElementById('deleteStylesStatus');
+                
+                if (show) {
+                    container.classList.add('processing');
+                    status.style.display = 'block';
+                } else {
+                    container.classList.remove('processing');
+                    status.style.display = 'none';
+                }
+            }
+
+            handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    console.log('No file selected');
+                    return;
+                }
+
+                console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+                this.validateAndProcessFile(file);
+            }
+
+            handleDrop(e) {
+                const files = e.dataTransfer.files;
+                if (files.length === 0) {
+                    console.log('No files dropped');
+                    return;
+                }
+
+                const file = files[0];
+                console.log('File dropped:', file.name, 'Size:', file.size, 'Type:', file.type);
+                this.validateAndProcessFile(file);
+            }
+
+            validateAndProcessFile(file) {
+                // Validate file extension
+                const fileName = file.name.toLowerCase();
+                if (!fileName.endsWith('.kml') && !fileName.endsWith('.kmz')) {
+                    this.showStatus('❌ Error: Please select a KML or KMZ file', 'error');
+                    return;
+                }
+
+                // Validate file size (100MB limit)
+                if (file.size > 100 * 1024 * 1024) {
+                    this.showStatus('❌ Error: File too large. Maximum size is 100MB', 'error');
+                    return;
+                }
+
+                // File is valid, process it
+                this.processFile(file);
+            }
+
+            showStatus(message, type = 'processing', showProgress = false) {
+                const statusEl = document.getElementById('status');
+                const statusText = document.getElementById('statusText');
+                const progressContainer = document.getElementById('progressContainer');
+                
+                statusText.textContent = message;
+                statusEl.className = `status ${type}`;
+                statusEl.style.display = 'block';
+                
+                progressContainer.style.display = showProgress ? 'block' : 'none';
+            }
+
+            updateProgress(percent) {
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = `${percent}%`;
+            }
+
+            hideStatus() {
+                const statusEl = document.getElementById('status');
+                statusEl.style.display = 'none';
+            }
+
+            async processFile(file) {
+                this.originalFileName = file.name;
+                this.isKMZ = file.name.toLowerCase().endsWith('.kmz');
+                this.geometries = [];
+                this.kmzAssets.clear();
+
+                this.showStatus('📂 Reading file...', 'processing', true);
+                this.updateProgress(10);
+
+                try {
+                    let kmlContent;
+                    
+                    if (this.isKMZ) {
+                        this.showStatus('📦 Extracting KMZ...', 'processing', true);
+                        this.updateProgress(30);
+                        kmlContent = await this.extractKMLFromKMZ(file);
+                    } else {
+                        kmlContent = await this.readFileAsText(file);
+                    }
+
+                    // Store original content for reprocessing
+                    this.originalKMLContent = kmlContent;
+
+                    this.showStatus('🔍 Processing geometries...', 'processing', true);
+                    this.updateProgress(60);
+                    
+                    await this.processKMLContent(kmlContent);
+                    
+                    this.showStatus('📊 Displaying results...', 'processing', true);
+                    this.updateProgress(90);
+                    
+                    this.displayResults();
+                    this.updateProgress(100);
+                    
+                    setTimeout(() => {
+                        this.hideStatus();
+                    }, 500);
+                } catch (error) {
+                    console.error('Processing error:', error);
+                    this.showStatus(`❌ Error: ${error.message}`, 'error');
+                }
+            }
+
+            readFileAsText(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.onerror = () => reject(new Error('Failed to read file'));
+                    reader.readAsText(file, 'UTF-8');
+                });
+            }
+
+            async extractKMLFromKMZ(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const arrayBuffer = e.target.result;
+                            const zip = new JSZip();
+                            const zipContent = await zip.loadAsync(arrayBuffer);
+                            
+                            let kmlContent = '';
+                            
+                            for (const fileName in zipContent.files) {
+                                const file = zipContent.files[fileName];
+                                
+                                if (fileName.toLowerCase().endsWith('.kml')) {
+                                    if (!kmlContent || fileName.toLowerCase() === 'doc.kml') {
+                                        kmlContent = await file.async('string');
+                                    }
+                                } else if (!file.dir) {
+                                    const fileData = await file.async('arraybuffer');
+                                    this.kmzAssets.set(fileName, {
+                                        data: fileData,
+                                        name: fileName
+                                    });
+                                }
+                            }
+                            
+                            if (!kmlContent) {
+                                throw new Error('No KML file found in KMZ');
+                            }
+                            
+                            this.originalKMZStructure = zipContent;
+                            resolve(kmlContent);
+                        } catch (error) {
+                            reject(new Error(`Failed to extract KMZ: ${error.message}`));
+                        }
+                    };
+                    reader.onerror = () => reject(new Error('Failed to read KMZ file'));
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            async processKMLContent(kmlContent) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('Invalid KML format');
+                }
+
+                this.geometries = [];
+                
+                // Get current options
+                const deleteStyles = document.getElementById('deleteStyles').checked;
+                
+                console.log('Processing options:', {
+                    deleteStyles
+                });
+                
+                await this.processGeometries(xmlDoc, 'LineString', 'LineString', deleteStyles);
+                await this.processGeometries(xmlDoc, 'Polygon', 'Polygon', deleteStyles);
+
+                const serializer = new XMLSerializer();
+                this.processedKMLContent = serializer.serializeToString(xmlDoc);
+                this.processedKMLContent = this.formatXML(this.processedKMLContent);
+            }
+
+            async processGeometries(xmlDoc, elementType, geometryType, deleteStyles) {
+                const elements = xmlDoc.querySelectorAll(elementType);
+                const total = elements.length;
+                
+                console.log(`Processing ${total} ${geometryType} elements with options:`, {
+                    deleteStyles
+                });
+                
+                for (let i = 0; i < total; i++) {
+                    const element = elements[i];
+                    let length = 0;
+                    
+                    if (geometryType === 'LineString') {
+                        length = await this.processLineString(element, i);
+                    } else if (geometryType === 'Polygon') {
+                        length = await this.processPolygon(element, i);
+                    }
+                    
+                    let placemark = element.closest('Placemark');
+                    if (!placemark) continue;
+                    
+                    // Apply deleteStyles option properly
+                    if (deleteStyles) {
+                        console.log(`Deleting styles for placemark ${i + 1}`);
+                        
+                        // Remove all style and description related elements
+                        const selectorsToRemove = [
+                            'Style', 'StyleUrl', 'styleUrl', 
+                            'description', 'Description',
+                            'LookAt', 'Region', 'Metadata', 'ExtendedData',
+                            'TimeSpan', 'TimeStamp', 'Camera',
+                            'ScreenOverlay', 'GroundOverlay', 'PhotoOverlay',
+                            'NetworkLink', 'IconStyle', 'LineStyle', 'PolyStyle',
+                            'BalloonStyle', 'ListStyle', 'LabelStyle'
+                        ];
+                        
+                        selectorsToRemove.forEach(selector => {
+                            const elementsToRemove = placemark.querySelectorAll(selector);
+                            elementsToRemove.forEach(elem => {
+                                console.log(`Removing element: ${elem.tagName}`);
+                                elem.remove();
+                            });
+                        });
+                        
+                        // Also remove attributes that might contain style references
+                        if (placemark.hasAttribute('styleUrl')) {
+                            placemark.removeAttribute('styleUrl');
+                        }
+                    }
+                    
+                    // Get existing name for display purposes only
+                    let nameElement = placemark.querySelector('name');
+                    let originalName = nameElement ? nameElement.textContent.trim() : '';
+                    
+                    // Clean up original name - remove any existing length suffixes
+                    originalName = originalName.replace(/\s*[——-]\s*\d+\s*meters?.*$/i, '').trim();
+                    
+                    if (!originalName) {
+                        originalName = `${geometryType} ${i + 1}`;
+                    }
+                    
+                    // Always use simple naming scheme without numbers
+                    let newName = `${geometryType} — ${Math.ceil(length)} meters`;
+                    console.log(`Setting name: "${newName}"`);
+                    
+                    // Set the new name
+                    if (nameElement) {
+                        nameElement.textContent = newName;
+                    } else {
+                        nameElement = xmlDoc.createElement('name');
+                        nameElement.textContent = newName;
+                        placemark.insertBefore(nameElement, placemark.firstChild);
+                    }
+
+                    this.geometries.push({
+                        originalName,
+                        newName,
+                        length,
+                        type: geometryType
+                    });
+                    
+                    if (total > 100 && i % Math.floor(total / 10) === 0) {
+                        const progress = 60 + (i / total) * 30;
+                        this.updateProgress(progress);
+                        await this.sleep(1);
+                    }
+                }
+            }
+
+            async processLineString(lineString, index) {
+                const coordinatesElement = lineString.querySelector('coordinates');
+                if (coordinatesElement) {
+                    const coordinatesText = coordinatesElement.textContent.trim();
+                    return this.calculateLineStringLength(coordinatesText);
+                }
+                return 0;
+            }
+
+            async processPolygon(polygon, index) {
+                let totalLength = 0;
+                
+                const outerBoundary = polygon.querySelector('outerBoundaryIs coordinates');
+                if (outerBoundary) {
+                    const coordinatesText = outerBoundary.textContent.trim();
+                    totalLength += this.calculateLineStringLength(coordinatesText);
+                }
+                
+                const innerBoundaries = polygon.querySelectorAll('innerBoundaryIs coordinates');
+                for (const innerBoundary of innerBoundaries) {
+                    const coordinatesText = innerBoundary.textContent.trim();
+                    totalLength += this.calculateLineStringLength(coordinatesText);
+                }
+                
+                return totalLength;
+            }
+
+            calculateLineStringLength(coordinatesText) {
+                const coordinates = this.parseCoordinates(coordinatesText);
+                
+                if (coordinates.length < 2) {
+                    return 0;
+                }
+                
+                let totalLength = 0;
+
+                for (let i = 0; i < coordinates.length - 1; i++) {
+                    const point1 = coordinates[i];
+                    const point2 = coordinates[i + 1];
+                    
+                    if (point1.lat === point2.lat && point1.lng === point2.lng) {
+                        continue;
+                    }
+                    
+                    let segmentDistance;
+                    try {
+                        segmentDistance = this.vincentyDistance(
+                            point1.lat, point1.lng,
+                            point2.lat, point2.lng
+                        );
+                        
+                        if (isNaN(segmentDistance) || segmentDistance < 0) {
+                            segmentDistance = this.haversineDistance(
+                                point1.lat, point1.lng,
+                                point2.lat, point2.lng
+                            );
+                        }
+                    } catch (e) {
+                        segmentDistance = this.haversineDistance(
+                            point1.lat, point1.lng,
+                            point2.lat, point2.lng
+                        );
+                    }
+                    
+                    totalLength += segmentDistance;
+                }
+
+                return totalLength;
+            }
+
+            parseCoordinates(coordinatesText) {
+                const cleanedText = coordinatesText.replace(/\s+/g, ' ').trim();
+                const coordPairs = cleanedText.split(/[\s\n\r]+/).filter(pair => pair.trim());
+                
+                return coordPairs.map(pair => {
+                    const parts = pair.trim().split(',');
+                    if (parts.length >= 2) {
+                        const lng = parseFloat(parts[0]);
+                        const lat = parseFloat(parts[1]);
+                        const alt = parts[2] ? parseFloat(parts[2]) : 0;
+                        
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            return { lng, lat, alt };
+                        }
+                    }
+                    return null;
+                }).filter(coord => coord !== null);
+            }
+
+            vincentyDistance(lat1, lng1, lat2, lng2) {
+                const a = 6378137.0;
+                const b = 6356752.314245;
+                const f = 1/298.257223563;
+                
+                const L = this.toRadians(lng2 - lng1);
+                const U1 = Math.atan((1-f) * Math.tan(this.toRadians(lat1)));
+                const U2 = Math.atan((1-f) * Math.tan(this.toRadians(lat2)));
+                const sinU1 = Math.sin(U1);
+                const cosU1 = Math.cos(U1);
+                const sinU2 = Math.sin(U2);
+                const cosU2 = Math.cos(U2);
+                
+                let lambda = L;
+                let lambdaP;
+                let iterLimit = 100;
+                let cosSqAlpha, sinSigma, cos2SigmaM, cosSigma, sigma;
+                
+                do {
+                    const sinLambda = Math.sin(lambda);
+                    const cosLambda = Math.cos(lambda);
+                    sinSigma = Math.sqrt((cosU2*sinLambda) * (cosU2*sinLambda) + 
+                               (cosU1*sinU2-sinU1*cosU2*cosLambda) * (cosU1*sinU2-sinU1*cosU2*cosLambda));
+                    
+                    if (sinSigma === 0) return 0;
+                    
+                    cosSigma = sinU1*sinU2 + cosU1*cosU2*cosLambda;
+                    sigma = Math.atan2(sinSigma, cosSigma);
+                    const sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
+                    cosSqAlpha = 1 - sinAlpha*sinAlpha;
+                    cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha;
+                    
+                    if (isNaN(cos2SigmaM)) cos2SigmaM = 0;
+                    
+                    const C = f/16*cosSqAlpha*(4+f*(4-3*cosSqAlpha));
+                    lambdaP = lambda;
+                    lambda = L + (1-C) * f * sinAlpha *
+                            (sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)));
+                            
+                } while (Math.abs(lambda-lambdaP) > 1e-12 && --iterLimit > 0);
+                
+                if (iterLimit === 0) {
+                    throw new Error('Vincenty formula failed to converge');
+                }
+                
+                const uSq = cosSqAlpha * (a*a - b*b) / (b*b);
+                const A = 1 + uSq/16384*(4096+uSq*(-768+uSq*(320-175*uSq)));
+                const B = uSq/1024 * (256+uSq*(-128+uSq*(74-47*uSq)));
+                const deltaSigma = B*sinSigma*(cos2SigmaM+B/4*(cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)-
+                                  B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
+                
+                const s = b*A*(sigma-deltaSigma);
+                
+                return s;
+            }
+
+            haversineDistance(lat1, lng1, lat2, lng2) {
+                const R = 6378137.0; // meters
+                
+                const φ1 = this.toRadians(lat1);
+                const φ2 = this.toRadians(lat2);
+                const Δφ = this.toRadians(lat2 - lat1);
+                const Δλ = this.toRadians(lng2 - lng1);
+
+                const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                         Math.cos(φ1) * Math.cos(φ2) *
+                         Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                
+                return R * c;
+            }
+
+            toRadians(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+
+            formatXML(xmlString) {
+                return xmlString
+                    .replace(/></g, '>\n<')
+                    .replace(/\n\s*\n/g, '\n')
+                    .trim();
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            displayResults() {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsCount = document.getElementById('resultsCount');
+                const statsGrid = document.getElementById('statsGrid');
+                const geometryList = document.getElementById('linestringList');
+
+                resultsCount.textContent = this.geometries.length;
+                
+                const lineStrings = this.geometries.filter(g => g.type === 'LineString');
+                const polygons = this.geometries.filter(g => g.type === 'Polygon');
+                const totalLength = this.geometries.reduce((sum, g) => sum + g.length, 0);
+                
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${lineStrings.length}</div>
+                        <div class="stat-label">LineStrings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${polygons.length}</div>
+                        <div class="stat-label">Polygons</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${Math.ceil(totalLength).toLocaleString()}</div>
+                        <div class="stat-label">Total Meters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${this.kmzAssets.size}</div>
+                        <div class="stat-label">Assets</div>
+                    </div>
+                `;
+                
+                geometryList.innerHTML = this.geometries.map((geometry, index) => `
+                    <div class="linestring-item">
+                        <div class="linestring-name">${this.escapeHtml(geometry.newName)}</div>
+                        <div class="linestring-length">
+                            Original: ${this.escapeHtml(geometry.originalName)}<br>
+                            Panjang: ${Math.ceil(geometry.length).toLocaleString()} meter
+                        </div>
+                        <div class="linestring-type">${geometry.type}</div>
+                    </div>
+                `).join('');
+
+                resultsSection.style.display = 'block';
+                
+                // Only scroll to results on first load, not on reprocessing
+                if (!this.isReprocessing) {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            async downloadFile(format) {
+                if (!this.processedKMLContent) return;
+
+                this.showStatus(`📦 Preparing ${format.toUpperCase()} download...`, 'processing');
+
+                try {
+                    if (format === 'kml') {
+                        await this.downloadKML();
+                    } else if (format === 'kmz') {
+                        await this.downloadKMZ();
+                    }
+                    
+                    this.showStatus(`✅ ${format.toUpperCase()} download successful!`, 'processing');
+                    setTimeout(() => this.hideStatus(), 2000);
+                } catch (error) {
+                    this.showStatus(`❌ Download failed: ${error.message}`, 'error');
+                }
+            }
+
+            async downloadKML() {
+                const blob = new Blob([this.processedKMLContent], { 
+                    type: 'application/vnd.google-earth.kml+xml' 
+                });
+                
+                this.downloadBlob(blob, this.getProcessedFileName('kml'));
+            }
+
+            async downloadKMZ() {
+                const zip = new JSZip();
+                
+                zip.file('doc.kml', this.processedKMLContent);
+                
+                for (const [fileName, asset] of this.kmzAssets) {
+                    zip.file(fileName, asset.data);
+                }
+                
+                const zipBlob = await zip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: {
+                        level: 6
+                    }
+                });
+                
+                this.downloadBlob(zipBlob, this.getProcessedFileName('kmz'));
+            }
+
+            downloadBlob(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            getProcessedFileName(extension) {
+                const baseName = this.originalFileName.replace(/\.[^/.]+$/, '');
+                return `${baseName}_processed.${extension}`;
+            }
+
+            // MODIFIED: Reprocess the same file with current options
+            async reprocessFile() {
+                if (!this.originalKMLContent) {
+                    this.showStatus('❌ No file to reprocess', 'error');
+                    return;
+                }
+
+                if (this.isReprocessing) {
+                    console.log('Already reprocessing, skipping...');
+                    return;
+                }
+
+                this.isReprocessing = true;
+
+                try {
+                    this.geometries = [];
+                    
+                    console.log('Reprocessing with current options...');
+                    await this.processKMLContent(this.originalKMLContent);
+                    
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Reprocessing error:', error);
+                    this.showStatus(`❌ Reprocessing failed: ${error.message}`, 'error');
+                } finally {
+                    this.isReprocessing = false;
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking JSZip...');
+            
+            if (typeof JSZip === 'undefined') {
+                console.error('JSZip library not loaded');
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #ff6b6b;">
+                        <h2>❌ Library Error</h2>
+                        <p>JSZip library failed to load. Please check your internet connection and refresh the page.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            console.log('JSZip loaded successfully');
+            new EnhancedKMLProcessor();
+        });
+
+        // Test function - you can call this from browser console
+        function testFileInput() {
+            console.log('Testing file input...');
+            const fileInput = document.getElementById('fileInput');
+            console.log('File input element:', fileInput);
+            console.log('File input display style:', window.getComputedStyle(fileInput).display);
+            fileInput.click();
+        }
+    </script>
+</body>
+</html>

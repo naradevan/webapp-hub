@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAT-HOMEPASS Connection Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            line-height: 1.5;
+        }
+
+        .header {
+            background: #171717;
+            border-bottom: 1px solid #262626;
+            padding: 1rem 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #fafafa;
+        }
+
+        .header p {
+            font-size: 0.875rem;
+            color: #a3a3a3;
+            margin-top: 0.25rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+            gap: 0.5rem;
+        }
+
+        .progress-step {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 2px solid #404040;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #737373;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active {
+            background: #fafafa;
+            border-color: #fafafa;
+            color: #0a0a0a;
+        }
+
+        .progress-line {
+            width: 4rem;
+            height: 2px;
+            background: #404040;
+            transition: background 0.3s;
+        }
+
+        .progress-line.active {
+            background: #fafafa;
+        }
+
+        .card {
+            background: #171717;
+            border: 1px solid #262626;
+            border-radius: 0.5rem;
+            padding: 2rem;
+        }
+
+        .alert {
+            background: #262626;
+            border: 1px solid #404040;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-icon {
+            color: #d4d4d4;
+            flex-shrink: 0;
+        }
+
+        .alert-text {
+            font-size: 0.875rem;
+            color: #d4d4d4;
+        }
+
+        .upload-area {
+            text-align: center;
+        }
+
+        .upload-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #737373;
+            margin: 0 auto 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.625rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #fafafa;
+            color: #0a0a0a;
+        }
+
+        .btn-primary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #d4d4d4;
+            border: 1px solid #404040;
+        }
+
+        .btn-secondary:hover {
+            background: #262626;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #d4d4d4;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            border: 1px solid #404040;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            outline: none;
+            background: #0a0a0a;
+            color: #e5e5e5;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: #fafafa;
+        }
+
+        .table-container {
+            max-height: 24rem;
+            overflow-y: auto;
+            border: 1px solid #262626;
+            border-radius: 0.375rem;
+        }
+
+        table {
+            width: 100%;
+            font-size: 0.875rem;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #0a0a0a;
+            border-bottom: 1px solid #262626;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 500;
+            color: #d4d4d4;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #1a1a1a;
+            color: #e5e5e5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: #0a0a0a;
+            border-radius: 0.375rem;
+            border: 1px solid #262626;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #fafafa;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #a3a3a3;
+            margin-top: 0.25rem;
+        }
+
+        .download-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border: 1px solid #404040;
+            border-radius: 0.375rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .download-item:hover {
+            background: #262626;
+        }
+
+        .download-text {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .error-banner {
+            background: #7f1d1d;
+            border: 1px solid #991b1b;
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #0a0a0a;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FAT-HOMEPASS Connection Generator</h1>
+        <p>Upload KML/KMZ, select folders, configure capacities, and generate connections</p>
+    </div>
+
+    <div class="container">
+        <div class="progress">
+            <div class="progress-step active" id="progress-1">1</div>
+            <div class="progress-line" id="line-1"></div>
+            <div class="progress-step" id="progress-2">2</div>
+            <div class="progress-line" id="line-2"></div>
+            <div class="progress-step" id="progress-3">3</div>
+            <div class="progress-line" id="line-3"></div>
+            <div class="progress-step" id="progress-4">4</div>
+        </div>
+
+        <div class="card">
+            <div class="error-banner" id="error-banner"></div>
+
+            <!-- Step 1: Upload -->
+            <div class="step active" id="step-1">
+                <div class="alert">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <div class="alert-text">
+                        Upload your KML or KMZ file containing FAT and HOMEPASS folders with point locations.
+                    </div>
+                </div>
+                <div class="upload-area">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3 style="margin-bottom: 0.5rem;">Upload KML/KMZ File</h3>
+                    <p style="font-size: 0.875rem; color: #a3a3a3; margin-bottom: 1.5rem;">Supports both .kml and .kmz formats</p>
+                    <input type="file" id="file-input" accept=".kml,.kmz">
+                    <label for="file-input" class="btn btn-primary">Choose File</label>
+                    <p id="file-name" style="font-size: 0.875rem; color: #a3a3a3; margin-top: 1rem;"></p>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Folders -->
+            <div class="step" id="step-2">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Select Folders</h2>
+                <div class="form-group">
+                    <label class="form-label">FAT Folder</label>
+                    <select id="fat-folder" class="form-select">
+                        <option value="">Select folder...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HOMEPASS Folder</label>
+                    <select id="homepass-folder" class="form-select">
+                        <option value="">Select folder...</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button class="btn btn-secondary" onclick="reset()">Back</button>
+                    <button class="btn btn-primary" onclick="selectFolders()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Configure Capacities -->
+            <div class="step" id="step-3">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Configure FAT Capacities</h2>
+                <div class="alert">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <div class="alert-text">
+                        Set maximum HOMEPASS connections per FAT (default: 10). Only HOMEPASS within 150m will be assigned.
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>FAT ID</th>
+                                <th>Max HOMEPASS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="capacity-table"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+                    <button class="btn btn-primary" id="generate-btn" onclick="generateOutput()">Generate</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Results -->
+            <div class="step" id="step-4">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Download Results</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total HOMEPASS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-assigned">0</div>
+                        <div class="stat-label">Assigned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-unassigned">0</div>
+                        <div class="stat-label">Unassigned</div>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <div class="download-item" onclick="downloadKML()">
+                        <div class="download-text">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Download KML with Connections</span>
+                        </div>
+                        <span style="color: #a3a3a3; font-size: 0.875rem;">connections.kml</span>
+                    </div>
+                    <div class="download-item" onclick="downloadCSV()">
+                        <div class="download-text">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Download Assignment CSV</span>
+                        </div>
+                        <span style="color: #a3a3a3; font-size: 0.875rem;">assignments.csv</span>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="reset()">Process Another File</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let parsedKML = null;
+        let originalKMLText = '';
+        let folderStructure = [];
+        let selectedFatFolderPath = '';
+        let selectedHomepassFolderPath = '';
+        let fatPoints = [];
+        let homepassPoints = [];
+        let fatCapacities = {};
+        let resultData = null;
+
+        // Progress management
+        function updateProgress() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`progress-${i}`);
+                const line = document.getElementById(`line-${i}`);
+                
+                if (i <= currentStep) {
+                    step.classList.add('active');
+                    if (line) line.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                    if (line) line.classList.remove('active');
+                }
+            }
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+            updateProgress();
+        }
+
+        // Error handling
+        function showError(message) {
+            const banner = document.getElementById('error-banner');
+            banner.textContent = message;
+            banner.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('error-banner').classList.remove('show');
+        }
+
+        // Parse KML/KMZ
+        async function parseKML(file) {
+            try {
+                const fileExt = file.name.toLowerCase().split('.').pop();
+                let kmlText = '';
+
+                if (fileExt === 'kmz') {
+                    // Handle KMZ (zipped KML)
+                    const arrayBuffer = await file.arrayBuffer();
+                    const zip = await JSZip.loadAsync(arrayBuffer);
+                    
+                    // Find the KML file in the zip
+                    let kmlFile = null;
+                    zip.forEach((relativePath, zipEntry) => {
+                        if (relativePath.toLowerCase().endsWith('.kml') && !kmlFile) {
+                            kmlFile = zipEntry;
+                        }
+                    });
+                    
+                    if (!kmlFile) {
+                        showError('No KML file found inside KMZ');
+                        return null;
+                    }
+                    
+                    kmlText = await kmlFile.async('string');
+                } else {
+                    // Handle regular KML
+                    kmlText = await file.text();
+                }
+
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(kmlText, 'text/xml');
+                
+                if (xml.querySelector('parsererror')) {
+                    showError('Invalid KML/KMZ format');
+                    return null;
+                }
+                
+                return { xml, text: kmlText };
+            } catch (err) {
+                showError(`Failed to parse file: ${err.message}`);
+                return null;
+            }
+        }
+
+        // Extract folder structure
+        function extractFolders(xml) {
+            const folders = [];
+            const folderElements = xml.querySelectorAll('Folder');
+            
+            folderElements.forEach(folder => {
+                const nameEl = folder.querySelector(':scope > name');
+                if (!nameEl) return;
+                
+                const folderName = nameEl.textContent.trim();
+                const placemarks = folder.querySelectorAll(':scope > Placemark');
+                
+                let pointCount = 0;
+                placemarks.forEach(pm => {
+                    if (pm.querySelector('Point')) pointCount++;
+                });
+                
+                if (pointCount > 0) {
+                    folders.push({
+                        path: folderName,
+                        count: pointCount
+                    });
+                }
+            });
+            
+            return folders;
+        }
+
+        // Extract points from folder
+        function extractPointsFromFolder(xml, folderPath) {
+            const points = [];
+            const folders = xml.querySelectorAll('Folder');
+            
+            folders.forEach(folder => {
+                const nameEl = folder.querySelector(':scope > name');
+                if (!nameEl || nameEl.textContent.trim() !== folderPath) return;
+                
+                const placemarks = folder.querySelectorAll(':scope > Placemark');
+                placemarks.forEach(pm => {
+                    const pointEl = pm.querySelector('Point');
+                    if (!pointEl) return;
+                    
+                    const coords = pointEl.querySelector('coordinates');
+                    if (!coords) return;
+                    
+                    const coordText = coords.textContent.trim();
+                    const parts = coordText.split(',');
+                    
+                    if (parts.length >= 2) {
+                        const lon = parseFloat(parts[0]);
+                        const lat = parseFloat(parts[1]);
+                        
+                        const nameEl = pm.querySelector('name');
+                        const name = nameEl ? nameEl.textContent.trim() : `Point_${points.length + 1}`;
+                        
+                        points.push({
+                            id: name,
+                            lat: lat,
+                            lon: lon
+                        });
+                    }
+                });
+            });
+            
+            return points;
+        }
+
+        // Haversine distance
+        function haversineDistance(coord1, coord2) {
+            const R = 6371000; // Earth radius in meters
+            const lat1 = coord1.lat * Math.PI / 180;
+            const lat2 = coord2.lat * Math.PI / 180;
+            const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
+            const dLon = (coord2.lon - coord1.lon) * Math.PI / 180;
+
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                     Math.cos(lat1) * Math.cos(lat2) *
+                     Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c;
+        }
+
+        // Format coordinate with fixed width and 6 decimals
+        function formatCoordinate(value, width) {
+            // Format to 6 decimal places
+            const formatted = value.toFixed(6);
+            // Pad to specified width
+            return formatted.padStart(width, ' ');
+        }
+
+        // File upload handler
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            hideError();
+            document.getElementById('file-name').textContent = `Selected: ${file.name}`;
+            
+            const result = await parseKML(file);
+            if (!result) return;
+            
+            parsedKML = result.xml;
+            originalKMLText = result.text;
+            folderStructure = extractFolders(parsedKML);
+            
+            if (folderStructure.length === 0) {
+                showError('No folders with points found in KML/KMZ file');
+                return;
+            }
+            
+            // Populate dropdowns
+            const fatSelect = document.getElementById('fat-folder');
+            const hpSelect = document.getElementById('homepass-folder');
+            
+            fatSelect.innerHTML = '<option value="">Select folder...</option>';
+            hpSelect.innerHTML = '<option value="">Select folder...</option>';
+            
+            folderStructure.forEach(folder => {
+                fatSelect.innerHTML += `<option value="${folder.path}">${folder.path} (${folder.count} points)</option>`;
+                hpSelect.innerHTML += `<option value="${folder.path}">${folder.path} (${folder.count} points)</option>`;
+            });
+            
+            goToStep(2);
+        });
+
+        // Select folders
+        function selectFolders() {
+            const fatFolder = document.getElementById('fat-folder').value;
+            const hpFolder = document.getElementById('homepass-folder').value;
+            
+            if (!fatFolder || !hpFolder) {
+                showError('Please select both FAT and HOMEPASS folders');
+                return;
+            }
+            
+            if (fatFolder === hpFolder) {
+                showError('FAT and HOMEPASS folders must be different');
+                return;
+            }
+            
+            hideError();
+            
+            selectedFatFolderPath = fatFolder;
+            selectedHomepassFolderPath = hpFolder;
+            
+            fatPoints = extractPointsFromFolder(parsedKML, fatFolder);
+            homepassPoints = extractPointsFromFolder(parsedKML, hpFolder);
+            
+            if (fatPoints.length === 0 || homepassPoints.length === 0) {
+                showError('Selected folders must contain points');
+                return;
+            }
+            
+            // Build capacity table - ONLY FAT points from selected folder
+            const tbody = document.getElementById('capacity-table');
+            tbody.innerHTML = '';
+            fatCapacities = {};
+            
+            fatPoints.forEach((fat, index) => {
+                const fatId = fat.id;
+                fatCapacities[fatId] = 10;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${fatId}</td>
+                        <td>
+                            <input type="number" min="1" value="10" 
+                                   class="form-input" style="width: 6rem;"
+                                   data-fat-id="${fatId}"
+                                   onchange="updateFatCapacity(this)">
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            goToStep(3);
+        }
+        
+        // Update FAT capacity
+        function updateFatCapacity(input) {
+            const fatId = input.getAttribute('data-fat-id');
+            fatCapacities[fatId] = parseInt(input.value) || 0;
+        }
+
+        // Generate output
+        function generateOutput() {
+            hideError();
+            const btn = document.getElementById('generate-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Processing...';
+            
+            setTimeout(() => {
+                try {
+                    // Assignment algorithm - assign HP to nearest FAT within 150m
+                    const assignments = [];
+                    const fatUsage = {};
+                    fatPoints.forEach(f => fatUsage[f.id] = 0);
+                    
+                    homepassPoints.forEach(hp => {
+                        const candidates = [];
+                        
+                        fatPoints.forEach(fat => {
+                            const dist = haversineDistance(
+                                { lat: hp.lat, lon: hp.lon },
+                                { lat: fat.lat, lon: fat.lon }
+                            );
+                            
+                            if (dist <= 150 && fatUsage[fat.id] < fatCapacities[fat.id]) {
+                                candidates.push({ fat, dist });
+                            }
+                        });
+                        
+                        // Sort by distance - nearest first
+                        candidates.sort((a, b) => a.dist - b.dist);
+                        
+                        if (candidates.length > 0) {
+                            const assigned = candidates[0];
+                            fatUsage[assigned.fat.id]++;
+                            assignments.push({
+                                hpId: hp.id,
+                                hpLat: hp.lat,
+                                hpLon: hp.lon,
+                                fatId: assigned.fat.id,
+                                fatLat: assigned.fat.lat,
+                                fatLon: assigned.fat.lon,
+                                dist: assigned.dist.toFixed(2)
+                            });
+                        } else {
+                            assignments.push({
+                                hpId: hp.id,
+                                hpLat: hp.lat,
+                                hpLon: hp.lon,
+                                fatId: 'UNASSIGNED',
+                                fatLat: null,
+                                fatLon: null,
+                                dist: 'N/A'
+                            });
+                        }
+                    });
+                    
+                    // Generate KML
+                    let kml = originalKMLText;
+                    let style = `
+  <Style id="magentaLine">
+    <LineStyle>
+      <color>ffff00ff</color>
+      <width>1</width>
+    </LineStyle>
+  </Style>
+  
+  <Folder>
+    <name>FAT-HOMEPASS Connections</name>`;
+                    
+                    assignments.forEach(a => {
+                        if (a.fatId !== 'UNASSIGNED') {
+                            style += `
+    <Placemark>
+      <name>${a.hpId} to ${a.fatId}</name>
+      <styleUrl>#magentaLine</styleUrl>
+      <LineString>
+        <coordinates>
+          ${a.hpLon},${a.hpLat},0
+          ${a.fatLon},${a.fatLat},0
+        </coordinates>
+      </LineString>
+    </Placemark>`;
+                        }
+                    });
+                    
+                    style += '\n  </Folder>';
+                    kml = kml.replace('</Document>', style + '\n</Document>');
+                    
+                    // Generate CSV with formatted coordinates
+                    let csv = 'HOMEPASS_ID,HOMEPASS_LAT,HOMEPASS_LON,FAT_ID,FAT_LAT,FAT_LON,DISTANCE_M\n';
+                    assignments.forEach(a => {
+                        // Format coordinates: Latitude 9 chars, Longitude 10 chars, 6 decimals
+                        const hpLat = formatCoordinate(a.hpLat, 9);
+                        const hpLon = formatCoordinate(a.hpLon, 10);
+                        const fatLat = a.fatLat !== null ? formatCoordinate(a.fatLat, 9) : '';
+                        const fatLon = a.fatLon !== null ? formatCoordinate(a.fatLon, 10) : '';
+                        
+                        csv += `${a.hpId},${hpLat},${hpLon},${a.fatId},${fatLat},${fatLon},${a.dist}\n`;
+                    });
+                    
+                    resultData = {
+                        kml,
+                        csv,
+                        stats: {
+                            total: homepassPoints.length,
+                            assigned: assignments.filter(a => a.fatId !== 'UNASSIGNED').length,
+                            unassigned: assignments.filter(a => a.fatId === 'UNASSIGNED').length
+                        }
+                    };
+                    
+                    // Update stats
+                    document.getElementById('stat-total').textContent = resultData.stats.total;
+                    document.getElementById('stat-assigned').textContent = resultData.stats.assigned;
+                    document.getElementById('stat-unassigned').textContent = resultData.stats.unassigned;
+                    
+                    goToStep(4);
+                } catch (err) {
+                    showError(`Processing failed: ${err.message}`);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Generate';
+                }
+            }, 100);
+        }
+
+        // Download functions
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadKML() {
+            downloadFile(resultData.kml, 'connections.kml', 'application/vnd.google-earth.kml+xml');
+        }
+
+        function downloadCSV() {
+            downloadFile(resultData.csv, 'assignments.csv', 'text/csv');
+        }
+
+        // Reset
+        function reset() {
+            currentStep = 1;
+            parsedKML = null;
+            originalKMLText = '';
+            folderStructure = [];
+            selectedFatFolderPath = '';
+            selectedHomepassFolderPath = '';
+            fatPoints = [];
+            homepassPoints = [];
+            fatCapacities = {};
+            resultData = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-name').textContent = '';
+            hideError();
+            goToStep(1);
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

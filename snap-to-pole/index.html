@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLE-Guided Spatial Anchoring & Correction Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-panel {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .work-area {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .folder-structure {
+            margin-top: 15px;
+        }
+
+        .folder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #f5f5f5;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .folder-item:hover {
+            background: #e9ecef;
+        }
+
+        .folder-name {
+            font-weight: 500;
+        }
+
+        .folder-count {
+            background: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .settings-group {
+            margin-bottom: 20px;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .settings-group input, .settings-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #545b62);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .log-area {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .results-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .processing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧾 POLE-Guided Spatial Anchoring Tool</h1>
+            <p>WebApp untuk Menyelaraskan Tikor dan Polyline Berdasarkan Jalur POLE dalam File KML/KMZ</p>
+        </div>
+
+        <div class="main-panel">
+            <div class="sidebar">
+                <!-- File Upload Section -->
+                <div class="section">
+                    <h3>📁 Input File</h3>
+                    <div class="file-upload">
+                        <input type="file" id="fileInput" class="file-input" accept=".kml,.kmz" multiple>
+                        <label for="fileInput" class="file-label">
+                            📂 Pilih File KML/KMZ
+                        </label>
+                    </div>
+                    <div id="fileInfo" class="file-info" style="display: none;"></div>
+                    <div id="folderStructure" class="folder-structure"></div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="section">
+                    <h3>🔧 Pengaturan Snapping</h3>
+                    <div class="settings-group">
+                        <label for="snapRadius">Radius Toleransi (meter)</label>
+                        <input type="number" id="snapRadius" value="50" min="1" max="1000">
+                    </div>
+                    <div class="settings-group">
+                        <label for="snapMode">Mode Snapping</label>
+                        <select id="snapMode">
+                            <option value="nearest">Titik Terdekat</option>
+                            <option value="weighted">Weighted Distance</option>
+                            <option value="cluster">Cluster-based</option>
+                        </select>
+                    </div>
+                    <div class="settings-group">
+                        <label for="polylineMode">Mode Polyline</label>
+                        <select id="polylineMode">
+                            <option value="pole-guided">POLE-Guided (Urutan POLE)</option>
+                            <option value="direct">Direct Snapping</option>
+                            <option value="interpolate">Interpolasi Path</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Actions Section -->
+                <div class="section">
+                    <h3>⚡ Aksi</h3>
+                    <button class="action-btn btn-primary" id="parseBtn" disabled>
+                        🔍 Parse & Analisis File
+                    </button>
+                    <button class="action-btn btn-success" id="snapBtn" disabled>
+                        🎯 Mulai Snapping
+                    </button>
+                    <button class="action-btn btn-warning" id="previewBtn" disabled>
+                        👁️ Preview Hasil
+                    </button>
+                    <button class="action-btn btn-secondary" id="undoBtn" disabled>
+                        ↶ Undo
+                    </button>
+                    
+                    <div class="progress-container" id="progressContainer" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">0%</div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="section">
+                    <h3>📤 Ekspor Hasil</h3>
+                    <div class="export-options">
+                        <button class="action-btn btn-success" id="exportKML" disabled>KML</button>
+                        <button class="action-btn btn-success" id="exportKMZ" disabled>KMZ</button>
+                        <button class="action-btn btn-success" id="exportCSV" disabled>CSV</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-area">
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="statPoles">0</span>
+                        <span class="stat-label">POLE Points</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="statTikor">0</span>
+                        <span class="stat-label">FAT + FDT Points</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="statPolylines">0</span>
+                        <span class="stat-label">Polylines</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="statProcessed">0</span>
+                        <span class="stat-label">Processed</span>
+                    </div>
+                </div>
+
+                <!-- Log Area -->
+                <div class="section">
+                    <h3>📋 Log Proses</h3>
+                    <div class="log-area" id="logArea">Sistem siap. Silakan upload file KML/KMZ untuk memulai...\n</div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="section">
+                    <h3>📊 Hasil Snapping</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="results-table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Tipe</th>
+                                    <th>Jarak Snap (m)</th>
+                                    <th>POLE Target</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        class POLESpatialTool {
+            constructor() {
+                this.data = {
+                    poles: [],
+                    fat: [],
+                    fdt: [],
+                    polylines: [],
+                    original: null,
+                    snapped: null
+                };
+                this.settings = {
+                    snapRadius: 50,
+                    snapMode: 'nearest',
+                    polylineMode: 'pole-guided'
+                };
+                this.history = [];
+                this.initEventListeners();
+                this.updateStats();
+            }
+
+            initEventListeners() {
+                const fileInput = document.getElementById('fileInput');
+                const parseBtn = document.getElementById('parseBtn');
+                const snapBtn = document.getElementById('snapBtn');
+                const previewBtn = document.getElementById('previewBtn');
+                const undoBtn = document.getElementById('undoBtn');
+                const exportKML = document.getElementById('exportKML');
+                const exportKMZ = document.getElementById('exportKMZ');
+                const exportCSV = document.getElementById('exportCSV');
+
+                fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                parseBtn.addEventListener('click', () => this.parseFiles());
+                snapBtn.addEventListener('click', () => this.startSnapping());
+                previewBtn.addEventListener('click', () => this.previewResults());
+                undoBtn.addEventListener('click', () => this.undoLastAction());
+                exportKML.addEventListener('click', () => this.exportFile('kml'));
+                exportKMZ.addEventListener('click', () => this.exportFile('kmz'));
+                exportCSV.addEventListener('click', () => this.exportFile('csv'));
+
+                // Settings listeners
+                document.getElementById('snapRadius').addEventListener('change', (e) => {
+                    this.settings.snapRadius = parseInt(e.target.value);
+                });
+                document.getElementById('snapMode').addEventListener('change', (e) => {
+                    this.settings.snapMode = e.target.value;
+                });
+                document.getElementById('polylineMode').addEventListener('change', (e) => {
+                    this.settings.polylineMode = e.target.value;
+                });
+            }
+
+            log(message, type = 'info') {
+                const logArea = document.getElementById('logArea');
+                const timestamp = new Date().toLocaleTimeString();
+                const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+                logArea.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+                logArea.scrollTop = logArea.scrollHeight;
+            }
+
+            updateProgress(percent, text = '') {
+                const progressContainer = document.getElementById('progressContainer');
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                
+                if (percent === 0) {
+                    progressContainer.style.display = 'none';
+                } else {
+                    progressContainer.style.display = 'block';
+                    progressFill.style.width = percent + '%';
+                    progressText.textContent = text || `${percent}%`;
+                }
+            }
+
+            updateStats() {
+                document.getElementById('statPoles').textContent = this.data.poles.length;
+                document.getElementById('statTikor').textContent = this.data.fat.length + this.data.fdt.length;
+                document.getElementById('statPolylines').textContent = this.data.polylines.length;
+                
+                const processed = this.data.snapped ? 
+                    (this.data.snapped.fat.length + this.data.snapped.fdt.length + this.data.snapped.polylines.length) : 0;
+                document.getElementById('statProcessed').textContent = processed;
+            }
+
+            async handleFileUpload(event) {
+                const files = Array.from(event.target.files);
+                const fileInfo = document.getElementById('fileInfo');
+                
+                if (files.length === 0) return;
+
+                this.log(`Memuat ${files.length} file...`);
+                fileInfo.style.display = 'block';
+                
+                let totalSize = 0;
+                let fileList = '';
+                
+                for (const file of files) {
+                    totalSize += file.size;
+                    fileList += `${file.name} (${this.formatFileSize(file.size)})\n`;
+                }
+                
+                fileInfo.innerHTML = `
+                    <strong>File yang dimuat:</strong><br>
+                    ${fileList.replace(/\n/g, '<br>')}
+                    <strong>Total ukuran:</strong> ${this.formatFileSize(totalSize)}
+                `;
+
+                this.files = files;
+                document.getElementById('parseBtn').disabled = false;
+                this.log('File berhasil dimuat. Klik "Parse & Analisis File" untuk melanjutkan.', 'success');
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            async parseFiles() {
+                if (!this.files || this.files.length === 0) return;
+                
+                this.log('Memulai parsing file...');
+                this.updateProgress(10, 'Parsing file...');
+                
+                try {
+                    for (const file of this.files) {
+                        if (file.name.endsWith('.kmz')) {
+                            await this.parseKMZ(file);
+                        } else if (file.name.endsWith('.kml')) {
+                            await this.parseKML(file);
+                        }
+                    }
+                    
+                    this.updateProgress(100, 'Parsing selesai');
+                    this.log(`Parsing selesai. Ditemukan: ${this.data.poles.length} POLE, ${this.data.fat.length} FAT, ${this.data.fdt.length} FDT, ${this.data.polylines.length} Polyline`, 'success');
+                    
+                    this.updateFolderStructure();
+                    this.updateStats();
+                    this.enableButtons();
+                    
+                    setTimeout(() => this.updateProgress(0), 2000);
+                } catch (error) {
+                    this.log(`Error parsing file: ${error.message}`, 'error');
+                    this.updateProgress(0);
+                }
+            }
+
+            async parseKMZ(file) {
+                const zip = new JSZip();
+                const contents = await zip.loadAsync(file);
+                
+                for (const filename in contents.files) {
+                    if (filename.endsWith('.kml')) {
+                        const kmlContent = await contents.files[filename].async('text');
+                        this.parseKMLContent(kmlContent, filename);
+                    }
+                }
+            }
+
+            async parseKML(file) {
+                const text = await file.text();
+                this.parseKMLContent(text, file.name);
+            }
+
+            parseKMLContent(kmlContent, filename) {
+                this.log(`Parsing ${filename}...`);
+                
+                const parser = new DOMParser();
+                const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+                
+                // Parse folders
+                const folders = kmlDoc.querySelectorAll('Folder');
+                
+                folders.forEach(folder => {
+                    const folderName = folder.querySelector('name')?.textContent?.toUpperCase();
+                    const placemarks = folder.querySelectorAll('Placemark');
+                    
+                    placemarks.forEach(placemark => {
+                        const name = placemark.querySelector('name')?.textContent || '';
+                        const coordinates = this.extractCoordinates(placemark);
+                        
+                        if (!coordinates) return;
+                        
+                        const item = {
+                            name: name,
+                            folder: folderName,
+                            coordinates: coordinates,
+                            original: placemark.cloneNode(true)
+                        };
+                        
+                        switch (folderName) {
+                            case 'POLE':
+                                this.data.poles.push(item);
+                                break;
+                            case 'FAT':
+                                this.data.fat.push(item);
+                                break;
+                            case 'FDT':
+                                this.data.fdt.push(item);
+                                break;
+                            case 'POLYLINE':
+                                this.data.polylines.push(item);
+                                break;
+                        }
+                    });
+                });
+                
+                // Store original document for export
+                if (!this.data.original) {
+                    this.data.original = kmlDoc;
+                }
+            }
+
+            extractCoordinates(placemark) {
+                const point = placemark.querySelector('Point coordinates');
+                const lineString = placemark.querySelector('LineString coordinates');
+                
+                if (point) {
+                    const coords = point.textContent.trim().split(',');
+                    return {
+                        type: 'Point',
+                        coordinates: [parseFloat(coords[0]), parseFloat(coords[1]), parseFloat(coords[2] || 0)]
+                    };
+                } else if (lineString) {
+                    const coordsText = lineString.textContent.trim();
+                    const coordPairs = coordsText.split(/\s+/);
+                    const coordinates = coordPairs.map(pair => {
+                        const coords = pair.split(',');
+                        return [parseFloat(coords[0]), parseFloat(coords[1]), parseFloat(coords[2] || 0)];
+                    });
+                    return {
+                        type: 'LineString',
+                        coordinates: coordinates
+                    };
+                }
+                
+                return null;
+            }
+
+            updateFolderStructure() {
+                const container = document.getElementById('folderStructure');
+                const folders = [
+                    { name: 'POLE', count: this.data.poles.length, color: '#007bff' },
+                    { name: 'FAT', count: this.data.fat.length, color: '#28a745' },
+                    { name: 'FDT', count: this.data.fdt.length, color: '#ffc107' },
+                    { name: 'POLYLINE', count: this.data.polylines.length, color: '#dc3545' }
+                ];
+                
+                container.innerHTML = folders.map(folder => `
+                    <div class="folder-item">
+                        <span class="folder-name">📁 ${folder.name}</span>
+                        <span class="folder-count" style="background: ${folder.color}">${folder.count}</span>
+                    </div>
+                `).join('');
+            }
+
+            enableButtons() {
+                document.getElementById('snapBtn').disabled = false;
+                document.getElementById('previewBtn').disabled = false;
+            }
+
+            async startSnapping() {
+                if (this.data.poles.length === 0) {
+                    this.log('Tidak ada data POLE untuk referensi snapping', 'error');
+                    return;
+                }
+                
+                this.log('Memulai proses snapping...');
+                this.updateProgress(10, 'Inisialisasi spatial index...');
+                
+                // Save current state for undo
+                this.history.push(JSON.parse(JSON.stringify(this.data)));
+                
+                try {
+                    // Build spatial index for POLE points
+                    const poleIndex = this.buildSpatialIndex(this.data.poles);
+                    
+                    this.data.snapped = {
+                        fat: [],
+                        fdt: [],
+                        polylines: []
+                    };
+                    
+                    // Snap FAT points
+                    this.updateProgress(30, 'Snapping FAT points...');
+                    for (const fatPoint of this.data.fat) {
+                        const snapped = this.snapToNearestPole(fatPoint, poleIndex);
+                        this.data.snapped.fat.push(snapped);
+                        await this.sleep(1); // Prevent blocking
+                    }
+                    
+                    // Snap FDT points
+                    this.updateProgress(60, 'Snapping FDT points...');
+                    for (const fdtPoint of this.data.fdt) {
+                        const snapped = this.snapToNearestPole(fdtPoint, poleIndex);
+                        this.data.snapped.fdt.push(snapped);
+                        await this.sleep(1);
+                    }
+                    
+                    // Process polylines
+                    this.updateProgress(80, 'Processing polylines...');
+                    for (const polyline of this.data.polylines) {
+                        const snapped = this.processPolyline(polyline, poleIndex);
+                        this.data.snapped.polylines.push(snapped);
+                        await this.sleep(1);
+                    }
+                    
+                    this.updateProgress(100, 'Snapping selesai');
+                    this.log('Proses snapping selesai!', 'success');
+                    this.updateStats();
+                    this.updateResultsTable();
+                    this.enableExportButtons();
+                    
+                    setTimeout(() => this.updateProgress(0), 2000);
+                } catch (error) {
+                    this.log(`Error saat snapping: ${error.message}`, 'error');
+                    this.updateProgress(0);
+                }
+            }
+
+            buildSpatialIndex(poles) {
+                // Simple spatial index - for large datasets, implement R-tree or KD-tree
+                return poles.map(pole => ({
+                    ...pole,
+                    x: pole.coordinates.coordinates[0],
+                    y: pole.coordinates.coordinates[1]
+                }));
+            }
+
+            snapToNearestPole(point, poleIndex) {
+                const pointCoords = point.coordinates.coordinates;
+                let nearestPole = null;
+                let minDistance = Infinity;
+                
+                for (const pole of poleIndex) {
+                    const distance = this.calculateDistance(
+                        pointCoords[1], pointCoords[0],
+                        pole.y, pole.x
+                    );
+                    
+                    if (distance < minDistance && distance <= this.settings.snapRadius) {
+                        minDistance = distance;
+                        nearestPole = pole;
+                    }
+                }
+                
+                if (nearestPole) {
+                    return {
+                        ...point,
+                        snappedTo: nearestPole.name,
+                        snapDistance: Math.round(minDistance),
+                        coordinates: {
+                            ...point.coordinates,
+                            coordinates: [nearestPole.x, nearestPole.y, pointCoords[2] || 0]
+                        },
+                        status: 'snapped'
+                    };
+                } else {
+                    return {
+                        ...point,
+                        snapDistance: null,
+                        status: 'not_snapped'
+                    };
+                }
+            }
+
+            processPolyline(polyline, poleIndex) {
+                const coords = polyline.coordinates.coordinates;
+                
+                if (this.settings.polylineMode === 'pole-guided' && coords.length === 2) {
+                    // POLE-guided mode for 2-point polylines
+                    const startPole = this.findNearestPole(coords[0], poleIndex);
+                    const endPole = this.findNearestPole(coords[coords.length - 1], poleIndex);
+                    
+                    if (startPole && endPole) {
+                        const path = this.buildPoleGuidedPath(startPole, endPole, poleIndex);
+                        return {
+                            ...polyline,
+                            coordinates: {
+                                type: 'LineString',
+                                coordinates: path
+                            },
+                            snappedTo: `${startPole.name} → ${endPole.name}`,
+                            snapDistance: 0,
+                            status: 'pole_guided',
+                            pathLength: path.length
+                        };
+                    }
+                }
+                
+                // Standard snapping mode
+                const snappedCoords = coords.map(coord => {
+                    const nearestPole = this.findNearestPole(coord, poleIndex);
+                    return nearestPole ? [nearestPole.x, nearestPole.y, coord[2] || 0] : coord;
+                });
+                
+                return {
+                    ...polyline,
+                    coordinates: {
+                        ...polyline.coordinates,
+                        coordinates: snappedCoords
+                    },
+                    status: 'snapped'
+                };
+            }
+
+            buildPoleGuidedPath(startPole, endPole, poleIndex) {
+                // Extract POLE numbers and build sequential path
+                const startNum = this.extractPoleNumber(startPole.name);
+                const endNum = this.extractPoleNumber(endPole.name);
+                
+                if (startNum === null || endNum === null) {
+                    return [[startPole.x, startPole.y, 0], [endPole.x, endPole.y, 0]];
+                }
+                
+                const path = [];
+                const step = startNum < endNum ? 1 : -1;
+                
+                for (let i = startNum; step > 0 ? i <= endNum : i >= endNum; i += step) {
+                    const pole = poleIndex.find(p => this.extractPoleNumber(p.name) === i);
+                    if (pole) {
+                        path.push([pole.x, pole.y, 0]);
+                    }
+                }
+                
+                return path.length > 1 ? path : [[startPole.x, startPole.y, 0], [endPole.x, endPole.y, 0]];
+            }
+
+            extractPoleNumber(poleName) {
+                const match = poleName.match(/(\d+)/);
+                return match ? parseInt(match[1]) : null;
+            }
+
+            findNearestPole(coord, poleIndex) {
+                let nearestPole = null;
+                let minDistance = Infinity;
+                
+                for (const pole of poleIndex) {
+                    const distance = this.calculateDistance(coord[1], coord[0], pole.y, pole.x);
+                    if (distance < minDistance && distance <= this.settings.snapRadius) {
+                        minDistance = distance;
+                        nearestPole = pole;
+                    }
+                }
+                
+                return nearestPole;
+            }
+
+            calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371000; // Earth radius in meters
+                const dLat = this.toRadians(lat2 - lat1);
+                const dLon = this.toRadians(lon2 - lon1);
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            toRadians(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+
+            updateResultsTable() {
+                const tableBody = document.querySelector('#resultsTable tbody');
+                const results = [];
+                
+                if (this.data.snapped) {
+                    // Add FAT results
+                    this.data.snapped.fat.forEach(item => {
+                        results.push({
+                            name: item.name,
+                            type: 'FAT',
+                            distance: item.snapDistance,
+                            target: item.snappedTo || '-',
+                            status: item.status
+                        });
+                    });
+                    
+                    // Add FDT results
+                    this.data.snapped.fdt.forEach(item => {
+                        results.push({
+                            name: item.name,
+                            type: 'FDT',
+                            distance: item.snapDistance,
+                            target: item.snappedTo || '-',
+                            status: item.status
+                        });
+                    });
+                    
+                    // Add Polyline results
+                    this.data.snapped.polylines.forEach(item => {
+                        results.push({
+                            name: item.name,
+                            type: 'Polyline',
+                            distance: item.snapDistance || 0,
+                            target: item.snappedTo || '-',
+                            status: item.status
+                        });
+                    });
+                }
+                
+                const rows = results.slice(0, 100).map(result => `
+                    <tr>
+                        <td>${result.name}</td>
+                        <td>${result.type}</td>
+                        <td>${result.distance !== null ? result.distance + ' m' : '-'}</td>
+                        <td>${result.target}</td>
+                        <td><span class="status-badge status-${this.getStatusClass(result.status)}">${this.getStatusText(result.status)}</span></td>
+                    </tr>
+                `).join('');
+                
+                tableBody.innerHTML = rows + (results.length > 100 ? `<tr><td colspan="5"><em>... dan ${results.length - 100} item lainnya</em></td></tr>` : '');
+            }
+
+            getStatusClass(status) {
+                switch (status) {
+                    case 'snapped': return 'success';
+                    case 'pole_guided': return 'success';
+                    case 'not_snapped': return 'warning';
+                    default: return 'error';
+                }
+            }
+
+            getStatusText(status) {
+                switch (status) {
+                    case 'snapped': return 'Snapped';
+                    case 'pole_guided': return 'POLE Guided';
+                    case 'not_snapped': return 'Not Snapped';
+                    default: return 'Error';
+                }
+            }
+
+            previewResults() {
+                if (!this.data.snapped) {
+                    this.log('Belum ada hasil snapping untuk di-preview', 'error');
+                    return;
+                }
+                
+                // Calculate statistics
+                const totalItems = this.data.snapped.fat.length + this.data.snapped.fdt.length + this.data.snapped.polylines.length;
+                const snappedItems = [...this.data.snapped.fat, ...this.data.snapped.fdt, ...this.data.snapped.polylines]
+                    .filter(item => item.status === 'snapped' || item.status === 'pole_guided').length;
+                const avgDistance = this.calculateAverageSnapDistance();
+                
+                this.log(`Preview hasil snapping:`, 'success');
+                this.log(`- Total item: ${totalItems}`);
+                this.log(`- Item ter-snap: ${snappedItems} (${Math.round(snappedItems/totalItems*100)}%)`);
+                this.log(`- Rata-rata jarak snap: ${avgDistance.toFixed(2)} meter`);
+                
+                this.updateResultsTable();
+            }
+
+            calculateAverageSnapDistance() {
+                const allItems = [...this.data.snapped.fat, ...this.data.snapped.fdt];
+                const validDistances = allItems
+                    .filter(item => item.snapDistance !== null && item.snapDistance !== undefined)
+                    .map(item => item.snapDistance);
+                
+                return validDistances.length > 0 
+                    ? validDistances.reduce((a, b) => a + b, 0) / validDistances.length 
+                    : 0;
+            }
+
+            undoLastAction() {
+                if (this.history.length === 0) {
+                    this.log('Tidak ada aksi untuk di-undo', 'error');
+                    return;
+                }
+                
+                this.data = this.history.pop();
+                this.updateStats();
+                this.log('Aksi terakhir berhasil di-undo', 'success');
+                
+                // Clear results table
+                document.querySelector('#resultsTable tbody').innerHTML = '';
+                
+                // Disable export buttons if no snapped data
+                if (!this.data.snapped) {
+                    this.disableExportButtons();
+                }
+                
+                document.getElementById('undoBtn').disabled = this.history.length === 0;
+            }
+
+            enableExportButtons() {
+                document.getElementById('exportKML').disabled = false;
+                document.getElementById('exportKMZ').disabled = false;
+                document.getElementById('exportCSV').disabled = false;
+                document.getElementById('undoBtn').disabled = false;
+            }
+
+            disableExportButtons() {
+                document.getElementById('exportKML').disabled = true;
+                document.getElementById('exportKMZ').disabled = true;
+                document.getElementById('exportCSV').disabled = true;
+            }
+
+            async exportFile(format) {
+                if (!this.data.snapped) {
+                    this.log('Tidak ada data untuk diekspor', 'error');
+                    return;
+                }
+                
+                this.log(`Memulai ekspor format ${format.toUpperCase()}...`);
+                
+                try {
+                    switch (format) {
+                        case 'kml':
+                            await this.exportKML();
+                            break;
+                        case 'kmz':
+                            await this.exportKMZ();
+                            break;
+                        case 'csv':
+                            await this.exportCSV();
+                            break;
+                    }
+                } catch (error) {
+                    this.log(`Error saat ekspor: ${error.message}`, 'error');
+                }
+            }
+
+            async exportKML() {
+                const kmlContent = this.generateKMLContent();
+                const blob = new Blob([kmlContent], { type: 'application/vnd.google-earth.kml+xml' });
+                this.downloadFile(blob, 'snapped_result.kml');
+                this.log('File KML berhasil diekspor', 'success');
+            }
+
+            async exportKMZ() {
+                const zip = new JSZip();
+                const kmlContent = this.generateKMLContent();
+                zip.file('doc.kml', kmlContent);
+                
+                const content = await zip.generateAsync({ type: 'blob' });
+                this.downloadFile(content, 'snapped_result.kmz');
+                this.log('File KMZ berhasil diekspor', 'success');
+            }
+
+            async exportCSV() {
+                const csvContent = this.generateCSVContent();
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                this.downloadFile(blob, 'snapping_results.csv');
+                this.log('File CSV berhasil diekspor', 'success');
+            }
+
+            generateKMLContent() {
+                let kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>POLE-Guided Snapping Results</name>
+    <description>Hasil snapping menggunakan POLE-Guided Spatial Anchoring Tool</description>
+    
+    <Folder>
+      <name>POLE</name>
+      <description>Reference POLE points</description>`;
+      
+                // Add POLE points (unchanged)
+                this.data.poles.forEach(pole => {
+                    const coords = pole.coordinates.coordinates;
+                    kmlContent += `
+      <Placemark>
+        <name>${pole.name}</name>
+        <Point>
+          <coordinates>${coords[0]},${coords[1]},${coords[2] || 0}</coordinates>
+        </Point>
+      </Placemark>`;
+                });
+                
+                kmlContent += `
+    </Folder>
+    
+    <Folder>
+      <name>FAT_SNAPPED</name>
+      <description>Snapped FAT points</description>`;
+      
+                // Add snapped FAT points
+                this.data.snapped.fat.forEach(fat => {
+                    const coords = fat.coordinates.coordinates;
+                    kmlContent += `
+      <Placemark>
+        <name>${fat.name}</name>
+        <description>Snapped to: ${fat.snappedTo || 'None'}, Distance: ${fat.snapDistance || 'N/A'} m</description>
+        <Point>
+          <coordinates>${coords[0]},${coords[1]},${coords[2] || 0}</coordinates>
+        </Point>
+      </Placemark>`;
+                });
+                
+                kmlContent += `
+    </Folder>
+    
+    <Folder>
+      <name>FDT_SNAPPED</name>
+      <description>Snapped FDT points</description>`;
+      
+                // Add snapped FDT points
+                this.data.snapped.fdt.forEach(fdt => {
+                    const coords = fdt.coordinates.coordinates;
+                    kmlContent += `
+      <Placemark>
+        <name>${fdt.name}</name>
+        <description>Snapped to: ${fdt.snappedTo || 'None'}, Distance: ${fdt.snapDistance || 'N/A'} m</description>
+        <Point>
+          <coordinates>${coords[0]},${coords[1]},${coords[2] || 0}</coordinates>
+        </Point>
+      </Placemark>`;
+                });
+                
+                kmlContent += `
+    </Folder>
+    
+    <Folder>
+      <name>POLYLINE_PROCESSED</name>
+      <description>Processed polylines</description>`;
+      
+                // Add processed polylines
+                this.data.snapped.polylines.forEach(polyline => {
+                    const coords = polyline.coordinates.coordinates;
+                    const coordsString = coords.map(coord => `${coord[0]},${coord[1]},${coord[2] || 0}`).join(' ');
+                    kmlContent += `
+      <Placemark>
+        <name>${polyline.name}</name>
+        <description>Status: ${polyline.status}, Path: ${polyline.snappedTo || 'Direct'}</description>
+        <LineString>
+          <coordinates>${coordsString}</coordinates>
+        </LineString>
+      </Placemark>`;
+                });
+                
+                kmlContent += `
+    </Folder>
+  </Document>
+</kml>`;
+                
+                return kmlContent;
+            }
+
+            generateCSVContent() {
+                let csvContent = 'Name,Type,Original_Lon,Original_Lat,Snapped_Lon,Snapped_Lat,Snap_Distance_m,Target_POLE,Status\n';
+                
+                // Add FAT data
+                this.data.fat.forEach((original, index) => {
+                    const snapped = this.data.snapped.fat[index];
+                    const origCoords = original.coordinates.coordinates;
+                    const snapCoords = snapped.coordinates.coordinates;
+                    
+                    csvContent += `"${original.name}",FAT,${origCoords[0]},${origCoords[1]},${snapCoords[0]},${snapCoords[1]},${snapped.snapDistance || ''},${snapped.snappedTo || ''},${snapped.status}\n`;
+                });
+                
+                // Add FDT data
+                this.data.fdt.forEach((original, index) => {
+                    const snapped = this.data.snapped.fdt[index];
+                    const origCoords = original.coordinates.coordinates;
+                    const snapCoords = snapped.coordinates.coordinates;
+                    
+                    csvContent += `"${original.name}",FDT,${origCoords[0]},${origCoords[1]},${snapCoords[0]},${snapCoords[1]},${snapped.snapDistance || ''},${snapped.snappedTo || ''},${snapped.status}\n`;
+                });
+                
+                // Add Polyline data
+                this.data.polylines.forEach((original, index) => {
+                    const snapped = this.data.snapped.polylines[index];
+                    const origStart = original.coordinates.coordinates[0];
+                    const snapStart = snapped.coordinates.coordinates[0];
+                    
+                    csvContent += `"${original.name}",Polyline,${origStart[0]},${origStart[1]},${snapStart[0]},${snapStart[1]},${snapped.snapDistance || 0},${snapped.snappedTo || ''},${snapped.status}\n`;
+                });
+                
+                return csvContent;
+            }
+
+            downloadFile(blob, filename) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Initialize the application
+        const app = new POLESpatialTool();
+    </script>
+</body>
+</html>

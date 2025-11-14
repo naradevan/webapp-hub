@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced KML/KMZ Placemark Organizer</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #4a6fa5;
+            --secondary-color: #3a5a7a;
+            --accent-color: #5d8bf4;
+            --error-color: #d32f2f;
+            --success-color: #388e3c;
+            --border-color: #444;
+            --input-bg: #2d2d2d;
+            --card-bg: #252525;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .upload-section.drag-over {
+            border-color: var(--accent-color);
+            background-color: var(--secondary-color);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .file-info {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .btn:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background-color: var(--error-color);
+        }
+
+        .btn-reset:hover {
+            background-color: #b71c1c;
+        }
+
+        .btn-kml {
+            background-color: #2e7d32;
+        }
+
+        .btn-kml:hover {
+            background-color: #4caf50;
+        }
+
+        .btn-kmz {
+            background-color: #7b1fa2;
+        }
+
+        .btn-kmz:hover {
+            background-color: #9c27b0;
+        }
+
+        .status-panel {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .status-item {
+            background-color: var(--input-bg);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .status-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .preview-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .folder-preview {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .folder {
+            margin-bottom: 15px;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        .folder-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .placemark-item {
+            margin-left: 15px;
+            padding: 3px 0;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: var(--input-bg);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error-color);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .performance-note {
+            background-color: var(--input-bg);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced KML/KMZ Placemark Organizer</h1>
+        
+        <div class="performance-note">
+            <strong>Note:</strong> This tool can handle large files with 30,000+ placemarks. Processing may take some time for very large files.
+        </div>
+        
+        <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" class="file-input" accept=".kml,.kmz">
+            <button class="upload-btn" id="uploadBtn">Choose KML/KMZ File</button>
+            <p>or drag and drop file here</p>
+            <div class="file-info" id="fileInfo">No file selected</div>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <div id="loadingText">Processing...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-kml" id="downloadKmlBtn" disabled>Download KML</button>
+            <button class="btn btn-kmz" id="downloadKmzBtn" disabled>Download KMZ</button>
+            <button class="btn btn-reset" id="resetBtn">Reset</button>
+        </div>
+        
+        <div class="status-panel">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">Polygons (Zones)</div>
+                    <div id="polygonCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Points (Targets)</div>
+                    <div id="pointCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Matched Points</div>
+                    <div id="matchedCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Folders Created</div>
+                    <div id="folderCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Images Found</div>
+                    <div id="imageCount">0</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Processing Status</div>
+                    <div id="processingStatus">Ready</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="folder-preview">
+                <h3>Folder Preview</h3>
+                <div id="folderPreview"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const dropZone = document.getElementById('dropZone');
+        const fileInfo = document.getElementById('fileInfo');
+        const downloadKmlBtn = document.getElementById('downloadKmlBtn');
+        const downloadKmzBtn = document.getElementById('downloadKmzBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const loadingText = document.getElementById('loadingText');
+        const progressBar = document.getElementById('progressBar');
+        
+        // Status elements
+        const polygonCountEl = document.getElementById('polygonCount');
+        const pointCountEl = document.getElementById('pointCount');
+        const matchedCountEl = document.getElementById('matchedCount');
+        const folderCountEl = document.getElementById('folderCount');
+        const imageCountEl = document.getElementById('imageCount');
+        const processingStatusEl = document.getElementById('processingStatus');
+        const folderPreview = document.getElementById('folderPreview');
+        
+        // App state
+        let appState = {
+            file: null,
+            fileName: '',
+            fileType: '', // 'kml' or 'kmz'
+            kmlContent: '',
+            processedKml: '',
+            polygons: [],
+            points: [],
+            folders: [],
+            unmatchedPoints: [],
+            originalStyles: new Map(),
+            kmzImages: new Map(),
+            kmzFiles: new Map(),
+            processingComplete: false,
+            polygonIdCounter: 0
+        };
+        
+        // Event Listeners
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+        downloadKmlBtn.addEventListener('click', () => downloadResult('kml'));
+        downloadKmzBtn.addEventListener('click', () => downloadResult('kmz'));
+        resetBtn.addEventListener('click', resetApp);
+        
+        // File handling
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadFile(file);
+            }
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+            
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                loadFile(file);
+            }
+        }
+        
+        async function loadFile(file) {
+            resetApp(false);
+            
+            appState.file = file;
+            appState.fileName = file.name;
+            appState.fileType = file.name.toLowerCase().endsWith('.kmz') ? 'kmz' : 'kml';
+            
+            fileInfo.textContent = `Selected: ${file.name}`;
+            processingStatusEl.textContent = 'Processing...';
+            
+            showMessage('success', `File loaded: ${file.name}. Auto-processing...`);
+            
+            // Auto-process file
+            await processFile();
+        }
+        
+        // Main processing function
+        async function processFile() {
+            if (!appState.file) return;
+            
+            try {
+                showLoading(true, "Reading file...");
+                progressBar.style.width = '10%';
+                
+                // Read file content
+                const fileContent = await readFileContent(appState.file);
+                progressBar.style.width = '20%';
+                
+                showLoading(true, "Extracting content...");
+                
+                // For KMZ, extract KML and images
+                if (appState.fileType === 'kmz') {
+                    const extracted = await extractContentFromKmz(fileContent);
+                    appState.kmlContent = extracted.kml;
+                    appState.kmzImages = extracted.images;
+                    appState.kmzFiles = extracted.allFiles;
+                    imageCountEl.textContent = extracted.images.size;
+                } else {
+                    appState.kmlContent = fileContent;
+                    imageCountEl.textContent = '0';
+                }
+                progressBar.style.width = '30%';
+                
+                showLoading(true, "Parsing KML structure...");
+                
+                // Parse KML with optimizations for large files
+                const kmlDoc = await parseKmlWithProgress(appState.kmlContent);
+                progressBar.style.width = '40%';
+                
+                // Extract polygons and points with progress updates
+                showLoading(true, "Extracting placemarks...");
+                await extractPlacemarksWithProgress(kmlDoc);
+                progressBar.style.width = '60%';
+                
+                // Process point-in-polygon checks with progress
+                showLoading(true, "Processing spatial relationships...");
+                await processPointInPolygonChecks(kmlDoc);
+                progressBar.style.width = '80%';
+                
+                // Generate the processed KML
+                showLoading(true, "Generating output...");
+                appState.processedKml = generateProcessedKml(kmlDoc);
+                progressBar.style.width = '90%';
+                
+                // Update UI with results
+                updateResultsUI();
+                progressBar.style.width = '100%';
+                
+                appState.processingComplete = true;
+                downloadKmlBtn.disabled = false;
+                downloadKmzBtn.disabled = false;
+                processingStatusEl.textContent = 'Complete';
+                
+                showMessage('success', 'Processing complete! Ready to download.');
+            } catch (error) {
+                console.error('Error processing file:', error);
+                showMessage('error', `Error: ${error.message}`);
+                processingStatusEl.textContent = 'Error';
+            } finally {
+                showLoading(false);
+                setTimeout(() => progressBar.style.width = '0%', 1000);
+            }
+        }
+        
+        // Optimized parsing for large files
+        async function parseKmlWithProgress(kmlContent) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const parser = new DOMParser();
+                    const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+                    
+                    // Check for parsing errors
+                    const parseError = kmlDoc.querySelector('parsererror');
+                    if (parseError) {
+                        throw new Error('Invalid KML/XML format');
+                    }
+                    
+                    resolve(kmlDoc);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+        
+        // File reading helpers
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(new Error('Failed to read file'));
+                
+                if (appState.fileType === 'kmz') {
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+        }
+        
+        async function extractContentFromKmz(arrayBuffer) {
+            try {
+                const JSZip = await loadJSZip();
+                const zip = await JSZip.loadAsync(arrayBuffer);
+                
+                const result = {
+                    kml: '',
+                    images: new Map(),
+                    allFiles: new Map()
+                };
+                
+                // Find the main KML file
+                let mainKmlFile = null;
+                const kmlFiles = [];
+                
+                for (const [filename, file] of Object.entries(zip.files)) {
+                    if (!file.dir) {
+                        result.allFiles.set(filename, file);
+                        
+                        if (filename.toLowerCase().endsWith('.kml')) {
+                            kmlFiles.push({ filename, file });
+                            if (filename.toLowerCase() === 'doc.kml' || 
+                                filename.toLowerCase().indexOf('doc') !== -1) {
+                                mainKmlFile = file;
+                            }
+                        } else if (filename.match(/\.(png|jpg|jpeg|gif|bmp)$/i)) {
+                            const imageBlob = await file.async('blob');
+                            result.images.set(filename, imageBlob);
+                        }
+                    }
+                }
+                
+                // Use the main KML file or the first one found
+                const targetKmlFile = mainKmlFile || (kmlFiles.length > 0 ? kmlFiles[0].file : null);
+                
+                if (!targetKmlFile) {
+                    throw new Error('No KML file found in the KMZ archive');
+                }
+                
+                result.kml = await targetKmlFile.async('text');
+                return result;
+            } catch (error) {
+                console.error('Error extracting content from KMZ:', error);
+                throw new Error('Failed to extract content from KMZ file: ' + error.message);
+            }
+        }
+        
+        // Lazy load JSZip only when needed for KMZ files
+        let jszipPromise = null;
+        function loadJSZip() {
+            if (!jszipPromise) {
+                jszipPromise = new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                    script.onload = () => {
+                        if (window.JSZip) {
+                            resolve(window.JSZip);
+                        } else {
+                            reject(new Error('JSZip failed to load'));
+                        }
+                    };
+                    script.onerror = () => reject(new Error('Failed to load JSZip library'));
+                    document.head.appendChild(script);
+                });
+            }
+            return jszipPromise;
+        }
+        
+        // Optimized placemark extraction for large files
+        async function extractPlacemarksWithProgress(kmlDoc) {
+            const placemarks = Array.from(kmlDoc.getElementsByTagName('Placemark'));
+            
+            // Extract styles first
+            extractStyles(kmlDoc);
+            
+            const batchSize = 1000;
+            let processedCount = 0;
+            
+            appState.polygons = [];
+            appState.points = [];
+            
+            for (let i = 0; i < placemarks.length; i += batchSize) {
+                const batch = placemarks.slice(i, Math.min(i + batchSize, placemarks.length));
+                
+                batch.forEach(placemark => {
+                    const hasPolygon = hasPolygonGeometry(placemark);
+                    const hasPoint = hasPointGeometry(placemark);
+                    
+                    if (hasPolygon && !hasPoint) {
+                        appState.polygons.push(placemark);
+                    } else if (hasPoint && !hasPolygon) {
+                        appState.points.push(placemark);
+                    }
+                });
+                
+                processedCount += batch.length;
+                
+                // Update progress for very large files
+                if (placemarks.length > 5000) {
+                    const progress = (processedCount / placemarks.length) * 20 + 40; // 20% of total progress
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Allow UI to update
+                    await new Promise(resolve => setTimeout(resolve, 1));
+                }
+            }
+            
+            polygonCountEl.textContent = appState.polygons.length;
+            pointCountEl.textContent = appState.points.length;
+        }
+        
+        // Extract and preserve styles
+        function extractStyles(kmlDoc) {
+            appState.originalStyles.clear();
+            
+            // Extract Style elements
+            const styles = kmlDoc.getElementsByTagName('Style');
+            for (const style of styles) {
+                const id = style.getAttribute('id');
+                if (id) {
+                    appState.originalStyles.set(id, style.cloneNode(true));
+                }
+            }
+            
+            // Extract StyleMap elements
+            const styleMaps = kmlDoc.getElementsByTagName('StyleMap');
+            for (const styleMap of styleMaps) {
+                const id = styleMap.getAttribute('id');
+                if (id) {
+                    appState.originalStyles.set(id, styleMap.cloneNode(true));
+                }
+            }
+        }
+        
+        function hasPolygonGeometry(placemark) {
+            if (placemark.getElementsByTagName('Polygon').length > 0) return true;
+            
+            const multiGeometry = placemark.getElementsByTagName('MultiGeometry')[0];
+            if (multiGeometry) {
+                return multiGeometry.getElementsByTagName('Polygon').length > 0;
+            }
+            
+            return false;
+        }
+        
+        function hasPointGeometry(placemark) {
+            if (placemark.getElementsByTagName('Point').length > 0) return true;
+            
+            const multiGeometry = placemark.getElementsByTagName('MultiGeometry')[0];
+            if (multiGeometry) {
+                return multiGeometry.getElementsByTagName('Point').length > 0;
+            }
+            
+            return false;
+        }
+        
+        async function processPointInPolygonChecks(kmlDoc) {
+            appState.folders = [];
+            appState.unmatchedPoints = [];
+            
+            // Create a folder for each polygon with proper naming
+            appState.polygons.forEach((polygonPlacemark, index) => {
+                const nameNode = polygonPlacemark.getElementsByTagName('name')[0];
+                let folderName = nameNode ? nameNode.textContent.trim() : '';
+                
+                // Handle empty names
+                if (!folderName) {
+                    appState.polygonIdCounter++;
+                    folderName = `Polygon_${appState.polygonIdCounter}`;
+                    
+                    // Update the placemark name
+                    if (!nameNode) {
+                        const newNameNode = kmlDoc.createElement('name');
+                        newNameNode.textContent = folderName;
+                        polygonPlacemark.insertBefore(newNameNode, polygonPlacemark.firstChild);
+                    } else {
+                        nameNode.textContent = folderName;
+                    }
+                }
+                
+                appState.folders.push({
+                    name: folderName,
+                    placemark: polygonPlacemark,
+                    points: []
+                });
+            });
+            
+            // Process points in batches for large files
+            const batchSize = 500;
+            let matchedCount = 0;
+            let processedPoints = 0;
+            
+            for (let i = 0; i < appState.points.length; i += batchSize) {
+                const batch = appState.points.slice(i, Math.min(i + batchSize, appState.points.length));
+                
+                for (const pointPlacemark of batch) {
+                    // Handle empty point names
+                    const nameNode = pointPlacemark.getElementsByTagName('name')[0];
+                    if (!nameNode || !nameNode.textContent.trim()) {
+                        const newName = `Point_${processedPoints + 1}`;
+                        if (!nameNode) {
+                            const newNameNode = kmlDoc.createElement('name');
+                            newNameNode.textContent = newName;
+                            pointPlacemark.insertBefore(newNameNode, pointPlacemark.firstChild);
+                        } else {
+                            nameNode.textContent = newName;
+                        }
+                    }
+                    
+                    const point = extractPointCoordinates(pointPlacemark);
+                    if (!point) {
+                        processedPoints++;
+                        continue;
+                    }
+                    
+                    let matched = false;
+                    
+                    for (const folder of appState.folders) {
+                        const polygons = extractPolygonCoordinates(folder.placemark);
+                        if (!polygons || polygons.length === 0) continue;
+                        
+                        const isInside = polygons.some(polygon => 
+                            isPointInPolygon(point, polygon)
+                        );
+                        
+                        if (isInside) {
+                            folder.points.push(pointPlacemark);
+                            matched = true;
+                            matchedCount++;
+                            break;
+                        }
+                    }
+                    
+                    if (!matched) {
+                        appState.unmatchedPoints.push(pointPlacemark);
+                    }
+                    
+                    processedPoints++;
+                }
+                
+                // Update progress for large files
+                if (appState.points.length > 1000) {
+                    const progress = (processedPoints / appState.points.length) * 20 + 60; // 20% of total progress
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Allow UI to update
+                    await new Promise(resolve => setTimeout(resolve, 1));
+                }
+            }
+            
+            matchedCountEl.textContent = matchedCount;
+            folderCountEl.textContent = appState.folders.filter(f => f.points.length > 0).length + 
+                                       (appState.unmatchedPoints.length > 0 ? 1 : 0);
+        }
+        
+        function extractPointCoordinates(placemark) {
+            const pointNode = placemark.getElementsByTagName('Point')[0];
+            if (!pointNode) return null;
+            
+            const coordinatesNode = pointNode.getElementsByTagName('coordinates')[0];
+            if (!coordinatesNode) return null;
+            
+            const coords = coordinatesNode.textContent.trim().split(',');
+            if (coords.length < 2) return null;
+            
+            return {
+                longitude: parseFloat(coords[0]),
+                latitude: parseFloat(coords[1])
+            };
+        }
+        
+        function extractPolygonCoordinates(placemark) {
+            const polygons = [];
+            
+            const singlePolygons = placemark.getElementsByTagName('Polygon');
+            for (const polygonNode of singlePolygons) {
+                const coordinates = extractCoordinatesFromPolygon(polygonNode);
+                if (coordinates) {
+                    polygons.push(coordinates);
+                }
+            }
+            
+            const multiGeometry = placemark.getElementsByTagName('MultiGeometry')[0];
+            if (multiGeometry) {
+                const multiPolygons = multiGeometry.getElementsByTagName('Polygon');
+                for (const polygonNode of multiPolygons) {
+                    const coordinates = extractCoordinatesFromPolygon(polygonNode);
+                    if (coordinates) {
+                        polygons.push(coordinates);
+                    }
+                }
+            }
+            
+            return polygons.length > 0 ? polygons : null;
+        }
+        
+        function extractCoordinatesFromPolygon(polygonNode) {
+            const outerBoundary = polygonNode.getElementsByTagName('outerBoundaryIs')[0];
+            if (!outerBoundary) return null;
+            
+            const linearRing = outerBoundary.getElementsByTagName('LinearRing')[0];
+            if (!linearRing) return null;
+            
+            const coordinatesNode = linearRing.getElementsByTagName('coordinates')[0];
+            if (!coordinatesNode) return null;
+            
+            const coordsText = coordinatesNode.textContent.trim();
+            const coordPairs = coordsText.split(/\s+/).filter(pair => pair.trim() !== '');
+            
+            return coordPairs.map(pair => {
+                const [lon, lat] = pair.split(',').map(parseFloat);
+                return { longitude: lon, latitude: lat };
+            });
+        }
+        
+        // Point-in-polygon algorithm (ray casting)
+        function isPointInPolygon(point, polygon) {
+            const x = point.longitude;
+            const y = point.latitude;
+            let inside = false;
+            
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].longitude;
+                const yi = polygon[i].latitude;
+                const xj = polygon[j].longitude;
+                const yj = polygon[j].latitude;
+                
+                const intersect = ((yi > y) !== (yj > y)) &&
+                    (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            
+            return inside;
+        }
+        
+        // Generate the processed KML with folders and preserved styles
+        function generateProcessedKml(kmlDoc) {
+            const doc = kmlDoc.implementation.createDocument('', '', null);
+            const kmlNode = kmlDoc.getElementsByTagName('kml')[0].cloneNode(false);
+            doc.appendChild(kmlNode);
+            
+            const documentNode = kmlDoc.getElementsByTagName('Document')[0].cloneNode(false);
+            kmlNode.appendChild(documentNode);
+            
+            // Add document name if it exists
+            const originalDocName = kmlDoc.querySelector('Document > name');
+            if (originalDocName) {
+                const newDocName = kmlDoc.createElement('name');
+                newDocName.textContent = originalDocName.textContent + ' - Organized';
+                documentNode.appendChild(newDocName);
+            }
+            
+            // Preserve all original styles and schemas
+            appState.originalStyles.forEach((styleElement, id) => {
+                documentNode.appendChild(styleElement.cloneNode(true));
+            });
+            
+            const schemas = kmlDoc.getElementsByTagName('Schema');
+            for (const schema of schemas) {
+                documentNode.appendChild(schema.cloneNode(true));
+            }
+            
+            // Create a separate folder for all polygons
+            if (appState.polygons.length > 0) {
+                const polygonFolderNode = kmlDoc.createElement('Folder');
+                
+                const polygonFolderName = kmlDoc.createElement('name');
+                polygonFolderName.textContent = 'All Polygons';
+                polygonFolderNode.appendChild(polygonFolderName);
+                
+                // Add all polygons to this folder
+                for (const polygonPlacemark of appState.polygons) {
+                    polygonFolderNode.appendChild(polygonPlacemark.cloneNode(true));
+                }
+                
+                documentNode.appendChild(polygonFolderNode);
+            }
+            
+            // Add folders for each polygon with its contained points (without the polygon)
+            for (const folder of appState.folders) {
+                if (folder.points.length === 0) continue;
+                
+                const folderNode = kmlDoc.createElement('Folder');
+                
+                const nameNode = kmlDoc.createElement('name');
+                nameNode.textContent = folder.name;
+                folderNode.appendChild(nameNode);
+                
+                // Add all contained points (no polygon here)
+                for (const pointPlacemark of folder.points) {
+                    folderNode.appendChild(pointPlacemark.cloneNode(true));
+                }
+                
+                documentNode.appendChild(folderNode);
+            }
+            
+            // Add unmatched points to an "Outside Polygon" folder
+            if (appState.unmatchedPoints.length > 0) {
+                const folderNode = kmlDoc.createElement('Folder');
+                
+                const nameNode = kmlDoc.createElement('name');
+                nameNode.textContent = 'Outside Polygon';
+                folderNode.appendChild(nameNode);
+                
+                const descNode = kmlDoc.createElement('description');
+                descNode.textContent = 'Points that do not fall within any polygon';
+                folderNode.appendChild(descNode);
+                
+                for (const pointPlacemark of appState.unmatchedPoints) {
+                    folderNode.appendChild(pointPlacemark.cloneNode(true));
+                }
+                
+                documentNode.appendChild(folderNode);
+            }
+            
+            // Add any remaining placemarks (lines, etc.)
+            const allPlacemarks = Array.from(kmlDoc.getElementsByTagName('Placemark'));
+            const processedPlacemarks = new Set([
+                ...appState.polygons,
+                ...appState.points
+            ]);
+            
+            const otherPlacemarks = allPlacemarks.filter(p => !processedPlacemarks.has(p));
+            if (otherPlacemarks.length > 0) {
+                const otherFolderNode = kmlDoc.createElement('Folder');
+                
+                const nameNode = kmlDoc.createElement('name');
+                nameNode.textContent = 'Other Features';
+                otherFolderNode.appendChild(nameNode);
+                
+                for (const placemark of otherPlacemarks) {
+                    otherFolderNode.appendChild(placemark.cloneNode(true));
+                }
+                
+                documentNode.appendChild(otherFolderNode);
+            }
+            
+            const serializer = new XMLSerializer();
+            return serializer.serializeToString(doc);
+        }
+        
+        // Download result
+        async function downloadResult(format) {
+            if (!appState.processedKml) return;
+            
+            try {
+                let blob, fileName;
+                
+                if (format === 'kmz') {
+                    // Create KMZ with preserved images and files
+                    blob = await createKmzBlob();
+                    fileName = appState.fileName.replace(/\.(kml|kmz)$/i, '') + '_organized.kmz';
+                } else {
+                    // Create KML
+                    blob = new Blob([appState.processedKml], { type: 'application/vnd.google-earth.kml+xml' });
+                    fileName = appState.fileName.replace(/\.(kml|kmz)$/i, '') + '_organized.kml';
+                }
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('success', `Download started! (${format.toUpperCase()})`);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+                showMessage('error', 'Error creating download: ' + error.message);
+            }
+        }
+        
+        async function createKmzBlob() {
+            const JSZip = await loadJSZip();
+            const zip = new JSZip();
+            
+            // Add the main KML file
+            zip.file('doc.kml', appState.processedKml);
+            
+            // Add preserved images and other files
+            for (const [filename, blob] of appState.kmzImages) {
+                zip.file(filename, blob);
+            }
+            
+            // Add any other files from the original KMZ (excluding the original KML)
+            for (const [filename, file] of appState.kmzFiles) {
+                if (!filename.toLowerCase().endsWith('.kml') && !appState.kmzImages.has(filename)) {
+                    const content = await file.async('blob');
+                    zip.file(filename, content);
+                }
+            }
+            
+            return await zip.generateAsync({ type: 'blob' });
+        }
+        
+        // UI Helpers
+        function updateResultsUI() {
+            folderPreview.innerHTML = '';
+            
+            // Show polygons folder
+            if (appState.polygons.length > 0) {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'folder-name';
+                nameDiv.textContent = 'All Polygons';
+                folderDiv.appendChild(nameDiv);
+                
+                const countDiv = document.createElement('div');
+                countDiv.className = 'folder-count';
+                countDiv.textContent = `Contains ${appState.polygons.length} polygon(s)`;
+                folderDiv.appendChild(countDiv);
+                
+                folderPreview.appendChild(folderDiv);
+            }
+            
+            // Add folders with their points
+            appState.folders.forEach(folder => {
+                if (folder.points.length === 0) return;
+                
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'folder-name';
+                nameDiv.textContent = folder.name;
+                folderDiv.appendChild(nameDiv);
+                
+                const countDiv = document.createElement('div');
+                countDiv.className = 'folder-count';
+                countDiv.textContent = `Contains ${folder.points.length} point(s)`;
+                folderDiv.appendChild(countDiv);
+                
+                // Show first few point names
+                const maxPointsToShow = 3;
+                const pointsToShow = folder.points.slice(0, maxPointsToShow);
+                
+                pointsToShow.forEach(pointPlacemark => {
+                    const pointName = pointPlacemark.getElementsByTagName('name')[0]?.textContent || 'Unnamed Point';
+                    const pointDiv = document.createElement('div');
+                    pointDiv.className = 'placemark-item';
+                    pointDiv.textContent = pointName;
+                    folderDiv.appendChild(pointDiv);
+                });
+                
+                if (folder.points.length > maxPointsToShow) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'placemark-item';
+                    moreDiv.textContent = `...and ${folder.points.length - maxPointsToShow} more`;
+                    folderDiv.appendChild(moreDiv);
+                }
+                
+                folderPreview.appendChild(folderDiv);
+            });
+            
+            // Add unmatched points section
+            if (appState.unmatchedPoints.length > 0) {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'folder-name';
+                nameDiv.textContent = 'Outside Polygon';
+                folderDiv.appendChild(nameDiv);
+                
+                const countDiv = document.createElement('div');
+                countDiv.className = 'folder-count';
+                countDiv.textContent = `Contains ${appState.unmatchedPoints.length} point(s)`;
+                folderDiv.appendChild(countDiv);
+                
+                // Show first few point names
+                const maxPointsToShow = 3;
+                const pointsToShow = appState.unmatchedPoints.slice(0, maxPointsToShow);
+                
+                pointsToShow.forEach(pointPlacemark => {
+                    const pointName = pointPlacemark.getElementsByTagName('name')[0]?.textContent || 'Unnamed Point';
+                    const pointDiv = document.createElement('div');
+                    pointDiv.className = 'placemark-item';
+                    pointDiv.textContent = pointName;
+                    folderDiv.appendChild(pointDiv);
+                });
+                
+                if (appState.unmatchedPoints.length > maxPointsToShow) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'placemark-item';
+                    moreDiv.textContent = `...and ${appState.unmatchedPoints.length - maxPointsToShow} more`;
+                    folderDiv.appendChild(moreDiv);
+                }
+                
+                folderPreview.appendChild(folderDiv);
+            }
+        }
+        
+        function showLoading(show, text = 'Processing...') {
+            loadingIndicator.style.display = show ? 'block' : 'none';
+            loadingText.textContent = text;
+        }
+        
+        function showMessage(type, text) {
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+            
+            if (type === 'error') {
+                errorMessage.textContent = text;
+            } else if (type === 'success') {
+                successMessage.textContent = text;
+            }
+        }
+        
+        function resetApp(clearFileInput = true) {
+            appState = {
+                file: null,
+                fileName: '',
+                fileType: '',
+                kmlContent: '',
+                processedKml: '',
+                polygons: [],
+                points: [],
+                folders: [],
+                unmatchedPoints: [],
+                originalStyles: new Map(),
+                kmzImages: new Map(),
+                kmzFiles: new Map(),
+                processingComplete: false,
+                polygonIdCounter: 0
+            };
+            
+            if (clearFileInput) {
+                fileInput.value = '';
+                fileInfo.textContent = 'No file selected';
+            }
+            
+            downloadKmlBtn.disabled = true;
+            downloadKmzBtn.disabled = true;
+            
+            polygonCountEl.textContent = '0';
+            pointCountEl.textContent = '0';
+            matchedCountEl.textContent = '0';
+            folderCountEl.textContent = '0';
+            imageCountEl.textContent = '0';
+            processingStatusEl.textContent = 'Ready';
+            
+            folderPreview.innerHTML = '';
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+            progressBar.style.width = '0%';
+        }
+    </script>
+</body>
+</html>

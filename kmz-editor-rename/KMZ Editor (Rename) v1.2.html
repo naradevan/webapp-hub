@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMZ Placemark Renaming Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        /* Left Panel - 1/3 width with internal scrolling */
+        .left-panel {
+            flex: 0 0 calc(33.333% - 0.5rem);
+            min-width: 300px;
+            max-width: 400px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .left-panel-header {
+            padding: 1.5rem 1.5rem 1rem;
+            border-bottom: 1px solid #21262d;
+            flex-shrink: 0;
+        }
+
+        .left-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #30363d #161b22;
+        }
+
+        .left-panel-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .left-panel-content::-webkit-scrollbar-track {
+            background: #161b22;
+        }
+
+        .left-panel-content::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 3px;
+        }
+
+        /* Right Panel - 2/3 width for preview */
+        .preview-panel {
+            flex: 1;
+            min-width: 0;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 2rem);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .refresh-btn {
+            background: #f85149;
+            border: 1px solid #da3633;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .refresh-btn:hover {
+            background: #da3633;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropzone {
+            border: 2px dashed #30363d;
+            border-radius: 8px;
+            padding: 2rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .dropzone-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #6e7681;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #7d8590;
+            margin-top: 0.25rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: #0d1117;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 0.75rem;
+            background: #21262d;
+            border: none;
+            color: #7d8590;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .tab-button.active {
+            background: #58a6ff;
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #f0f6fc;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.1);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .filter-chip {
+            padding: 0.25rem 0.75rem;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-chip.active {
+            background: #58a6ff;
+            border-color: #58a6ff;
+            color: #ffffff;
+        }
+
+        .table-container {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .editable-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .editable-table th,
+        .editable-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .editable-table th {
+            background: #161b22;
+            font-weight: 600;
+            color: #f0f6fc;
+            font-size: 0.75rem;
+        }
+
+        .editable-table input {
+            background: transparent;
+            border: none;
+            color: #c9d1d9;
+            width: 100%;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .editable-table input:focus {
+            outline: 1px solid #58a6ff;
+            background: #0d1117;
+            border-radius: 4px;
+        }
+
+        .add-row-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #58a6ff;
+            border-radius: 0 0 6px 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .add-row-btn:hover {
+            background: #30363d;
+        }
+
+        .delete-row-btn {
+            background: #da3633;
+            border: 1px solid #f85149;
+            border-radius: 4px;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+
+        .delete-row-btn:hover {
+            opacity: 1;
+            background: #f85149;
+        }
+
+        .table-row:hover .delete-row-btn {
+            opacity: 1;
+        }
+
+        .padding-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .padding-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .padding-btn:hover {
+            background: #30363d;
+        }
+
+        .padding-btn.active {
+            background: #58a6ff;
+            border-color: #58a6ff;
+            color: #ffffff;
+        }
+
+        .sort-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #7c3aed;
+            border: 1px solid #8b5cf6;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .sort-btn:hover {
+            background: #8b5cf6;
+        }
+
+        .sort-btn:disabled {
+            background: #21262d;
+            border-color: #30363d;
+            color: #7d8590;
+            cursor: not-allowed;
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .export-btn {
+            padding: 0.75rem;
+            background: #238636;
+            border: 1px solid #2ea043;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .export-btn:hover {
+            background: #2ea043;
+        }
+
+        .export-btn:disabled {
+            background: #21262d;
+            border-color: #30363d;
+            color: #7d8590;
+            cursor: not-allowed;
+        }
+
+        .csv-export-btn {
+            background: #7c3aed;
+            border: 1px solid #8b5cf6;
+            grid-column: 1 / -1;
+        }
+
+        .csv-export-btn:hover {
+            background: #8b5cf6;
+        }
+
+        /* Preview Panel Styles */
+        .preview-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #21262d;
+            flex-shrink: 0;
+        }
+
+        .preview-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #0d1117;
+            margin: 1rem;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #30363d #161b22;
+            min-height: 0;
+        }
+
+        .preview-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .preview-list::-webkit-scrollbar-track {
+            background: #161b22;
+        }
+
+        .preview-list::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        .preview-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #21262d;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-item.excluded {
+            opacity: 0.6;
+            background: #21262d;
+        }
+
+        .preview-item.excluded .new-name {
+            color: #7d8590;
+            text-decoration: line-through;
+        }
+
+        .exclude-checkbox {
+            margin-right: 0.75rem;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-names {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-names-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .original-name {
+            color: #7d8590;
+            text-decoration: line-through;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .new-name {
+            color: #58a6ff;
+            font-weight: 500;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .geometry-type {
+            background: #21262d;
+            color: #7d8590;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            min-width: fit-content;
+        }
+
+        .folder-indicator {
+            background: #f59e0b;
+            color: #ffffff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            min-width: fit-content;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            color: #7d8590;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #21262d;
+            border-top: 2px solid #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .left-panel {
+                min-width: 280px;
+                max-width: 350px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.5rem;
+                height: 100vh;
+            }
+            
+            .left-panel {
+                flex: 0 0 40vh;
+                min-width: unset;
+                max-width: unset;
+                height: 40vh;
+            }
+            
+            .preview-panel {
+                flex: 1;
+                min-height: 0;
+                height: auto;
+            }
+            
+            .export-buttons {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0.25rem;
+                gap: 0.25rem;
+            }
+            
+            .left-panel {
+                flex: 0 0 45vh;
+                height: 45vh;
+            }
+            
+            .left-panel-content {
+                padding: 1rem;
+            }
+            
+            .preview-header {
+                padding: 1rem;
+            }
+            
+            .preview-list {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel (1/3) -->
+        <div class="left-panel">
+            <div class="left-panel-header">
+                <div class="panel-header">
+                    <span>📋</span>
+                    KMZ Editor
+                    <button class="refresh-btn" onclick="refreshApp()">🔄 Refresh</button>
+                </div>
+            </div>
+            
+            <div class="left-panel-content">
+                <!-- File Input Section -->
+                <div class="section">
+                    <div class="section-title">
+                        <span>📂</span>
+                        File Input
+                    </div>
+                    
+                    <div class="dropzone" id="dropzone">
+                        <div class="dropzone-icon">📁</div>
+                        <div>Drop KMZ/KML files here or click to browse</div>
+                        <input type="file" id="fileInput" accept=".kmz,.kml" style="display: none;" multiple>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalItems">0</div>
+                            <div class="stat-label">Total Items</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="fileSize">0 MB</div>
+                            <div class="stat-label">File Size</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="placemarkCount">0</div>
+                            <div class="stat-label">Placemarks</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="lineCount">0</div>
+                            <div class="stat-label">Lines/Polygons</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="section">
+                    <div class="section-title">Filter & Sort</div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">Filter by Type</div>
+                        <div class="filter-chips">
+                            <div class="filter-chip active" data-type="all">All</div>
+                            <div class="filter-chip" data-type="placemark">Placemarks</div>
+                            <div class="filter-chip" data-type="linestring">Lines</div>
+                            <div class="filter-chip" data-type="polygon">Polygons</div>
+                        </div>
+                    </div>
+
+                    <button class="sort-btn" onclick="sortByName()" id="sortBtn" disabled>
+                        📤 Sort by Name
+                    </button>
+                </div>
+
+                <!-- Rename Options Section -->
+                <div class="section">
+                    <div class="section-title">
+                        <span>✏️</span>
+                        Rename Options
+                    </div>
+
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('basic')">Basic</button>
+                        <button class="tab-button" onclick="switchTab('advanced')">Advanced</button>
+                    </div>
+
+                    <div class="tab-content active" id="basicTab">
+                        <div class="form-group">
+                            <label class="form-label">Prefix</label>
+                            <input type="text" id="basicPrefix" class="form-input" placeholder="e.g., pole, feeder, A" value="item">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Start Number</label>
+                            <input type="text" id="basicStartNumber" class="form-input" placeholder="1, 01, 001" value="1">
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="advancedTab">
+                        <div class="form-group">
+                            <label class="form-label">Custom Separator</label>
+                            <input type="text" id="customSeparator" class="form-input" placeholder="- (default), _, ., or leave empty" value="-">
+                        </div>
+
+                        <div class="table-container">
+                            <table class="editable-table">
+                                <thead>
+                                    <tr>
+                                        <th>Prefix</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="advancedTableBody">
+                                    <tr class="table-row">
+                                        <td><input type="text" value="QWE" oninput="updateAdvancedPreview()"></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center;">
+                                                <input type="number" value="100" oninput="updateAdvancedPreview()" style="flex: 1;">
+                                                <button class="delete-row-btn" onclick="deleteRow(this)" title="Delete row">×</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row">
+                                        <td><input type="text" value="RTY" oninput="updateAdvancedPreview()"></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center;">
+                                                <input type="number" value="40" oninput="updateAdvancedPreview()" style="flex: 1;">
+                                                <button class="delete-row-btn" onclick="deleteRow(this)" title="Delete row">×</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row">
+                                        <td><input type="text" value="YUI" oninput="updateAdvancedPreview()"></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center;">
+                                                <input type="number" value="670" oninput="updateAdvancedPreview()" style="flex: 1;">
+                                                <button class="delete-row-btn" onclick="deleteRow(this)" title="Delete row">×</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="add-row-btn" onclick="addAdvancedRow()">+ Add Row</button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Number Padding</label>
+                            <div class="padding-selector">
+                                <button type="button" class="padding-btn active" onclick="setPadding(0)" data-padding="0">1</button>
+                                <button type="button" class="padding-btn" onclick="setPadding(2)" data-padding="2">01</button>
+                                <button type="button" class="padding-btn" onclick="setPadding(3)" data-padding="3">001</button>
+                            </div>
+                            <input type="hidden" id="advancedPadding" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="section">
+                    <div class="section-title">Export Options</div>
+                    
+                    <div class="export-buttons">
+                        <button class="export-btn" id="exportWithPhotos" onclick="exportFile(true)" disabled>
+                            KMZ With Photos
+                        </button>
+                        <button class="export-btn" id="exportWithoutPhotos" onclick="exportFile(false)" disabled>
+                            KMZ Without Photos
+                        </button>
+                        <button class="export-btn csv-export-btn" id="exportCsv" onclick="exportCsv()" disabled>
+                            📊 Export CSV with Coordinates
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel (2/3) - Live Preview -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <div class="panel-header">
+                    <span>👁️</span>
+                    Live Preview
+                    <div style="margin-left: auto; font-size: 0.75rem; color: #7d8590;" id="previewCounter">
+                        0 items
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-list" id="previewList">
+                <div class="loading">
+                    <div>Upload a KMZ/KML file to see preview</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = [];
+        let filteredData = [];
+        let currentFilter = 'all';
+        let activeTab = 'basic';
+        let originalKmlContent = '';
+        let currentFileName = '';
+        let originalZipContent = null;
+
+        // Initialize event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+        });
+
+        function initializeEventListeners() {
+            // File handling
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            dropzone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            });
+
+            dropzone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) handleFile(files[0]);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) handleFile(e.target.files[0]);
+            });
+
+            // Basic rename inputs
+            document.getElementById('basicPrefix').addEventListener('input', updatePreview);
+            document.getElementById('basicStartNumber').addEventListener('input', updatePreview);
+
+            // Advanced separator input
+            document.getElementById('customSeparator').addEventListener('input', updateAdvancedPreview);
+
+            // Filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentFilter = chip.dataset.type;
+                    applyFilter();
+                    updatePreview();
+                });
+            });
+        }
+
+        // Refresh function
+        function refreshApp() {
+            currentData = [];
+            filteredData = [];
+            currentFilter = 'all';
+            originalKmlContent = '';
+            currentFileName = '';
+            originalZipContent = null;
+            
+            // Reset UI
+            document.getElementById('fileInput').value = '';
+            document.getElementById('totalItems').textContent = '0';
+            document.getElementById('fileSize').textContent = '0 MB';
+            document.getElementById('placemarkCount').textContent = '0';
+            document.getElementById('lineCount').textContent = '0';
+            document.getElementById('previewCounter').textContent = '0 items';
+            document.getElementById('previewList').innerHTML = '<div class="loading">Upload a KMZ/KML file to see preview</div>';
+            
+            // Reset filters
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-type="all"]').classList.add('active');
+            
+            // Disable export buttons and sort functionality
+            document.getElementById('exportWithPhotos').disabled = true;
+            document.getElementById('exportWithoutPhotos').disabled = true;
+            document.getElementById('exportCsv').disabled = true;
+            document.getElementById('sortBtn').disabled = true;
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            updatePreview();
+        }
+
+        // Extract coordinates from various geometry types
+        function extractCoordinates(placemark) {
+            const coordinates = [];
+            
+            // Point geometry
+            const point = placemark.querySelector('Point coordinates');
+            if (point) {
+                const coords = point.textContent.trim().split(',');
+                if (coords.length >= 2) {
+                    coordinates.push({
+                        type: 'Point',
+                        longitude: parseFloat(coords[0]),
+                        latitude: parseFloat(coords[1]),
+                        altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                    });
+                }
+            }
+            
+            // LineString geometry
+            const lineString = placemark.querySelector('LineString coordinates');
+            if (lineString) {
+                const coordPairs = lineString.textContent.trim().split(/\s+/);
+                coordPairs.forEach(pair => {
+                    const coords = pair.split(',');
+                    if (coords.length >= 2) {
+                        coordinates.push({
+                            type: 'LineString',
+                            longitude: parseFloat(coords[0]),
+                            latitude: parseFloat(coords[1]),
+                            altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                        });
+                    }
+                });
+            }
+            
+            // Polygon geometry (outer boundary)
+            const polygon = placemark.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
+            if (polygon) {
+                const coordPairs = polygon.textContent.trim().split(/\s+/);
+                coordPairs.forEach(pair => {
+                    const coords = pair.split(',');
+                    if (coords.length >= 2) {
+                        coordinates.push({
+                            type: 'Polygon',
+                            longitude: parseFloat(coords[0]),
+                            latitude: parseFloat(coords[1]),
+                            altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                        });
+                    }
+                });
+            }
+            
+            // MultiGeometry handling
+            const multiGeometry = placemark.querySelector('MultiGeometry');
+            if (multiGeometry) {
+                // Points in MultiGeometry
+                multiGeometry.querySelectorAll('Point coordinates').forEach(point => {
+                    const coords = point.textContent.trim().split(',');
+                    if (coords.length >= 2) {
+                        coordinates.push({
+                            type: 'MultiGeometry-Point',
+                            longitude: parseFloat(coords[0]),
+                            latitude: parseFloat(coords[1]),
+                            altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                        });
+                    }
+                });
+                
+                // LineStrings in MultiGeometry
+                multiGeometry.querySelectorAll('LineString coordinates').forEach(lineString => {
+                    const coordPairs = lineString.textContent.trim().split(/\s+/);
+                    coordPairs.forEach(pair => {
+                        const coords = pair.split(',');
+                        if (coords.length >= 2) {
+                            coordinates.push({
+                                type: 'MultiGeometry-LineString',
+                                longitude: parseFloat(coords[0]),
+                                latitude: parseFloat(coords[1]),
+                                altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                            });
+                        }
+                    });
+                });
+                
+                // Polygons in MultiGeometry
+                multiGeometry.querySelectorAll('Polygon outerBoundaryIs LinearRing coordinates').forEach(polygon => {
+                    const coordPairs = polygon.textContent.trim().split(/\s+/);
+                    coordPairs.forEach(pair => {
+                        const coords = pair.split(',');
+                        if (coords.length >= 2) {
+                            coordinates.push({
+                                type: 'MultiGeometry-Polygon',
+                                longitude: parseFloat(coords[0]),
+                                latitude: parseFloat(coords[1]),
+                                altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // gx:Track handling (GPS tracks)
+            const gxTrack = placemark.querySelector('gx\\:Track');
+            if (gxTrack) {
+                const coordElements = gxTrack.querySelectorAll('gx\\:coord');
+                coordElements.forEach(coord => {
+                    const coords = coord.textContent.trim().split(' ');
+                    if (coords.length >= 2) {
+                        coordinates.push({
+                            type: 'Track',
+                            longitude: parseFloat(coords[0]),
+                            latitude: parseFloat(coords[1]),
+                            altitude: coords.length > 2 ? parseFloat(coords[2]) : null
+                        });
+                    }
+                });
+            }
+            
+            return coordinates;
+        }
+
+        async function handleFile(file) {
+            currentFileName = file.name;
+            const fileSize = (file.size / (1024 * 1024)).toFixed(1);
+            document.getElementById('fileSize').textContent = fileSize + ' MB';
+
+            // Show loading
+            document.getElementById('previewList').innerHTML = '<div class="loading"><div class="spinner"></div>Processing file...</div>';
+
+            try {
+                let content = '';
+                if (file.name.toLowerCase().endsWith('.kmz')) {
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const zip = new JSZip();
+                        originalZipContent = await zip.loadAsync(arrayBuffer);
+                        
+                        // Find the main KML file
+                        let kmlFile = null;
+                        originalZipContent.forEach((relativePath, zipEntry) => {
+                            if (relativePath.toLowerCase().endsWith('.kml') && !zipEntry.dir) {
+                                kmlFile = zipEntry;
+                            }
+                        });
+                        
+                        if (kmlFile) {
+                            content = await kmlFile.async('text');
+                        } else {
+                            throw new Error('No KML file found in KMZ archive');
+                        }
+                    } catch (zipError) {
+                        console.error('KMZ processing error:', zipError);
+                        throw new Error(`Failed to process KMZ file: ${zipError.message}`);
+                    }
+                } else {
+                    content = await file.text();
+                    originalZipContent = null;
+                }
+
+                if (!content.trim()) {
+                    throw new Error('File appears to be empty or invalid');
+                }
+
+                originalKmlContent = content;
+                parseKmlContent(content);
+            } catch (error) {
+                console.error('Error processing file:', error);
+                document.getElementById('previewList').innerHTML = `<div class="loading">Error: ${error.message}</div>`;
+                
+                // Reset states on error
+                resetButtons();
+            }
+        }
+
+        function resetButtons() {
+            document.getElementById('exportWithPhotos').disabled = true;
+            document.getElementById('exportWithoutPhotos').disabled = true;
+            document.getElementById('exportCsv').disabled = true;
+            document.getElementById('sortBtn').disabled = true;
+        }
+
+        function parseKmlContent(content) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(content, 'text/xml');
+                
+                // Check for parsing errors
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    throw new Error('Invalid KML/XML format');
+                }
+                
+                // Get all placemarks - improved to handle folder structures
+                const placemarks = Array.from(xmlDoc.querySelectorAll('Placemark'));
+                
+                if (placemarks.length === 0) {
+                    throw new Error('No placemarks found in the file');
+                }
+                
+                currentData = placemarks.map((placemark, index) => {
+                    const nameElement = placemark.querySelector('name');
+                    const name = nameElement ? nameElement.textContent.trim() : `Unnamed-${index + 1}`;
+                    
+                    // Get folder path for better organization
+                    let folderPath = '';
+                    let currentParent = placemark.parentNode;
+                    const folderNames = [];
+                    
+                    while (currentParent && currentParent !== xmlDoc) {
+                        if (currentParent.tagName === 'Folder') {
+                            const folderNameEl = currentParent.querySelector(':scope > name');
+                            if (folderNameEl) {
+                                folderNames.unshift(folderNameEl.textContent.trim());
+                            }
+                        }
+                        currentParent = currentParent.parentNode;
+                    }
+                    
+                    folderPath = folderNames.join(' > ');
+                    
+                    // Detect geometry type - improved detection
+                    let geometryType = 'placemark';
+                    if (placemark.querySelector('LineString') || placemark.querySelector('gx\\:Track')) {
+                        geometryType = 'linestring';
+                    } else if (placemark.querySelector('Polygon')) {
+                        geometryType = 'polygon';
+                    } else if (placemark.querySelector('Point')) {
+                        geometryType = 'placemark';
+                    } else if (placemark.querySelector('MultiGeometry LineString')) {
+                        geometryType = 'linestring';
+                    } else if (placemark.querySelector('MultiGeometry Polygon')) {
+                        geometryType = 'polygon';
+                    }
+                    
+                    // Extract coordinates
+                    const coordinates = extractCoordinates(placemark);
+                    
+                    return {
+                        id: index,
+                        originalName: name,
+                        newName: name,
+                        geometryType,
+                        element: placemark,
+                        coordinates: coordinates,
+                        folderPath: folderPath,
+                        isFiltered: false,
+                        isExcluded: false,
+                        originalIndex: index  // Keep track of original position
+                    };
+                });
+
+                updateStats();
+                applyFilter();
+                updatePreview();
+                
+                // Enable export buttons and sort functionality
+                document.getElementById('exportWithPhotos').disabled = false;
+                document.getElementById('exportWithoutPhotos').disabled = false;
+                document.getElementById('exportCsv').disabled = false;
+                document.getElementById('sortBtn').disabled = false;
+                
+            } catch (error) {
+                console.error('KML parsing error:', error);
+                document.getElementById('previewList').innerHTML = `<div class="loading">Error parsing KML: ${error.message}</div>`;
+                throw error;
+            }
+        }
+
+        function updateStats() {
+            const placemarkCount = currentData.filter(item => item.geometryType === 'placemark').length;
+            const lineCount = currentData.filter(item => item.geometryType !== 'placemark').length;
+            const excludedCount = currentData.filter(item => item.isExcluded).length;
+            
+            let totalText = currentData.length.toString();
+            if (excludedCount > 0) {
+                totalText += `<br><small style="color: #7d8590;">${excludedCount} excluded</small>`;
+            }
+            
+            document.getElementById('totalItems').innerHTML = totalText;
+            document.getElementById('placemarkCount').textContent = placemarkCount;
+            document.getElementById('lineCount').textContent = lineCount;
+        }
+
+        function applyFilter() {
+            if (currentFilter === 'all') {
+                filteredData = [...currentData];
+            } else {
+                filteredData = currentData.filter(item => item.geometryType === currentFilter);
+            }
+        }
+
+        function detectPadding(startStr) {
+            if (startStr.length <= 1) return 0;
+            if (startStr.startsWith('0')) return startStr.length;
+            return 0;
+        }
+
+        function updatePreview() {
+            if (!filteredData.length) return;
+
+            if (activeTab === 'basic') {
+                updateBasicPreview();
+            } else {
+                updateAdvancedPreview();
+            }
+        }
+
+        function updateBasicPreview() {
+            const prefix = document.getElementById('basicPrefix').value || 'item';
+            const startStr = document.getElementById('basicStartNumber').value || '1';
+            const startNum = parseInt(startStr);
+            const padding = detectPadding(startStr);
+
+            // Apply changes only to filtered, non-excluded items
+            let counter = 0;
+            filteredData.forEach((item) => {
+                if (!item.isExcluded) {
+                    const num = startNum + counter;
+                    const paddedNum = padding > 0 ? num.toString().padStart(padding, '0') : num.toString();
+                    item.newName = `${prefix}${paddedNum}`;
+                    
+                    // Update the corresponding item in currentData
+                    const currentItem = currentData.find(data => data.id === item.id);
+                    if (currentItem) {
+                        currentItem.newName = item.newName;
+                        currentItem.isExcluded = item.isExcluded;
+                    }
+                    
+                    counter++;
+                } else {
+                    item.newName = item.originalName;
+                    
+                    // Update the corresponding item in currentData
+                    const currentItem = currentData.find(data => data.id === item.id);
+                    if (currentItem) {
+                        currentItem.newName = item.originalName;
+                        currentItem.isExcluded = item.isExcluded;
+                    }
+                }
+            });
+
+            renderPreview();
+        }
+
+        function updateAdvancedPreview() {
+            const rows = document.querySelectorAll('#advancedTableBody tr');
+            const groups = [];
+            
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const prefix = inputs[0].value.trim();
+                const count = parseInt(inputs[1].value) || 0;
+                if (prefix && count > 0) {
+                    groups.push({ prefix, count });
+                }
+            });
+
+            if (groups.length === 0) return;
+
+            // Get padding from advanced padding selector
+            const paddingSelect = document.getElementById('advancedPadding');
+            const paddingValue = paddingSelect ? parseInt(paddingSelect.value) : 3;
+
+            // Get custom separator
+            const separator = document.getElementById('customSeparator').value;
+
+            let groupIndex = 0;
+            let countInGroup = 0;
+            
+            filteredData.forEach((item) => {
+                if (item.isExcluded) {
+                    item.newName = item.originalName;
+                    
+                    // Update the corresponding item in currentData
+                    const currentItem = currentData.find(data => data.id === item.id);
+                    if (currentItem) {
+                        currentItem.newName = item.originalName;
+                        currentItem.isExcluded = item.isExcluded;
+                    }
+                    return;
+                }
+                
+                if (groupIndex >= groups.length) {
+                    item.newName = item.originalName;
+                    
+                    // Update the corresponding item in currentData
+                    const currentItem = currentData.find(data => data.id === item.id);
+                    if (currentItem) {
+                        currentItem.newName = item.originalName;
+                        currentItem.isExcluded = item.isExcluded;
+                    }
+                    return;
+                }
+                
+                const currentGroup = groups[groupIndex];
+                const num = countInGroup + 1;
+                const paddedNum = paddingValue > 0 ? num.toString().padStart(paddingValue, '0') : num.toString();
+                
+                // Use custom separator or no separator if empty
+                if (separator) {
+                    item.newName = `${currentGroup.prefix}${separator}${paddedNum}`;
+                } else {
+                    item.newName = `${currentGroup.prefix}${paddedNum}`;
+                }
+                
+                // Update the corresponding item in currentData
+                const currentItem = currentData.find(data => data.id === item.id);
+                if (currentItem) {
+                    currentItem.newName = item.newName;
+                    currentItem.isExcluded = item.isExcluded;
+                }
+                
+                countInGroup++;
+                if (countInGroup >= currentGroup.count) {
+                    groupIndex++;
+                    countInGroup = 0;
+                }
+            });
+
+            renderPreview();
+        }
+
+        function renderPreview() {
+            const previewList = document.getElementById('previewList');
+            
+            if (filteredData.length === 0) {
+                previewList.innerHTML = '<div class="loading">No items match the current filter</div>';
+                document.getElementById('previewCounter').textContent = '0 items';
+                return;
+            }
+
+            // Update counter
+            const excludedCount = filteredData.filter(item => item.isExcluded).length;
+            const activeCount = filteredData.length - excludedCount;
+            document.getElementById('previewCounter').textContent = 
+                `${filteredData.length} total (${activeCount} active, ${excludedCount} excluded)`;
+
+            const html = filteredData.map((item, index) => {
+                const displayName = item.isExcluded ? item.originalName : item.newName;
+                const excludedClass = item.isExcluded ? ' excluded' : '';
+                
+                return `
+                <div class="preview-item${excludedClass}" data-item-id="${item.id}">
+                    <div class="item-content">
+                        <input type="checkbox" class="exclude-checkbox" ${item.isExcluded ? 'checked' : ''} onchange="toggleExclude(${item.id})">
+                        ${item.folderPath ? `<div class="folder-indicator">${item.folderPath}</div>` : ''}
+                        <div class="geometry-type">${item.geometryType}</div>
+                        <div class="item-names">
+                            <div class="item-names-row">
+                                <div class="original-name">${item.originalName}</div>
+                                <div class="new-name">${displayName}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            previewList.innerHTML = html;
+            updateStats();
+        }
+
+        // Exclude functionality
+        function toggleExclude(itemId) {
+            const item = filteredData.find(data => data.id === itemId);
+            if (item) {
+                item.isExcluded = !item.isExcluded;
+                
+                // Update the same item in currentData
+                const currentItem = currentData.find(data => data.id === itemId);
+                if (currentItem) {
+                    currentItem.isExcluded = item.isExcluded;
+                    // Also update the newName in currentData
+                    currentItem.newName = item.newName;
+                }
+                
+                updatePreview();
+            }
+        }
+
+        // Sorting functionality
+        function sortByName() {
+            if (!filteredData.length) return;
+            
+            // Sort filtered data by original name (case-insensitive, natural sort)
+            filteredData.sort((a, b) => {
+                return a.originalName.localeCompare(b.originalName, 'en', { 
+                    numeric: true, 
+                    sensitivity: 'base' 
+                });
+            });
+            
+            // Update currentData to reflect sorted order
+            updateCurrentDataFromFiltered();
+            updatePreview();
+        }
+
+        function updateCurrentDataFromFiltered() {
+            // Create a map to track which items are in the filtered data and their new order
+            const filteredMap = new Map();
+            filteredData.forEach((item, index) => {
+                filteredMap.set(item.id, { item, newOrder: index });
+            });
+            
+            // Get all non-filtered items to preserve their positions
+            const nonFilteredItems = currentData.filter(item => !filteredMap.has(item.id));
+            
+            // Create new array maintaining overall structure but updating filtered items order
+            const newCurrentData = [];
+            const filteredItems = [...filteredData]; // Copy to avoid mutation
+            let filteredInsertIndex = 0;
+            
+            for (let i = 0; i < currentData.length; i++) {
+                const originalItem = currentData[i];
+                
+                if (filteredMap.has(originalItem.id)) {
+                    // Insert the reordered filtered item
+                    if (filteredInsertIndex < filteredItems.length) {
+                        newCurrentData.push(filteredItems[filteredInsertIndex]);
+                        filteredInsertIndex++;
+                    }
+                } else {
+                    // Keep non-filtered items in their original positions
+                    newCurrentData.push(originalItem);
+                }
+            }
+            
+            // If there are remaining filtered items (edge case), append them
+            while (filteredInsertIndex < filteredItems.length) {
+                newCurrentData.push(filteredItems[filteredInsertIndex]);
+                filteredInsertIndex++;
+            }
+            
+            currentData = newCurrentData;
+        }
+
+        function addAdvancedRow() {
+            const tbody = document.getElementById('advancedTableBody');
+            const row = document.createElement('tr');
+            row.className = 'table-row';
+            row.innerHTML = `
+                <td><input type="text" value="" oninput="updateAdvancedPreview()"></td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <input type="number" value="1" oninput="updateAdvancedPreview()" style="flex: 1;">
+                        <button class="delete-row-btn" onclick="deleteRow(this)" title="Delete row">×</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function deleteRow(button) {
+            const row = button.closest('tr');
+            const tbody = row.parentNode;
+            
+            // Don't delete if it's the last row
+            if (tbody.children.length > 1) {
+                row.remove();
+                updateAdvancedPreview();
+            }
+        }
+
+        function setPadding(value) {
+            document.querySelectorAll('.padding-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-padding="${value}"]`).classList.add('active');
+            document.getElementById('advancedPadding').value = value;
+            if (activeTab === 'advanced') {
+                updateAdvancedPreview();
+            }
+        }
+
+        function exportCsv() {
+            if (!currentData.length) return;
+
+            let csvContent = 'Original Name,New Name,Geometry Type,Folder Path,Excluded,Coordinate Index,Coordinate Type,Longitude,Latitude,Altitude\n';
+            
+            // Use currentData to maintain proper order
+            currentData.forEach(item => {
+                const originalName = `"${item.originalName.replace(/"/g, '""')}"`;
+                const newName = `"${item.newName.replace(/"/g, '""')}"`;
+                const geometryType = item.geometryType;
+                const folderPath = `"${item.folderPath || ''}"`;
+                const excluded = item.isExcluded ? 'Yes' : 'No';
+                
+                if (item.coordinates && item.coordinates.length > 0) {
+                    item.coordinates.forEach((coord, coordIndex) => {
+                        const longitude = coord.longitude || '';
+                        const latitude = coord.latitude || '';
+                        const altitude = coord.altitude !== null ? coord.altitude : '';
+                        const coordType = coord.type || '';
+                        
+                        csvContent += `${originalName},${newName},${geometryType},${folderPath},${excluded},${coordIndex + 1},"${coordType}",${longitude},${latitude},${altitude}\n`;
+                    });
+                } else {
+                    csvContent += `${originalName},${newName},${geometryType},${folderPath},${excluded},0,"No coordinates",,,,\n`;
+                }
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const baseName = currentFileName.replace(/\.(kmz|kml)$/i, '');
+            const filename = `${baseName}_with_coordinates.csv`;
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportFile(withPhotos) {
+            if (!originalKmlContent || !currentData.length) return;
+
+            const exportBtns = document.querySelectorAll('.export-btn:not(.csv-export-btn)');
+            exportBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.id === 'exportWithPhotos') btn.textContent = 'Exporting...';
+                if (btn.id === 'exportWithoutPhotos') btn.textContent = 'Exporting...';
+            });
+
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(originalKmlContent, 'text/xml');
+                const placemarks = xmlDoc.querySelectorAll('Placemark');
+
+                // Create a map of original indices to new names
+                const nameMap = new Map();
+                currentData.forEach(item => {
+                    const finalName = item.isExcluded ? item.originalName : item.newName;
+                    nameMap.set(item.originalIndex, finalName);
+                });
+
+                // Apply name changes based on original indices
+                Array.from(placemarks).forEach((placemark, index) => {
+                    if (nameMap.has(index)) {
+                        const nameElement = placemark.querySelector('name');
+                        const newName = nameMap.get(index);
+                        
+                        if (nameElement) {
+                            nameElement.textContent = newName;
+                        } else {
+                            const newNameElement = xmlDoc.createElement('name');
+                            newNameElement.textContent = newName;
+                            placemark.insertBefore(newNameElement, placemark.firstChild);
+                        }
+                    }
+                });
+
+                // Remove photos/media if requested
+                if (!withPhotos) {
+                    xmlDoc.querySelectorAll('description').forEach(desc => {
+                        if (desc.textContent.includes('<img') || desc.textContent.includes('src=')) {
+                            desc.textContent = '';
+                        }
+                    });
+                    
+                    xmlDoc.querySelectorAll('ScreenOverlay, GroundOverlay').forEach(el => {
+                        el.remove();
+                    });
+                }
+
+                const serializer = new XMLSerializer();
+                let modifiedContent = serializer.serializeToString(xmlDoc);
+                
+                if (modifiedContent.startsWith('<?xml')) {
+                    modifiedContent = '<?xml version="1.0" encoding="UTF-8"?>\n' + 
+                                    modifiedContent.substring(modifiedContent.indexOf('<kml'));
+                }
+
+                const isKmzInput = currentFileName.toLowerCase().endsWith('.kmz');
+                const baseName = currentFileName.replace(/\.(kmz|kml)$/i, '');
+                const suffix = withPhotos ? '_renamed' : '_renamed_no_photos';
+
+                let blob;
+                let filename;
+
+                if (isKmzInput && originalZipContent && withPhotos) {
+                    const newZip = new JSZip();
+                    
+                    const kmlFiles = [];
+                    originalZipContent.forEach((relativePath, zipEntry) => {
+                        if (relativePath.toLowerCase().endsWith('.kml')) {
+                            kmlFiles.push(relativePath);
+                        }
+                    });
+                    
+                    if (kmlFiles.length > 0) {
+                        newZip.file(kmlFiles[0], modifiedContent);
+                    }
+                    
+                    const copyPromises = [];
+                    originalZipContent.forEach((relativePath, zipEntry) => {
+                        if (!zipEntry.dir && !relativePath.toLowerCase().endsWith('.kml')) {
+                            copyPromises.push(
+                                zipEntry.async('uint8array').then(content => {
+                                    newZip.file(relativePath, content);
+                                }).catch(err => {
+                                    console.warn(`Failed to copy ${relativePath}:`, err);
+                                })
+                            );
+                        }
+                    });
+                    
+                    await Promise.all(copyPromises);
+                    
+                    const zipBlob = await newZip.generateAsync({
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: {
+                            level: 6
+                        }
+                    });
+                    
+                    blob = zipBlob;
+                    filename = `${baseName}${suffix}.kmz`;
+                } else if (isKmzInput && !withPhotos) {
+                    const newZip = new JSZip();
+                    newZip.file('doc.kml', modifiedContent);
+                    
+                    const zipBlob = await newZip.generateAsync({
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: {
+                            level: 6
+                        }
+                    });
+                    
+                    blob = zipBlob;
+                    filename = `${baseName}${suffix}.kmz`;
+                } else {
+                    blob = new Blob([modifiedContent], { type: 'application/vnd.google-earth.kml+xml' });
+                    filename = `${baseName}${suffix}.kml`;
+                }
+
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('Export error:', error);
+                alert(`Error exporting file: ${error.message}`);
+            } finally {
+                document.getElementById('exportWithPhotos').disabled = false;
+                document.getElementById('exportWithPhotos').textContent = 'KMZ With Photos';
+                document.getElementById('exportWithoutPhotos').disabled = false;
+                document.getElementById('exportWithoutPhotos').textContent = 'KMZ Without Photos';
+            }
+        }
+    </script>
+</body>
+</html>

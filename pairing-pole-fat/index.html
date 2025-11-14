@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KML/KMZ POLE-FAT Processor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        h1 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #555;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #242424;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area.dragover {
+            border-color: #4a90e2;
+            background: #2a2a2a;
+        }
+        
+        .upload-area p {
+            color: #a0a0a0;
+            margin: 10px 0;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label {
+            color: #b0b0b0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3a7bc8;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-secondary {
+            background: #555;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #666;
+        }
+        
+        button:disabled {
+            background: #3a3a3a;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: #242424;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .warnings {
+            background: #3a3020;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .warnings.show {
+            display: block;
+        }
+        
+        .warnings ul {
+            margin-left: 20px;
+            color: #ffd54f;
+        }
+        
+        .debug-info {
+            background: #1a2332;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .debug-info h4 {
+            color: #64b5f6;
+            margin-bottom: 8px;
+        }
+        
+        .debug-info .folder-item {
+            padding: 4px 0;
+            color: #90caf9;
+        }
+        
+        .debug-info .folder-item.fat {
+            color: #ffb74d;
+        }
+        
+        .debug-info .folder-item.pole {
+            color: #81c784;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            border-radius: 6px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        thead {
+            position: sticky;
+            top: 0;
+            background: #1a1a1a;
+            color: white;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #4a90e2;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        tbody tr:hover {
+            background: #242424;
+        }
+        
+        .file-name {
+            margin: 15px 0;
+            padding: 10px;
+            background: #1a2a3a;
+            border-radius: 4px;
+            color: #64b5f6;
+            font-weight: 500;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .icon {
+            font-size: 48px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KML/KMZ POLE-FAT Processor</h1>
+        <p class="subtitle">Upload file KML/KMZ untuk memproses data POLE dan FAT</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="icon">📁</div>
+            <p><strong>Drag & drop file KML/KMZ di sini</strong></p>
+            <p>atau</p>
+            <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">Pilih File</button>
+            <input type="file" id="fileInput" accept=".kml,.kmz">
+        </div>
+        
+        <div class="file-name" id="fileName" style="display: none;"></div>
+        
+        <div class="debug-info" id="debugInfo" style="display: none;"></div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="radius">Radius (meter):</label>
+                <input type="number" id="radius" value="5" min="1" max="1000">
+            </div>
+            <button class="btn-primary" id="processBtn" disabled onclick="processData()">Proses</button>
+            <button class="btn-success" id="exportBtn" disabled onclick="exportCSV()">Export CSV</button>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-box">
+                <div class="stat-label">Total POLE</div>
+                <div class="stat-value" id="totalPoles">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Total FAT</div>
+                <div class="stat-value" id="totalFats">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">POLE Terpasang</div>
+                <div class="stat-value" id="pairedPoles">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">POLE Dihapus</div>
+                <div class="stat-value" id="removedPoles">0</div>
+            </div>
+        </div>
+        
+        <div class="warnings" id="warnings">
+            <strong>⚠️ Peringatan:</strong>
+            <ul id="warningList"></ul>
+        </div>
+        
+        <div class="table-container" id="tableContainer" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama POLE</th>
+                        <th>Nama FAT</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Jarak (m)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let kmlData = null;
+        let processedData = null;
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const fileName = document.getElementById('fileName');
+        
+        // Drag & Drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+        
+        async function handleFile(file) {
+            if (!file) return;
+            
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext !== 'kml' && ext !== 'kmz') {
+                alert('File harus berformat KML atau KMZ');
+                return;
+            }
+            
+            fileName.textContent = `File: ${file.name}`;
+            fileName.style.display = 'block';
+            
+            try {
+                let kmlText;
+                if (ext === 'kmz') {
+                    const zip = await JSZip.loadAsync(file);
+                    const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
+                    if (!kmlFile) {
+                        alert('File KML tidak ditemukan di dalam KMZ');
+                        return;
+                    }
+                    kmlText = await zip.files[kmlFile].async('string');
+                } else {
+                    kmlText = await file.text();
+                }
+                
+                kmlData = parseKML(kmlText);
+                processBtn.disabled = false;
+                document.getElementById('stats').style.display = 'none';
+                document.getElementById('tableContainer').style.display = 'none';
+                document.getElementById('warnings').classList.remove('show');
+                exportBtn.disabled = true;
+            } catch (err) {
+                alert('Error membaca file: ' + err.message);
+            }
+        }
+        
+        function parseKML(kmlText) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(kmlText, 'text/xml');
+            
+            const poles = [];
+            const fats = [];
+            const folderDebug = [];
+            
+            // Fungsi rekursif untuk mencari folder parent utama
+            function getMainFolder(folder) {
+                let current = folder;
+                let mainFolder = null;
+                
+                // Cari parent folder sampai ke Document
+                while (current && current.tagName === 'Folder') {
+                    const nameEl = current.getElementsByTagName('name')[0];
+                    if (nameEl) {
+                        const name = nameEl.textContent.trim();
+                        // Jika ini bukan folder "Point", simpan sebagai main folder
+                        if (name.toUpperCase() !== 'POINT') {
+                            mainFolder = name;
+                        }
+                    }
+                    current = current.parentNode;
+                }
+                
+                return mainFolder;
+            }
+            
+            // Fungsi untuk mengambil semua Placemark
+            function extractPlacemarks(element) {
+                const placemarks = element.getElementsByTagName('Placemark');
+                
+                for (let i = 0; i < placemarks.length; i++) {
+                    const placemark = placemarks[i];
+                    
+                    const nameEl = placemark.getElementsByTagName('name')[0];
+                    const name = nameEl ? nameEl.textContent.trim() : '';
+                    
+                    const pointEl = placemark.getElementsByTagName('Point')[0];
+                    if (!pointEl) continue;
+                    
+                    const coordsEl = pointEl.getElementsByTagName('coordinates')[0];
+                    if (!coordsEl) continue;
+                    
+                    const coords = coordsEl.textContent.trim().split(',');
+                    const lon = parseFloat(coords[0]);
+                    const lat = parseFloat(coords[1]);
+                    
+                    if (isNaN(lat) || isNaN(lon)) continue;
+                    
+                    // Cari main folder dari placemark ini
+                    const mainFolder = getMainFolder(placemark.parentNode);
+                    
+                    if (!mainFolder) continue;
+                    
+                    const isFAT = mainFolder.toUpperCase().includes('FAT');
+                    
+                    // Tambahkan ke debug jika belum ada
+                    if (!folderDebug.find(f => f.name === mainFolder)) {
+                        folderDebug.push({
+                            name: mainFolder,
+                            isFAT: isFAT
+                        });
+                    }
+                    
+                    if (isFAT) {
+                        fats.push({ 
+                            name: name, 
+                            lat: lat, 
+                            lon: lon, 
+                            used: false,
+                            folder: mainFolder
+                        });
+                    } else {
+                        poles.push({ 
+                            name: name, 
+                            lat: lat, 
+                            lon: lon,
+                            folder: mainFolder
+                        });
+                    }
+                }
+            }
+            
+            // Mulai dari Document atau root
+            const doc = xmlDoc.getElementsByTagName('Document')[0] || xmlDoc.documentElement;
+            extractPlacemarks(doc);
+            
+            // Tampilkan debug info
+            const debugInfo = document.getElementById('debugInfo');
+            let debugHTML = '<h4>📂 Struktur Folder Terdeteksi:</h4>';
+            folderDebug.forEach(folder => {
+                const cssClass = folder.isFAT ? 'fat' : 'pole';
+                const type = folder.isFAT ? '[FAT]' : '[POLE]';
+                debugHTML += `<div class="folder-item ${cssClass}">${type} ${folder.name}</div>`;
+            });
+            debugHTML += `<div style="margin-top: 10px; color: #64b5f6;">✓ Ditemukan ${poles.length} POLE dan ${fats.length} FAT</div>`;
+            debugInfo.innerHTML = debugHTML;
+            debugInfo.style.display = 'block';
+            
+            return { poles, fats };
+        }
+        
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Radius bumi dalam meter
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        function processData() {
+            const radius = parseFloat(document.getElementById('radius').value);
+            const { poles, fats } = kmlData;
+            
+            const results = [];
+            const warnings = [];
+            
+            // Reset status penggunaan FAT
+            fats.forEach(fat => fat.used = false);
+            
+            // Buat array semua kandidat pairing dengan jarak
+            const candidates = [];
+            for (let pole of poles) {
+                for (let fat of fats) {
+                    const dist = haversineDistance(pole.lat, pole.lon, fat.lat, fat.lon);
+                    if (dist <= radius) {
+                        candidates.push({
+                            pole: pole,
+                            fat: fat,
+                            distance: dist
+                        });
+                    }
+                }
+            }
+            
+            // Urutkan berdasarkan jarak terdekat
+            candidates.sort((a, b) => a.distance - b.distance);
+            
+            // Track POLE dan FAT yang sudah digunakan
+            const usedPoles = new Set();
+            const usedFats = new Set();
+            
+            // Proses pairing 1:1 berdasarkan jarak terdekat
+            for (let candidate of candidates) {
+                const poleId = candidate.pole.name;
+                const fatId = candidate.fat.name;
+                
+                // Skip jika POLE atau FAT sudah digunakan
+                if (usedPoles.has(poleId) || usedFats.has(fatId)) {
+                    continue;
+                }
+                
+                // Pairing berhasil - POLE sebagai POLE, FAT sebagai FAT
+                results.push({
+                    poleName: candidate.pole.name,  // Nama dari POLE
+                    fatName: candidate.fat.name,    // Nama dari FAT
+                    lat: candidate.pole.lat,        // Koordinat dari POLE
+                    lon: candidate.pole.lon,        // Koordinat dari POLE
+                    distance: candidate.distance.toFixed(2)
+                });
+                
+                usedPoles.add(poleId);
+                usedFats.add(fatId);
+                candidate.fat.used = true;
+            }
+            
+            // Hitung POLE yang tidak dapat dipairing
+            const unpairedPoles = poles.length - usedPoles.size;
+            if (unpairedPoles > 0) {
+                warnings.push(`${unpairedPoles} POLE tidak dapat dipairing (tidak ada FAT dalam radius ${radius}m atau FAT sudah terpakai)`);
+            }
+            
+            // Hitung FAT yang tidak terpakai
+            const unusedFats = fats.length - usedFats.size;
+            if (unusedFats > 0) {
+                warnings.push(`${unusedFats} FAT tidak terpakai (tidak ada POLE dalam radius ${radius}m)`);
+            }
+            
+            processedData = results;
+            
+            // Update stats
+            document.getElementById('totalPoles').textContent = poles.length;
+            document.getElementById('totalFats').textContent = fats.length;
+            document.getElementById('pairedPoles').textContent = results.length;
+            document.getElementById('removedPoles').textContent = poles.length - results.length;
+            document.getElementById('stats').style.display = 'flex';
+            
+            // Update warnings
+            if (warnings.length > 0) {
+                const warningList = document.getElementById('warningList');
+                warningList.innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+                document.getElementById('warnings').classList.add('show');
+            } else {
+                document.getElementById('warnings').classList.remove('show');
+            }
+            
+            // Update table
+            const tbody = document.getElementById('resultTable');
+            tbody.innerHTML = results.map((row, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${row.poleName}</td>
+                    <td>${row.fatName}</td>
+                    <td>${row.lat.toFixed(6)}</td>
+                    <td>${row.lon.toFixed(6)}</td>
+                    <td>${row.distance}</td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('tableContainer').style.display = 'block';
+            exportBtn.disabled = false;
+        }
+        
+        function exportCSV() {
+            if (!processedData || processedData.length === 0) {
+                alert('Tidak ada data untuk diekspor');
+                return;
+            }
+            
+            let csv = 'No,Nama POLE,Nama FAT,Latitude,Longitude,Jarak (m)\n';
+            processedData.forEach((row, idx) => {
+                csv += `${idx + 1},"${row.poleName}","${row.fatName}",${row.lat},${row.lon},${row.distance}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'pole_fat_pairing_' + new Date().toISOString().slice(0,10) + '.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>
