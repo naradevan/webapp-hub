@@ -126,6 +126,19 @@
             color: rgba(255,255,255,0.4);
         }
 
+        .webapp-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
         .webapp-list {
             list-style: none;
         }
@@ -165,6 +178,26 @@
             font-size: 15px;
             color: #e0e0e0;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .webapp-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .badge-official {
+            background: rgba(100, 200, 100, 0.2);
+            color: #80c080;
+        }
+
+        .badge-uploaded {
+            background: rgba(200, 180, 100, 0.2);
+            color: #c0b080;
         }
 
         .webapp-item.active .webapp-name {
@@ -241,105 +274,20 @@
             gap: 12px;
         }
 
-        .iframe-container {
-            flex: 1;
-            position: relative;
-            background: #1e1e1e;
-        }
-
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Floating Fullscreen Button */
-        .fullscreen-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: #333;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
+        /* Welcome Screen */
+        .welcome-screen {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .iframe-container:hover .fullscreen-btn,
-        .fullscreen-btn.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .fullscreen-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
-        }
-
-        .fullscreen-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Fullscreen Mode */
-        .fullscreen-mode {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            z-index: 9999 !important;
-            background: #1e1e1e;
-        }
-
-        .fullscreen-mode .webapp-header {
-            display: none;
-        }
-
-        .fullscreen-mode .fullscreen-btn {
-            opacity: 0.7;
-        }
-
-        .fullscreen-mode .fullscreen-btn:hover {
-            opacity: 1;
-        }
-
-        /* Fullscreen overlay background */
-        .fullscreen-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 9998;
-        }
-
-        .fullscreen-overlay.active {
-            display: block;
-        }
-
-        .welcome-screen {
             text-align: center;
-            padding: 80px 40px;
+            padding: 40px;
         }
 
         .welcome-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 120px;
+            margin-bottom: 30px;
             animation: float 3s ease-in-out infinite;
         }
 
@@ -349,90 +297,87 @@
         }
 
         .welcome-screen h2 {
-            font-size: 36px;
+            font-size: 32px;
             color: #e0e0e0;
-            margin-bottom: 20px;
-            font-weight: 600;
+            margin-bottom: 15px;
         }
 
         .welcome-screen p {
-            font-size: 17px;
+            font-size: 16px;
             color: rgba(255,255,255,0.6);
-            margin-bottom: 40px;
-            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 500px;
         }
 
         /* Buttons */
         .btn {
-            padding: 12px 28px;
+            padding: 12px 24px;
             border: none;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: #333;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            background: #444;
+            color: #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .btn-primary:hover {
+            background: #555;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-            background: #444;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         .btn-secondary {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.1);
             color: #e0e0e0;
-            border: 1px solid #444;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: #555;
+            background: rgba(255,255,255,0.15);
         }
 
         .btn-success {
-            background: #444;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: #3a3a3a;
+            color: #80c080;
         }
 
         .btn-success:hover {
+            background: #4a4a4a;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            background: #555;
         }
 
         .btn-danger {
-            background: #555;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: #3a3a3a;
+            color: #c08080;
         }
 
         .btn-danger:hover {
+            background: #4a4a4a;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            background: #666;
         }
 
         /* Modal */
         .modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
+            backdrop-filter: blur(5px);
+            display: none;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
         }
 
         .modal.active {
@@ -440,37 +385,19 @@
         }
 
         .modal-content {
-            background: #1e1e1e;
+            background: #212121;
             padding: 35px;
             border-radius: 16px;
+            max-width: 500px;
             width: 90%;
-            max-width: 550px;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             border: 1px solid #333;
-            animation: modalSlideIn 0.3s ease;
         }
 
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
+        .modal-content h3 {
+            font-size: 24px;
             margin-bottom: 25px;
-        }
-
-        .modal-header h3 {
-            font-size: 26px;
             color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .form-group {
@@ -479,144 +406,85 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
+            margin-bottom: 8px;
             color: #e0e0e0;
+            font-weight: 500;
             font-size: 14px;
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-group input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 15px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
+            border-radius: 8px;
             color: #e0e0e0;
             font-size: 14px;
-            transition: all 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #555;
             background: rgba(255,255,255,0.08);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: rgba(255,255,255,0.4);
+        .file-upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.02);
         }
 
-        .form-group textarea {
-            min-height: 220px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            resize: vertical;
+        .file-upload-area:hover {
+            border-color: #555;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .file-upload-area.drag-over {
+            border-color: #80c080;
+            background: rgba(100, 200, 100, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
         }
 
         .form-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: flex-end;
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: rgba(255,255,255,0.4);
-        }
-
-        .empty-state-icon {
-            font-size: 56px;
-            margin-bottom: 15px;
-            opacity: 0.6;
-        }
-
-        /* File Input Custom */
-        .file-input-wrapper {
+        /* Iframe Container */
+        .iframe-container {
+            flex: 1;
             position: relative;
+            background: #1e1e1e;
             overflow: hidden;
-            display: inline-block;
+        }
+
+        .iframe-container iframe {
             width: 100%;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: block;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed #444;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .file-input-label:hover {
-            border-color: #666;
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: none;
+            height: 100%;
             border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.5);
-            border-bottom: 2px solid transparent;
-            margin-bottom: -1px;
-            transition: all 0.3s;
         }
 
-        .tab:hover {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .tab.active {
-            color: #e0e0e0;
-            border-bottom-color: #555;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Loading Overlay */
         .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(30, 30, 30, 0.95);
+            background: #1e1e1e;
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 10;
         }
 
         .loading-overlay.active {
@@ -624,74 +492,94 @@
         }
 
         .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #666;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #555;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Category Badge */
-        .category-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #333;
-            color: #e0e0e0;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 6px;
-        }
-
-        /* Export Collection */
-        .export-collection-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ccc;
-            border: 1px solid #444;
-        }
-
-        .export-collection-btn:hover {
-            background: #444;
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(33, 33, 33, 0.9);
             color: white;
-        }
-
-        .import-collection-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ccc;
             border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .import-collection-btn:hover {
+        .fullscreen-btn.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .fullscreen-btn:hover {
             background: #444;
-            color: white;
+            transform: scale(1.1);
         }
 
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
+        /* Fullscreen Mode */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 998;
+            display: none;
         }
 
-        .toolbar button {
-            flex: 1;
-            padding: 10px;
-            font-size: 12px;
+        .fullscreen-overlay.active {
+            display: block;
+        }
+
+        .content-area.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            z-index: 999;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Fullscreen Overlay -->
+    <div id="fullscreenOverlay" class="fullscreen-overlay"></div>
+
     <div class="container">
         <!-- Navbar -->
         <div class="navbar">
             <h1>🚀 WebApp Hub</h1>
             <div class="navbar-actions">
-                <span class="status-indicator" id="statusIndicator">✓ Ready</span>
+                <span class="status-indicator">● Online</span>
                 <button class="btn btn-primary" onclick="openAddModal()">+ Add WebApp</button>
             </div>
         </div>
@@ -699,25 +587,30 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <h2>
-                My WebApps 
+                WebApps 
                 <span class="webapp-count" id="webappCount">0</span>
             </h2>
             
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Search webapps..." oninput="filterWebApps()">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search webapps..." 
+                    oninput="filterWebApps()"
+                >
             </div>
 
-            <div class="toolbar">
-                <button class="btn-small export-collection-btn" onclick="exportCollection()">📤 Export All</button>
-                <button class="btn-small import-collection-btn" onclick="importCollection()">📥 Import</button>
+            <!-- Official WebApps Section -->
+            <div class="webapp-section">
+                <div class="section-title">📁 Official WebApps</div>
+                <ul class="webapp-list" id="officialWebAppList"></ul>
             </div>
-            
-            <ul class="webapp-list" id="webappList">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📦</div>
-                    <p>No webapps yet<br>Add your first webapp!</p>
-                </div>
-            </ul>
+
+            <!-- User Uploaded WebApps Section -->
+            <div class="webapp-section" id="uploadedSection" style="display: none;">
+                <div class="section-title">📤 User Uploaded</div>
+                <ul class="webapp-list" id="uploadedWebAppList"></ul>
+            </div>
         </div>
 
         <!-- Content Area -->
@@ -725,62 +618,44 @@
             <div class="welcome-screen">
                 <div class="welcome-icon">🚀</div>
                 <h2>Welcome to WebApp Hub!</h2>
-                <p>Manage all your web applications in one place.<br>Add, organize, and run your webapps seamlessly with powerful export features.</p>
-                <button class="btn btn-primary" onclick="openAddModal()">Get Started - Add Your First WebApp</button>
+                <p>Manage all your web applications in one place.<br>Select an official webapp or upload your own to get started.</p>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Upload Your Own WebApp</button>
             </div>
         </div>
     </div>
 
-    <!-- Fullscreen Overlay -->
-    <div class="fullscreen-overlay" id="fullscreenOverlay"></div>
-
     <!-- Add WebApp Modal -->
     <div class="modal" id="addModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>✨ Add New WebApp</h3>
-            </div>
-            
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('upload')">📁 Upload File</button>
-                <button class="tab" onclick="switchTab('paste')">📝 Paste HTML</button>
-            </div>
-
-            <form id="addWebAppForm">
+            <h3>+ Add New WebApp</h3>
+            <form id="addWebAppForm" onsubmit="handleAddWebApp(event)">
                 <div class="form-group">
                     <label>WebApp Name</label>
-                    <input type="text" id="webappName" placeholder="My Awesome App" required>
+                    <input 
+                        type="text" 
+                        id="webappName" 
+                        placeholder="Enter webapp name..." 
+                        required
+                    >
                 </div>
-
+                
                 <div class="form-group">
-                    <label>Category (Optional)</label>
-                    <input type="text" id="webappCategory" placeholder="e.g., Tools, Games, Utilities" list="categoryList">
-                    <datalist id="categoryList">
-                        <option value="Tools">
-                        <option value="Games">
-                        <option value="Utilities">
-                        <option value="Productivity">
-                        <option value="Creative">
-                    </datalist>
-                </div>
-
-                <div class="tab-content active" id="uploadTab">
-                    <div class="form-group">
-                        <label>Upload HTML File</label>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="fileInput" accept=".html,.htm" onchange="handleFileSelect(event)">
-                            <label for="fileInput" class="file-input-label">
-                                <span id="fileLabel">📁 Click to select HTML file</span>
-                            </label>
-                        </div>
+                    <label>Upload HTML File</label>
+                    <div 
+                        class="file-upload-area" 
+                        id="fileUploadArea"
+                        onclick="document.getElementById('fileInput').click()"
+                    >
+                        <div class="upload-icon">📁</div>
+                        <p id="fileUploadText">Click or drag to upload HTML file</p>
                     </div>
-                </div>
-
-                <div class="tab-content" id="pasteTab">
-                    <div class="form-group">
-                        <label>Paste HTML Code</label>
-                        <textarea id="htmlCode" placeholder="<!DOCTYPE html>&#10;<html>&#10;..."></textarea>
-                    </div>
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        accept=".html,.htm" 
+                        style="display: none;"
+                        onchange="handleFileSelect(event)"
+                    >
                 </div>
 
                 <div class="form-actions">
@@ -791,284 +666,203 @@
         </div>
     </div>
 
-    <!-- Import Collection Input -->
-    <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(event)">
-
     <script>
-        // Storage Manager
+        // ===== HARDCODED OFFICIAL WEBAPPS FROM FOLDERS =====
+        const OFFICIAL_WEBAPPS = [
+            {
+                id: 'auto-measure-line',
+                name: 'Auto Measure Line',
+                path: '/auto-measure-line/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'clamphook-homepass',
+                name: 'Clamphook Homepass',
+                path: '/clamphook-homepass/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kml-extract-by-folder',
+                name: 'KML Extract by Folder',
+                path: '/kml-extract-by-folder/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'fat-to-homepass',
+                name: 'FAT to Homepass',
+                path: '/fat-to-homepass/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'hp-by-polygon',
+                name: 'HP by Polygon',
+                path: '/hp-by-polygon/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kml-to-csv',
+                name: 'KML to CSV',
+                path: '/kml-to-csv/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kmz-editor-rename',
+                name: 'KMZ Editor Rename',
+                path: '/kmz-editor-rename/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'pairing-pole-fat',
+                name: 'Pairing Pole FAT',
+                path: '/pairing-pole-fat/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'pole-separator-by-line',
+                name: 'Pole Separator by Line',
+                path: '/pole-separator-by-line/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'snap-to-pole',
+                name: 'Snap to Pole',
+                path: '/snap-to-pole/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'split-line-for-surge',
+                name: 'Split Line for Surge',
+                path: '/split-line-for-surge/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            }
+        ];
+
+        // ===== STORAGE MANAGER (User Uploads Only) =====
         const StorageManager = {
-            getWebApps() {
-                const data = localStorage.getItem('webappHub');
+            STORAGE_KEY: 'webappHub_userUploads',
+            
+            getUserUploads() {
+                const data = localStorage.getItem(this.STORAGE_KEY);
                 return data ? JSON.parse(data) : [];
             },
             
-            saveWebApps(webapps) {
-                localStorage.setItem('webappHub', JSON.stringify(webapps));
+            saveUserUpload(webapp) {
+                const uploads = this.getUserUploads();
+                uploads.push(webapp);
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(uploads));
             },
             
-            addWebApp(webapp) {
-                const webapps = this.getWebApps();
-                webapp.id = Date.now().toString();
-                webapp.createdAt = new Date().toISOString();
-                webapps.push(webapp);
-                this.saveWebApps(webapps);
-                return webapp;
-            },
-            
-            deleteWebApp(id) {
-                let webapps = this.getWebApps();
-                webapps = webapps.filter(app => app.id !== id);
-                this.saveWebApps(webapps);
+            deleteUserUpload(id) {
+                const uploads = this.getUserUploads();
+                const filtered = uploads.filter(app => app.id !== id);
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
             },
             
             getWebApp(id) {
-                const webapps = this.getWebApps();
-                return webapps.find(app => app.id === id);
+                const official = OFFICIAL_WEBAPPS.find(app => app.id === id);
+                if (official) return official;
+                
+                const uploads = this.getUserUploads();
+                return uploads.find(app => app.id === id);
             }
         };
 
-        // PostMessage Handler for File Export
-        class FileExportHandler {
-            constructor() {
-                this.setupMessageListener();
-            }
-
-            setupMessageListener() {
-                window.addEventListener('message', (event) => {
-                    // Security check - only accept messages from same origin iframe
-                    if (event.source !== document.querySelector('#webappIframe')?.contentWindow) {
-                        return;
-                    }
-
-                    const message = event.data;
-                    
-                    if (message.type === 'EXPORT_FILE') {
-                        this.handleFileExport(message.payload);
-                    } else if (message.type === 'WEBAPP_READY') {
-                        this.updateStatus('✓ WebApp Loaded', 'success');
-                    } else if (message.type === 'WEBAPP_ERROR') {
-                        this.updateStatus('✗ Error: ' + message.error, 'error');
-                    }
-                });
-            }
-
-            handleFileExport(payload) {
-                const { filename, content, contentType } = payload;
-                
-                try {
-                    let blob;
-                    
-                    // Handle different content types
-                    if (contentType === 'text/plain' || contentType === 'text/csv' || contentType === 'application/json') {
-                        blob = new Blob([content], { type: contentType });
-                    } else if (contentType === 'base64') {
-                        // Handle base64 encoded files
-                        const byteCharacters = atob(content);
-                        const byteNumbers = new Array(byteCharacters.length);
-                        for (let i = 0; i < byteCharacters.length; i++) {
-                            byteNumbers[i] = byteCharacters.charCodeAt(i);
-                        }
-                        const byteArray = new Uint8Array(byteNumbers);
-                        blob = new Blob([byteArray], { type: payload.mimeType || 'application/octet-stream' });
-                    } else {
-                        blob = new Blob([content], { type: contentType || 'application/octet-stream' });
-                    }
-                    
-                    // Create download link
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    this.updateStatus('✓ File exported: ' + filename, 'success');
-                } catch (error) {
-                    console.error('Export error:', error);
-                    this.updateStatus('✗ Export failed', 'error');
-                }
-            }
-
-            updateStatus(message, type) {
-                const indicator = document.getElementById('statusIndicator');
-                indicator.textContent = message;
-                
-                if (type === 'success') {
-                    indicator.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                } else if (type === 'error') {
-                    indicator.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                } else {
-                    indicator.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                }
-                
-                // Reset after 3 seconds
-                setTimeout(() => {
-                    indicator.textContent = '✓ Ready';
-                    indicator.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                }, 3000);
-            }
-        }
-
-        // Initialize File Export Handler
-        const fileExportHandler = new FileExportHandler();
-
-        // UI State
-        let currentTab = 'upload';
-        let selectedFile = null;
+        // ===== GLOBAL VARIABLES =====
         let currentWebAppId = null;
         let isFullscreen = false;
+        let selectedFile = null;
 
-        // Initialize
+        // ===== INITIALIZATION =====
         function init() {
             renderWebAppList();
             updateWebAppCount();
+            setupDragAndDrop();
+            showWelcomeScreen();
         }
 
-        // Update WebApp Count
-        function updateWebAppCount() {
-            const webapps = StorageManager.getWebApps();
-            document.getElementById('webappCount').textContent = webapps.length;
-        }
-
-        // Filter WebApps
-        function filterWebApps() {
+        // ===== RENDER WEBAPP LIST =====
+        function renderWebAppList() {
+            const officialList = document.getElementById('officialWebAppList');
+            const uploadedList = document.getElementById('uploadedWebAppList');
+            const uploadedSection = document.getElementById('uploadedSection');
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const webapps = StorageManager.getWebApps();
             
-            const filtered = webapps.filter(app => 
-                app.name.toLowerCase().includes(searchTerm) ||
-                (app.category && app.category.toLowerCase().includes(searchTerm))
+            officialList.innerHTML = '';
+            const filteredOfficial = OFFICIAL_WEBAPPS.filter(app => 
+                app.name.toLowerCase().includes(searchTerm)
             );
             
-            renderWebAppList(filtered);
-        }
-
-        // Render WebApp List
-        function renderWebAppList(webapps = null) {
-            if (!webapps) {
-                webapps = StorageManager.getWebApps();
-            }
-            
-            const listElement = document.getElementById('webappList');
-            
-            if (webapps.length === 0) {
-                listElement.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <p>No webapps found</p>
+            filteredOfficial.forEach(app => {
+                const li = document.createElement('li');
+                li.className = \`webapp-item \${currentWebAppId === app.id ? 'active' : ''}\`;
+                li.innerHTML = \`
+                    <div class="webapp-info" onclick="loadOfficialWebApp('\${app.id}')">
+                        <div class="webapp-name">
+                            \${app.name}
+                            <span class="webapp-badge badge-official">OFFICIAL</span>
+                        </div>
+                        <div class="webapp-date">\${app.date}</div>
                     </div>
-                `;
-                return;
-            }
-            
-            listElement.innerHTML = webapps.map(app => `
-                <li class="webapp-item ${currentWebAppId === app.id ? 'active' : ''}" onclick="loadWebApp('${app.id}')">
-                    <div class="webapp-info">
-                        <div class="webapp-name">${app.name}</div>
-                        <div class="webapp-date">${formatDate(app.createdAt)}</div>
-                        ${app.category ? `<span class="category-badge">${app.category}</span>` : ''}
-                    </div>
-                    <div class="webapp-actions">
-                        <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteWebApp('${app.id}')">🗑️</button>
-                    </div>
-                </li>
-            `).join('');
-        }
-
-        // Format Date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { 
-                day: 'numeric', 
-                month: 'short', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                \`;
+                officialList.appendChild(li);
             });
-        }
-
-        // Export Collection
-        function exportCollection() {
-            const webapps = StorageManager.getWebApps();
             
-            if (webapps.length === 0) {
-                alert('No webapps to export!');
-                return;
+            const userUploads = StorageManager.getUserUploads();
+            const filteredUploads = userUploads.filter(app => 
+                app.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredUploads.length > 0) {
+                uploadedSection.style.display = 'block';
+                uploadedList.innerHTML = '';
+                
+                filteredUploads.forEach(app => {
+                    const li = document.createElement('li');
+                    li.className = \`webapp-item \${currentWebAppId === app.id ? 'active' : ''}\`;
+                    li.innerHTML = \`
+                        <div class="webapp-info" onclick="loadUserUploadedWebApp('\${app.id}')">
+                            <div class="webapp-name">
+                                \${app.name}
+                                <span class="webapp-badge badge-uploaded">UPLOADED</span>
+                            </div>
+                            <div class="webapp-date">\${app.date}</div>
+                        </div>
+                        <div class="webapp-actions" onclick="event.stopPropagation()">
+                            <button class="btn-small btn-delete" onclick="deleteUserUpload('\${app.id}')">🗑️</button>
+                        </div>
+                    \`;
+                    uploadedList.appendChild(li);
+                });
+            } else {
+                uploadedSection.style.display = 'none';
             }
-            
-            const exportData = {
-                version: '1.0',
-                exportDate: new Date().toISOString(),
-                webapps: webapps
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `webapp-hub-collection-${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            fileExportHandler.updateStatus(`✓ Exported ${webapps.length} webapps`, 'success');
         }
 
-        // Import Collection
-        function importCollection() {
-            document.getElementById('importFileInput').click();
+        function updateWebAppCount() {
+            const userUploads = StorageManager.getUserUploads();
+            const total = OFFICIAL_WEBAPPS.length + userUploads.length;
+            document.getElementById('webappCount').textContent = total;
         }
 
-        function handleImportFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importData = JSON.parse(e.target.result);
-                    
-                    if (!importData.webapps || !Array.isArray(importData.webapps)) {
-                        alert('Invalid collection file!');
-                        return;
-                    }
-                    
-                    const currentWebapps = StorageManager.getWebApps();
-                    const newWebapps = [...currentWebapps];
-                    
-                    let importedCount = 0;
-                    importData.webapps.forEach(webapp => {
-                        // Generate new ID to avoid conflicts
-                        webapp.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-                        webapp.importedAt = new Date().toISOString();
-                        newWebapps.push(webapp);
-                        importedCount++;
-                    });
-                    
-                    StorageManager.saveWebApps(newWebapps);
-                    renderWebAppList();
-                    updateWebAppCount();
-                    
-                    fileExportHandler.updateStatus(`✓ Imported ${importedCount} webapps`, 'success');
-                } catch (error) {
-                    alert('Error importing collection: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-            
-            // Reset input
-            event.target.value = '';
+        function filterWebApps() {
+            renderWebAppList();
         }
 
-        // Modal Functions
         function openAddModal() {
             document.getElementById('addModal').classList.add('active');
             document.getElementById('webappName').value = '';
-            document.getElementById('webappCategory').value = '';
-            document.getElementById('htmlCode').value = '';
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileLabel').textContent = '📁 Click to select HTML file';
+            document.getElementById('fileUploadText').textContent = 'Click or drag to upload HTML file';
             selectedFile = null;
         }
 
@@ -1076,145 +870,69 @@
             document.getElementById('addModal').classList.remove('active');
         }
 
-        // Tab Switching
-        function switchTab(tabName) {
-            currentTab = tabName;
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('fileUploadArea');
             
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
             });
-            event.target.classList.add('active');
             
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
             });
-            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && (file.name.endsWith('.html') || file.name.endsWith('.htm'))) {
+                    handleFileSelect({ target: { files: [file] } });
+                }
+            });
         }
 
-        // File Selection
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
                 selectedFile = file;
-                document.getElementById('fileLabel').textContent = `✅ ${file.name}`;
+                document.getElementById('fileUploadText').textContent = \`✓ \${file.name}\`;
                 
-                // Auto-fill name if empty
                 if (!document.getElementById('webappName').value) {
-                    const fileName = file.name.replace('.html', '').replace('.htm', '');
-                    document.getElementById('webappName').value = fileName;
+                    const name = file.name.replace('.html', '').replace('.htm', '');
+                    document.getElementById('webappName').value = name;
                 }
             }
         }
 
-        // Form Submit
-        document.getElementById('addWebAppForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function handleAddWebApp(event) {
+            event.preventDefault();
             
-            const name = document.getElementById('webappName').value;
-            const category = document.getElementById('webappCategory').value;
-            let htmlContent = '';
-            
-            if (currentTab === 'upload') {
-                if (!selectedFile) {
-                    alert('Please select a file!');
-                    return;
-                }
-                htmlContent = await readFileAsText(selectedFile);
-            } else {
-                htmlContent = document.getElementById('htmlCode').value;
-                if (!htmlContent.trim()) {
-                    alert('Please paste HTML code!');
-                    return;
-                }
+            if (!selectedFile) {
+                alert('Please select an HTML file!');
+                return;
             }
             
-            // Inject export helper script into webapp
-            const injectedContent = injectExportHelper(htmlContent);
+            const name = document.getElementById('webappName').value;
+            const htmlContent = await readFileAsText(selectedFile);
             
-            // Convert to base64
-            const base64Content = btoa(unescape(encodeURIComponent(injectedContent)));
-            
-            // Save to storage
-            const webapp = StorageManager.addWebApp({
+            const webapp = {
+                id: 'user_' + Date.now(),
                 name: name,
-                category: category,
-                content: base64Content,
-                size: injectedContent.length
-            });
+                content: btoa(unescape(encodeURIComponent(htmlContent))),
+                date: new Date().toISOString().split('T')[0],
+                type: 'uploaded'
+            };
             
-            // Update UI
+            StorageManager.saveUserUpload(webapp);
             renderWebAppList();
             updateWebAppCount();
             closeAddModal();
+            loadUserUploadedWebApp(webapp.id);
             
-            // Show success message
-            fileExportHandler.updateStatus('✓ WebApp added successfully!', 'success');
-        });
-
-        // Inject Export Helper
-        function injectExportHelper(htmlContent) {
-            const helperScript = `
-<script>
-// WebApp Hub Export Helper
-(function() {
-    // Export function for sub-webapps
-    window.exportFile = function(filename, content, contentType = 'text/plain') {
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'EXPORT_FILE',
-                payload: {
-                    filename: filename,
-                    content: content,
-                    contentType: contentType
-                }
-            }, '*');
-        } else {
-            // Fallback if not in iframe
-            const blob = new Blob([content], { type: contentType });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    };
-    
-    // Export base64 files
-    window.exportFileBase64 = function(filename, base64Content, mimeType = 'application/octet-stream') {
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'EXPORT_FILE',
-                payload: {
-                    filename: filename,
-                    content: base64Content,
-                    contentType: 'base64',
-                    mimeType: mimeType
-                }
-            }, '*');
-        }
-    };
-    
-    // Notify parent that webapp is ready
-    if (window.parent !== window) {
-        window.parent.postMessage({ type: 'WEBAPP_READY' }, '*');
-    }
-})();
-<\/script>`;
-            
-            // Inject before closing body tag, or at the end if no body tag
-            if (htmlContent.includes('</body>')) {
-                return htmlContent.replace('</body>', helperScript + '</body>');
-            } else if (htmlContent.includes('</html>')) {
-                return htmlContent.replace('</html>', helperScript + '</html>');
-            } else {
-                return htmlContent + helperScript;
-            }
+            alert('✓ WebApp added successfully!');
         }
 
-        // Read File
         function readFileAsText(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1224,12 +942,10 @@
             });
         }
 
-        // Delete WebApp
-        function deleteWebApp(id) {
+        function deleteUserUpload(id) {
             if (confirm('Are you sure you want to delete this webapp?')) {
-                StorageManager.deleteWebApp(id);
+                StorageManager.deleteUserUpload(id);
                 
-                // If currently viewing deleted app, show welcome screen
                 if (currentWebAppId === id) {
                     currentWebAppId = null;
                     showWelcomeScreen();
@@ -1237,29 +953,67 @@
                 
                 renderWebAppList();
                 updateWebAppCount();
-                fileExportHandler.updateStatus('✓ WebApp deleted', 'success');
             }
         }
 
-        // Load WebApp
-        function loadWebApp(id) {
-            const webapp = StorageManager.getWebApp(id);
+        async function loadOfficialWebApp(id) {
+            const webapp = OFFICIAL_WEBAPPS.find(app => app.id === id);
             if (!webapp) return;
             
             currentWebAppId = id;
             isFullscreen = false;
             
             const contentArea = document.getElementById('contentArea');
-            
-            // Decode base64 content
-            const htmlContent = decodeURIComponent(escape(atob(webapp.content)));
-            
-            contentArea.innerHTML = `
+            contentArea.innerHTML = \`
                 <div class="webapp-header">
-                    <h2>📱 ${webapp.name}</h2>
+                    <h2>📁 \${webapp.name} <span class="webapp-badge badge-official">OFFICIAL</span></h2>
                     <div class="webapp-header-actions">
                         <button class="btn btn-secondary" onclick="reloadWebApp()">🔄 Reload</button>
-                        <button class="btn btn-success" onclick="showExportInfo()">💡 Export Info</button>
+                        <button class="btn btn-danger" onclick="closeWebApp()">✕ Close</button>
+                    </div>
+                </div>
+                <div class="iframe-container" id="iframeContainer">
+                    <div class="loading-overlay active">
+                        <div class="spinner"></div>
+                    </div>
+                    <iframe 
+                        id="webappIframe" 
+                        src="\${webapp.path}"
+                        sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"
+                    ></iframe>
+                    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
+                        ⛶
+                    </button>
+                </div>
+            \`;
+            
+            const iframe = document.getElementById('webappIframe');
+            iframe.onload = function() {
+                setTimeout(() => {
+                    document.querySelector('.loading-overlay').classList.remove('active');
+                    document.getElementById('fullscreenBtn').classList.add('active');
+                }, 500);
+            };
+            
+            setupFullscreenListeners();
+            renderWebAppList();
+        }
+
+        function loadUserUploadedWebApp(id) {
+            const webapp = StorageManager.getWebApp(id);
+            if (!webapp || webapp.type !== 'uploaded') return;
+            
+            currentWebAppId = id;
+            isFullscreen = false;
+            
+            const contentArea = document.getElementById('contentArea');
+            const htmlContent = decodeURIComponent(escape(atob(webapp.content)));
+            
+            contentArea.innerHTML = \`
+                <div class="webapp-header">
+                    <h2>📤 \${webapp.name} <span class="webapp-badge badge-uploaded">UPLOADED</span></h2>
+                    <div class="webapp-header-actions">
+                        <button class="btn btn-secondary" onclick="reloadWebApp()">🔄 Reload</button>
                         <button class="btn btn-danger" onclick="closeWebApp()">✕ Close</button>
                     </div>
                 </div>
@@ -1270,31 +1024,26 @@
                     <iframe 
                         id="webappIframe" 
                         sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"
-                        srcdoc="${htmlContent.replace(/"/g, '&quot;')}"
+                        srcdoc="\${htmlContent.replace(/"/g, '&quot;')}"
                     ></iframe>
                     <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
                         ⛶
                     </button>
                 </div>
-            `;
+            \`;
             
-            // Hide loading overlay after iframe loads
             const iframe = document.getElementById('webappIframe');
             iframe.onload = function() {
                 setTimeout(() => {
                     document.querySelector('.loading-overlay').classList.remove('active');
-                    // Make fullscreen button visible
                     document.getElementById('fullscreenBtn').classList.add('active');
                 }, 500);
             };
             
-            // Setup ESC key listener
             setupFullscreenListeners();
-            
             renderWebAppList();
         }
 
-        // Toggle Fullscreen
         function toggleFullscreen() {
             const contentArea = document.getElementById('contentArea');
             const overlay = document.getElementById('fullscreenOverlay');
@@ -1303,36 +1052,27 @@
             isFullscreen = !isFullscreen;
             
             if (isFullscreen) {
-                // Enter fullscreen
                 contentArea.classList.add('fullscreen-mode');
                 overlay.classList.add('active');
-                btn.innerHTML = '⛶'; // Change to minimize icon
+                btn.innerHTML = '⛶';
                 btn.title = 'Exit Fullscreen';
-                
-                // Disable body scroll
                 document.body.style.overflow = 'hidden';
             } else {
-                // Exit fullscreen
                 contentArea.classList.remove('fullscreen-mode');
                 overlay.classList.remove('active');
-                btn.innerHTML = '⛶'; // Change back to maximize icon
+                btn.innerHTML = '⛶';
                 btn.title = 'Fullscreen';
-                
-                // Enable body scroll
                 document.body.style.overflow = '';
             }
         }
 
-        // Setup Fullscreen Listeners
         function setupFullscreenListeners() {
-            // ESC key to exit fullscreen
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && isFullscreen) {
                     toggleFullscreen();
                 }
             });
             
-            // Click overlay to exit fullscreen
             document.getElementById('fullscreenOverlay').addEventListener('click', function() {
                 if (isFullscreen) {
                     toggleFullscreen();
@@ -1340,80 +1080,38 @@
             });
         }
 
-        // Reload Current WebApp
         function reloadWebApp() {
             if (currentWebAppId) {
-                loadWebApp(currentWebAppId);
+                const webapp = StorageManager.getWebApp(currentWebAppId);
+                if (webapp.type === 'official') {
+                    loadOfficialWebApp(currentWebAppId);
+                } else {
+                    loadUserUploadedWebApp(currentWebAppId);
+                }
             }
         }
 
-        // Close WebApp
         function closeWebApp() {
-            // Exit fullscreen if active
             if (isFullscreen) {
                 toggleFullscreen();
             }
-            
             currentWebAppId = null;
             showWelcomeScreen();
             renderWebAppList();
         }
 
-        // Show Export Info
-        function showExportInfo() {
-            const infoHTML = `
-                <div style="background: rgba(26, 26, 46, 0.95); padding: 30px; border-radius: 12px; max-width: 600px; color: #e0e0e0;">
-                    <h3 style="margin-bottom: 20px; color: #667eea;">📦 Export API Documentation</h3>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: #10b981; margin-bottom: 10px;">1. Export Text/CSV/JSON:</h4>
-                        <code style="color: #e0e0e0;">exportFile('data.txt', 'Hello World!', 'text/plain');</code>
-                    </div>
-                    
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: #10b981; margin-bottom: 10px;">2. Export Base64 Files:</h4>
-                        <code style="color: #e0e0e0;">exportFileBase64('image.png', base64Data, 'image/png');</code>
-                    </div>
-                    
-                    <p style="margin-top: 20px; font-size: 13px; opacity: 0.7;">
-                        These functions are automatically available in all sub-webapps!
-                    </p>
-                </div>
-            `;
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.innerHTML = `
-                <div class="modal-content" style="max-width: 700px;">
-                    ${infoHTML}
-                    <div class="form-actions" style="margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Got it!</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-
-        // Show Welcome Screen
         function showWelcomeScreen() {
             const contentArea = document.getElementById('contentArea');
-            contentArea.innerHTML = `
+            contentArea.innerHTML = \`
                 <div class="welcome-screen">
                     <div class="welcome-icon">🚀</div>
                     <h2>Welcome to WebApp Hub!</h2>
-                    <p>Manage all your web applications in one place.<br>Add, organize, and run your webapps seamlessly with powerful export features.</p>
-                    <button class="btn btn-primary" onclick="openAddModal()">Get Started - Add Your First WebApp</button>
+                    <p>Manage all your web applications in one place.<br>Select an official webapp or upload your own to get started.</p>
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Upload Your Own WebApp</button>
                 </div>
-            `;
+            \`;
         }
 
-        // Initialize on load
         init();
     </script>
 </body>
