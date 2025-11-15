@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KML Processor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1A1A1A;
+            color: #E8E8E0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #F5F5F0;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #A0A0A0;
+            margin-bottom: 40px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #404040;
+            border-radius: 8px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #252525;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 30px;
+        }
+
+        .upload-zone:hover {
+            border-color: #606060;
+            background: #2A2A2A;
+        }
+
+        .upload-zone.dragover {
+            border-color: #808080;
+            background: #303030;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.4;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #D0D0D0;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #909090;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: #F5F5F0;
+            color: #1A1A1A;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #E0E0D8;
+        }
+
+        .btn:disabled {
+            background: #404040;
+            color: #707070;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .folder-section {
+            background: #252525;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #353535;
+        }
+
+        .folder-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #F5F5F0;
+            border-bottom: 1px solid #353535;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #2A2A2A;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 10px;
+            font-weight: 500;
+            color: #E8E8E0;
+            border-bottom: 2px solid #404040;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #303030;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #2A2A2A;
+        }
+
+        .coord {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .description {
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        .stats {
+            background: #252525;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #353535;
+            font-size: 14px;
+            color: #D0D0D0;
+        }
+
+        .download-btn {
+            margin-bottom: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #909090;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KML Processor</h1>
+        <p class="subtitle">Upload file KML/KMZ untuk memproses dan membersihkan data</p>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📍</div>
+            <div class="upload-text">Klik atau drag file ke sini</div>
+            <div class="upload-hint">Mendukung format .kml dan .kmz</div>
+            <input type="file" id="fileInput" accept=".kml,.kmz">
+        </div>
+
+        <div class="loading" id="loading">
+            Memproses file...
+        </div>
+
+        <div class="results" id="results">
+            <div class="stats" id="stats"></div>
+            <button class="btn download-btn" id="downloadBtn">Download CSV</button>
+            <div id="folders"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const foldersDiv = document.getElementById('folders');
+        const statsDiv = document.getElementById('stats');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let processedData = [];
+
+        // Upload zone interactions
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        });
+
+        async function processFile(file) {
+            loading.classList.add('show');
+            results.classList.remove('show');
+            
+            try {
+                let kmlText;
+                
+                if (file.name.endsWith('.kmz')) {
+                    const zip = await JSZip.loadAsync(file);
+                    const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
+                    if (!kmlFile) throw new Error('Tidak ada file KML di dalam KMZ');
+                    kmlText = await zip.files[kmlFile].async('string');
+                } else {
+                    kmlText = await file.text();
+                }
+
+                const parser = new DOMParser();
+                const kmlDoc = parser.parseFromString(kmlText, 'text/xml');
+                
+                processedData = parseKML(kmlDoc);
+                displayResults(processedData);
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        function cleanDescription(desc) {
+            if (!desc) return '';
+            
+            // Remove HTML tags
+            const temp = document.createElement('div');
+            temp.innerHTML = desc;
+            let text = temp.textContent || temp.innerText || '';
+            
+            // Clean up whitespace
+            text = text.replace(/\s+/g, ' ').trim();
+            
+            return text;
+        }
+
+        function formatCoordinate(coord, isLat) {
+            const num = parseFloat(coord);
+            if (isNaN(num)) return '';
+            
+            const fixed = num.toFixed(6);
+            if (isLat) {
+                return fixed.padStart(9, ' ');
+            } else {
+                return fixed.padStart(10, ' ');
+            }
+        }
+
+        function parseKML(kmlDoc) {
+            const folders = {};
+            const placemarks = kmlDoc.getElementsByTagName('Placemark');
+            
+            for (let placemark of placemarks) {
+                const name = placemark.getElementsByTagName('name')[0]?.textContent || 'Unnamed';
+                const descElement = placemark.getElementsByTagName('description')[0];
+                const description = cleanDescription(descElement?.textContent || '');
+                
+                // Get coordinates
+                const coordinates = placemark.getElementsByTagName('coordinates')[0]?.textContent.trim();
+                let lat = '', lon = '';
+                
+                if (coordinates) {
+                    const coords = coordinates.split(',');
+                    if (coords.length >= 2) {
+                        lon = formatCoordinate(coords[0], false);
+                        lat = formatCoordinate(coords[1], true);
+                    }
+                }
+                
+                // Build full folder path from all parent folders
+                const folderPath = [];
+                let parent = placemark.parentElement;
+                
+                while (parent && parent.nodeName !== 'Document') {
+                    if (parent.nodeName === 'Folder') {
+                        const folderNameElement = parent.getElementsByTagName('name')[0];
+                        if (folderNameElement) {
+                            folderPath.unshift(folderNameElement.textContent);
+                        }
+                    }
+                    parent = parent.parentElement;
+                }
+                
+                const folderName = folderPath.length > 0 ? folderPath.join(' / ') : 'Root';
+                
+                if (!folders[folderName]) {
+                    folders[folderName] = [];
+                }
+                
+                folders[folderName].push({
+                    name,
+                    description,
+                    lat,
+                    lon
+                });
+            }
+            
+            return folders;
+        }
+
+        function displayResults(data) {
+            foldersDiv.innerHTML = '';
+            
+            const folderNames = Object.keys(data);
+            const totalPlacemarks = folderNames.reduce((sum, folder) => sum + data[folder].length, 0);
+            
+            statsDiv.innerHTML = `
+                <strong>${totalPlacemarks}</strong> placemark ditemukan dalam <strong>${folderNames.length}</strong> folder
+            `;
+            
+            folderNames.forEach(folderName => {
+                const section = document.createElement('div');
+                section.className = 'folder-section';
+                
+                const items = data[folderName];
+                
+                section.innerHTML = `
+                    <div class="folder-title">${folderName} (${items.length})</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Lat</th>
+                                <th>Lon</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td class="coord">${item.lat}</td>
+                                    <td class="coord">${item.lon}</td>
+                                    <td class="description">${item.description}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                foldersDiv.appendChild(section);
+            });
+            
+            results.classList.add('show');
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            let csv = 'Folder,Name,Lat,Lon,Description\n';
+            
+            for (let folder in processedData) {
+                processedData[folder].forEach(item => {
+                    const row = [
+                        `"${folder}"`,
+                        `"${item.name}"`,
+                        item.lat.trim(),
+                        item.lon.trim(),
+                        `"${item.description}"`
+                    ].join(',');
+                    csv += row + '\n';
+                });
+            }
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'kml_processed_' + new Date().getTime() + '.csv';
+            link.click();
+        });
+    </script>
+</body>
+</html>
