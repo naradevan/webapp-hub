@@ -57,6 +57,1070 @@
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #212121;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            border-right: 1px solid #333;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .webapp-count {
+            background: #333;
+            color: #e0e0e0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #555;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .webapp-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .webapp-list {
+            list-style: none;
+        }
+
+        .webapp-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .webapp-item:hover {
+            transform: translateX(5px);
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        .webapp-item.active {
+            background: #333;
+            border-color: #555;
+        }
+
+        .webapp-info {
+            flex: 1;
+        }
+
+        .webapp-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .webapp-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .badge-official {
+            background: rgba(100, 200, 100, 0.2);
+            color: #80c080;
+        }
+
+        .badge-uploaded {
+            background: rgba(200, 180, 100, 0.2);
+            color: #c0b080;
+        }
+
+        .webapp-date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .webapp-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete {
+            background: rgba(100, 100, 100, 0.2);
+            color: #999;
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: #555;
+            color: white;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: #1e1e1e;
+            margin: 20px;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #333;
+        }
+
+        .webapp-header {
+            padding: 20px 30px;
+            background: #212121;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .webapp-header h2 {
+            font-size: 22px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .webapp-header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .welcome-screen h2 {
+            font-size: 32px;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        .welcome-screen p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #444;
+            color: #e0e0e0;
+        }
+
+        .btn-primary:hover {
+            background: #555;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .btn-danger {
+            background: #3a3a3a;
+            color: #c08080;
+        }
+
+        .btn-danger:hover {
+            background: #4a4a4a;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #212121;
+            padding: 35px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #333;
+        }
+
+        .modal-content h3 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .file-upload-area:hover {
+            border-color: #555;
+        }
+
+        .file-upload-area.drag-over {
+            border-color: #80c080;
+            background: rgba(100, 200, 100, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* Iframe Container */
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background: #1e1e1e;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #555;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(33, 33, 33, 0.9);
+            color: white;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 5;
+            opacity: 0;
+        }
+
+        .fullscreen-btn.active {
+            opacity: 1;
+        }
+
+        .fullscreen-btn:hover {
+            background: #444;
+        }
+
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 998;
+            display: none;
+        }
+
+        .fullscreen-overlay.active {
+            display: block;
+        }
+
+        .content-area.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="fullscreenOverlay" class="fullscreen-overlay"></div>
+
+    <div class="container">
+        <div class="navbar">
+            <h1>🚀 WebApp Hub</h1>
+            <div class="navbar-actions">
+                <span class="status-indicator">● Online</span>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Add WebApp</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h2>
+                WebApps 
+                <span class="webapp-count" id="webappCount">0</span>
+            </h2>
+            
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search webapps..." 
+                    oninput="filterWebApps()"
+                >
+            </div>
+
+            <div class="webapp-section">
+                <div class="section-title">📁 Official WebApps</div>
+                <ul class="webapp-list" id="officialWebAppList"></ul>
+            </div>
+
+            <div class="webapp-section" id="uploadedSection" style="display: none;">
+                <div class="section-title">📤 User Uploaded</div>
+                <ul class="webapp-list" id="uploadedWebAppList"></ul>
+            </div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <div class="welcome-screen">
+                <div class="welcome-icon">🚀</div>
+                <h2>Welcome to WebApp Hub!</h2>
+                <p>Manage all your web applications in one place.<br>Select an official webapp or upload your own to get started.</p>
+                <button class="btn btn-primary" onclick="openAddModal()">+ Upload Your Own WebApp</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h3>+ Add New WebApp</h3>
+            <form id="addWebAppForm" onsubmit="handleAddWebApp(event)">
+                <div class="form-group">
+                    <label>WebApp Name</label>
+                    <input 
+                        type="text" 
+                        id="webappName" 
+                        placeholder="Enter webapp name..." 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload HTML File</label>
+                    <div 
+                        class="file-upload-area" 
+                        id="fileUploadArea"
+                        onclick="document.getElementById('fileInput').click()"
+                    >
+                        <div class="upload-icon">📁</div>
+                        <p id="fileUploadText">Click or drag to upload HTML file</p>
+                    </div>
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        accept=".html,.htm" 
+                        style="display: none;"
+                        onchange="handleFileSelect(event)"
+                    >
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add WebApp</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const OFFICIAL_WEBAPPS = [
+            {
+                id: 'auto-measure-line',
+                name: 'Auto Measure Line',
+                path: '/auto-measure-line/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'clamphook-homepass',
+                name: 'Clamphook Homepass',
+                path: '/clamphook-homepass/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kml-extract-by-folder',
+                name: 'KML Extract by Folder',
+                path: '/kml-extract-by-folder/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'fat-to-homepass',
+                name: 'FAT to Homepass',
+                path: '/fat-to-homepass/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'hp-by-polygon',
+                name: 'HP by Polygon',
+                path: '/hp-by-polygon/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kml-to-csv',
+                name: 'KML to CSV',
+                path: '/kml-to-csv/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'kmz-editor-rename',
+                name: 'KMZ Editor Rename',
+                path: '/kmz-editor-rename/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'pairing-pole-fat',
+                name: 'Pairing Pole FAT',
+                path: '/pairing-pole-fat/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'pole-separator-by-line',
+                name: 'Pole Separator by Line',
+                path: '/pole-separator-by-line/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'snap-to-pole',
+                name: 'Snap to Pole',
+                path: '/snap-to-pole/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            },
+            {
+                id: 'split-line-for-surge',
+                name: 'Split Line for Surge',
+                path: '/split-line-for-surge/index.html',
+                date: '2024-11-14',
+                type: 'official'
+            }
+        ];
+
+        const StorageManager = {
+            STORAGE_KEY: 'webappHub_userUploads',
+            
+            getUserUploads() {
+                const data = localStorage.getItem(this.STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            },
+            
+            saveUserUpload(webapp) {
+                const uploads = this.getUserUploads();
+                uploads.push(webapp);
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(uploads));
+            },
+            
+            deleteUserUpload(id) {
+                const uploads = this.getUserUploads();
+                const filtered = uploads.filter(app => app.id !== id);
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
+            },
+            
+            getWebApp(id) {
+                const official = OFFICIAL_WEBAPPS.find(app => app.id === id);
+                if (official) return official;
+                
+                const uploads = this.getUserUploads();
+                return uploads.find(app => app.id === id);
+            }
+        };
+
+        let currentWebAppId = null;
+        let isFullscreen = false;
+        let selectedFile = null;
+
+        function init() {
+            renderWebAppList();
+            updateWebAppCount();
+            setupDragAndDrop();
+            showWelcomeScreen();
+        }
+
+        function renderWebAppList() {
+            const officialList = document.getElementById('officialWebAppList');
+            const uploadedList = document.getElementById('uploadedWebAppList');
+            const uploadedSection = document.getElementById('uploadedSection');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            officialList.innerHTML = '';
+            const filteredOfficial = OFFICIAL_WEBAPPS.filter(app => 
+                app.name.toLowerCase().includes(searchTerm)
+            );
+            
+            filteredOfficial.forEach(app => {
+                const li = document.createElement('li');
+                li.className = `webapp-item ${currentWebAppId === app.id ? 'active' : ''}`;
+                li.innerHTML = `
+                    <div class="webapp-info" onclick="loadOfficialWebApp('${app.id}')">
+                        <div class="webapp-name">
+                            ${app.name}
+                            <span class="webapp-badge badge-official">OFFICIAL</span>
+                        </div>
+                        <div class="webapp-date">${app.date}</div>
+                    </div>
+                `;
+                officialList.appendChild(li);
+            });
+            
+            const userUploads = StorageManager.getUserUploads();
+            const filteredUploads = userUploads.filter(app => 
+                app.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredUploads.length > 0) {
+                uploadedSection.style.display = 'block';
+                uploadedList.innerHTML = '';
+                
+                filteredUploads.forEach(app => {
+                    const li = document.createElement('li');
+                    li.className = `webapp-item ${currentWebAppId === app.id ? 'active' : ''}`;
+                    li.innerHTML = `
+                        <div class="webapp-info" onclick="loadUserUploadedWebApp('${app.id}')">
+                            <div class="webapp-name">
+                                ${app.name}
+                                <span class="webapp-badge badge-uploaded">UPLOADED</span>
+                            </div>
+                            <div class="webapp-date">${app.date}</div>
+                        </div>
+                        <div class="webapp-actions" onclick="event.stopPropagation()">
+                            <button class="btn-small btn-delete" onclick="deleteUserUpload('${app.id}')">🗑️</button>
+                        </div>
+                    `;
+                    uploadedList.appendChild(li);
+                });
+            } else {
+                uploadedSection.style.display = 'none';
+            }
+        }
+
+        function updateWebAppCount() {
+            const userUploads = StorageManager.getUserUploads();
+            const total = OFFICIAL_WEBAPPS.length + userUploads.length;
+            document.getElementById('webappCount').textContent = total;
+        }
+
+        function filterWebApps() {
+            renderWebAppList();
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('webappName').value = '';
+            document.getElementById('fileUploadText').textContent = 'Click or drag to upload HTML file';
+            selectedFile = null;
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('fileUploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && (file.name.endsWith('.html') || file.name.endsWith('.htm'))) {
+                    handleFileSelect({ target: { files: [file] } });
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                document.getElementById('fileUploadText').textContent = `✓ ${file.name}`;
+                
+                if (!document.getElementById('webappName').value) {
+                    const name = file.name.replace('.html', '').replace('.htm', '');
+                    document.getElementById('webappName').value = name;
+                }
+            }
+        }
+
+        async function handleAddWebApp(event) {
+            event.preventDefault();
+            
+            if (!selectedFile) {
+                alert('Please select an HTML file!');
+                return;
+            }
+            
+            const name = document.getElementById('webappName').value;
+            const htmlContent = await readFileAsText(selectedFile);
+            
+            const webapp = {
+                id: 'user_' + Date.now(),
+                name: name,
+                content: btoa(unescape(encodeURIComponent(htmlContent))),
+                date: new Date().toISOString().split('T')[0],
+                type: 'uploaded'
+            };
+            
+            StorageManager.saveUserUpload(webapp);
+            renderWebAppList();
+            updateWebAppCount();
+            closeAddModal();
+            loadUserUploadedWebApp(webapp.id);
+            
+            alert('✓ WebApp added successfully!');
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function deleteUserUpload(id) {
+            if (confirm('Are you sure you want to delete this webapp?')) {
+                StorageManager.deleteUserUpload(id);
+                
+                if (currentWebAppId === id) {
+                    currentWebAppId = null;
+                    showWelcomeScreen();
+                }
+                
+                renderWebAppList();
+                updateWebAppCount();
+            }
+        }
+
+        async function loadOfficialWebApp(id) {
+            const webapp = OFFICIAL_WEBAPPS.find(app => app.id === id);
+            if (!webapp) return;
+            
+            currentWebAppId = id;
+            isFullscreen = false;
+            
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="webapp-header">
+                    <h2>📁 ${webapp.name} <span class="webapp-badge badge-official">OFFICIAL</span></h2>
+                    <div class="webapp-header-actions">
+                        <button class="btn btn-secondary" onclick="reloadWebApp()">🔄 Reload</button>
+                        <button class="btn btn-danger" onclick="closeWebApp()">✕ Close</button>
+                    </div>
+                </div>
+                <div class="iframe-container" id="iframeContainer">
+                    <div class="loading-overlay active">
+                        <div class="spinner"></div>
+                    </div>
+                    <iframe 
+                        id="webappIframe" 
+                        src="${webapp.path}"
+                        sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-same-origin"
+                    ></iframe>
+                    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
+                        ⛶
+                    </button>
+                </div>
+            `;
+            
+            const iframe = document.getElementById('webappIframe');
+            iframe.onload = function() {
+                setTimeout(() => {
+                    document.querySelector('.loading-overlay').classList.remove('active');
+                    document.getElementById('fullscreenBtn').classList.add('active');
+                }, 500);
+            };
+            
+            setupFullscreenListeners();
+            renderWebAppList();
+        }
+
+        function loadUserUploadedWebApp(id) {
+            const webapp = StorageManager.getWebApp(id);
+            if (!webapp || webapp.type !== 'uploaded') return;
+            
+            currentWebAppId = id;
+            isFullscreen = false;
+            
+            const contentArea = document.getElementById('contentArea');
+            const htmlContent = decodeURIComponent(escape(atob(webapp.content)));
+            
+            contentArea.innerHTML = `
+                <div class="webapp-header">
+                    <h2>📤 ${webapp.name} <span class="webapp-badge badge-uploaded">UPLOADED</span></h2>
+                    <div class="webapp-header-actions">
+                        <button class="btn btn-secondary" onclick="reloadWebApp()">🔄 Reload</button>
+                        <button class="btn btn-danger" onclick="closeWebApp()">✕ Close</button>
+                    </div>
+                </div>
+                <div class="iframe-container" id="iframeContainer">
+                    <div class="loading-overlay active">
+                        <div class="spinner"></div>
+                    </div>
+                    <iframe 
+                        id="webappIframe" 
+                        sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"
+                        srcdoc="${htmlContent.replace(/"/g, '&quot;')}"
+                    ></iframe>
+                    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
+                        ⛶
+                    </button>
+                </div>
+            `;
+            
+            const iframe = document.getElementById('webappIframe');
+            iframe.onload = function() {
+                setTimeout(() => {
+                    document.querySelector('.loading-overlay').classList.remove('active');
+                    document.getElementById('fullscreenBtn').classList.add('active');
+                }, 500);
+            };
+            
+            setupFullscreenListeners();
+            renderWebAppList();
+        }
+
+        function toggleFullscreen() {
+            const contentArea = document.getElementById('contentArea');
+            const overlay = document.getElementById('fullscreenOverlay');
+            const btn = document.getElementById('fullscreenBtn');
+            
+            isFullscreen = !isFullscreen;
+            
+            if (isFullscreen) {
+                contentArea.classList.add('fullscreen-mode');
+                overlay.classList.add('active');
+                btn.innerHTML = '⛶';
+                document.body.style.overflow = 'hidden';
+            } else {
+                contentArea.classList.remove('fullscreen-mode');
+                overlay.classList.remove('active');
+                btn.innerHTML = '⛶';
+                document.body.style.overflow = '';
+            }
+        }
+
+        function setupFullscreenListeners() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isFullscreen) {
+                    toggleFullscreen();
+                }
+            });
+            
+            document.getElementById('fullscreenOverlay').addEventListener('click', function() {
+                if (isFullscreen) {
+                    toggleFullscreen();
+                }
+            });
+        }
+
+        function reloadWebApp() {
+            if (currentWebAppId) {
+                const webapp = StorageManager.getWebApp(currentWebAppId);
+                if (webapp.type === 'official') {
+                    loadOfficialWebApp(currentWebAppId);
+                } else {
+                    loadUserUploadedWebApp(currentWebAppId);
+                }
+            }
+        }
+
+        function closeWebApp() {
+            if (isFullscreen) {
+                toggleFullscreen();
+            }
+            currentWebAppId = null;
+            showWelcomeScreen();
+            renderWebAppList();
+        }
+
+        function showWelcomeScreen() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="welcome-screen">
+                    <div class="welcome-icon">🚀</div>
+                    <h2>Welcome to WebApp Hub!</h2>
+                    <p>Manage all your web applications in one place.<br>Select an official webapp or upload your own to get started.</p>
+                    <button class="btn btn-primary" onclick="openAddModal()">+ Upload Your Own WebApp</button>
+                </div>
+            `;
+        }
+
+        init();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebApp Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            grid-column: 1 / -1;
+            background: #212121;
+            backdrop-filter: blur(10px);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar h1 {
+            font-size: 26px;
+            color: #e0e0e0;
+            font-weight: 600;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            padding: 8px 16px;
+            background: #333;
+            color: #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
             box-shadow: none;
         }
 
