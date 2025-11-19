@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KML/KMZ POLE-FAT Processor</title>
+    <title>KML/KMZ POLE-FAT Processor (Manual)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * {
@@ -88,6 +88,22 @@
             font-size: 14px;
             background: #1a1a1a;
             color: #e0e0e0;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #4a90e2;
         }
         
         button {
@@ -180,6 +196,68 @@
             color: #ffd54f;
         }
         
+        .folder-selection {
+            background: #1a2332;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .folder-selection.show {
+            display: block;
+        }
+        
+        .folder-selection h3 {
+            color: #64b5f6;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .folder-selection .instructions {
+            color: #90caf9;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #242424;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        
+        .folder-name {
+            flex: 1;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .folder-count {
+            color: #888;
+            font-size: 13px;
+        }
+        
+        .folder-type-select {
+            min-width: 180px;
+        }
+        
+        .confirm-selection {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
         .debug-info {
             background: #1a2332;
             border-left: 4px solid #2196f3;
@@ -188,6 +266,7 @@
             border-radius: 4px;
             font-size: 13px;
             font-family: 'Courier New', monospace;
+            display: none;
         }
         
         .debug-info h4 {
@@ -195,16 +274,16 @@
             margin-bottom: 8px;
         }
         
-        .debug-info .folder-item {
+        .debug-info .folder-item-debug {
             padding: 4px 0;
             color: #90caf9;
         }
         
-        .debug-info .folder-item.fat {
+        .debug-info .folder-item-debug.fat {
             color: #ffb74d;
         }
         
-        .debug-info .folder-item.pole {
+        .debug-info .folder-item-debug.pole {
             color: #81c784;
         }
         
@@ -240,59 +319,89 @@
         
         td {
             padding: 10px 12px;
-            border-bottom: 1px solid #3a3a3a;
+            border-bottom: 1px solid #333;
         }
         
-        tbody tr:hover {
+        tr:hover {
             background: #242424;
         }
         
-        .file-name {
-            margin: 15px 0;
+        .step-indicator {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #242424;
+            border-radius: 6px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
             padding: 10px;
-            background: #1a2a3a;
             border-radius: 4px;
-            color: #64b5f6;
-            font-weight: 500;
+            background: #1a1a1a;
+            color: #666;
         }
         
-        input[type="file"] {
-            display: none;
+        .step.active {
+            background: #4a90e2;
+            color: white;
         }
         
-        .icon {
-            font-size: 48px;
-            color: #555;
-            margin-bottom: 10px;
+        .step.completed {
+            background: #27ae60;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>KML/KMZ POLE-FAT Processor</h1>
-        <p class="subtitle">Upload file KML/KMZ untuk memproses data POLE dan FAT</p>
+        <h1>🗂️ KML/KMZ POLE-FAT Processor (Manual Selection)</h1>
+        <p class="subtitle">Upload file KML/KMZ, pilih folder FAT & POLE secara manual, lalu proses pairing</p>
         
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">1. Upload File</div>
+            <div class="step" id="step2">2. Pilih Folder</div>
+            <div class="step" id="step3">3. Proses Data</div>
+            <div class="step" id="step4">4. Export</div>
+        </div>
+        
+        <!-- Upload Area -->
         <div class="upload-area" id="uploadArea">
-            <div class="icon">📁</div>
-            <p><strong>Drag & drop file KML/KMZ di sini</strong></p>
-            <p>atau</p>
-            <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">Pilih File</button>
-            <input type="file" id="fileInput" accept=".kml,.kmz">
+            <p style="font-size: 48px; margin-bottom: 10px;">📁</p>
+            <p style="font-size: 16px; font-weight: 600;">Klik atau drag & drop file KML/KMZ</p>
+            <p style="font-size: 13px;">File akan dianalisis dan folder akan ditampilkan untuk dipilih</p>
+            <input type="file" id="fileInput" accept=".kml,.kmz" style="display: none;">
         </div>
         
-        <div class="file-name" id="fileName" style="display: none;"></div>
-        
-        <div class="debug-info" id="debugInfo" style="display: none;"></div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label for="radius">Radius (meter):</label>
-                <input type="number" id="radius" value="5" min="1" max="1000">
+        <!-- Folder Selection Area -->
+        <div class="folder-selection" id="folderSelection">
+            <h3>📂 Pilih Tipe untuk Setiap Folder</h3>
+            <div class="instructions">
+                Pilih tipe data untuk setiap folder yang ditemukan. Folder yang dipilih sebagai <strong>FAT</strong> akan dipairing dengan folder yang dipilih sebagai <strong>POLE</strong>. Folder yang dipilih <strong>Abaikan</strong> tidak akan diproses.
             </div>
-            <button class="btn-primary" id="processBtn" disabled onclick="processData()">Proses</button>
-            <button class="btn-success" id="exportBtn" disabled onclick="exportCSV()">Export CSV</button>
+            <div class="folder-list" id="folderList"></div>
+            <div class="confirm-selection">
+                <button class="btn-success" id="confirmBtn" onclick="confirmFolderSelection()">✓ Konfirmasi Pilihan & Lanjutkan</button>
+            </div>
         </div>
         
+        <!-- Debug Info -->
+        <div class="debug-info" id="debugInfo"></div>
+        
+        <!-- Controls -->
+        <div class="controls" id="controls" style="display: none;">
+            <div class="control-group">
+                <label for="radius">Radius Pairing (m):</label>
+                <input type="number" id="radius" value="100" min="1">
+            </div>
+            <button class="btn-primary" id="processBtn" onclick="processData()">⚙️ Proses Pairing</button>
+            <button class="btn-success" id="exportBtn" onclick="exportCSV()" disabled>💾 Export CSV</button>
+        </div>
+        
+        <!-- Stats -->
         <div class="stats" id="stats" style="display: none;">
             <div class="stat-box">
                 <div class="stat-label">Total POLE</div>
@@ -303,20 +412,22 @@
                 <div class="stat-value" id="totalFats">0</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">POLE Terpasang</div>
+                <div class="stat-label">POLE Terpairing</div>
                 <div class="stat-value" id="pairedPoles">0</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">POLE Dihapus</div>
+                <div class="stat-label">POLE Tidak Terpairing</div>
                 <div class="stat-value" id="removedPoles">0</div>
             </div>
         </div>
         
+        <!-- Warnings -->
         <div class="warnings" id="warnings">
             <strong>⚠️ Peringatan:</strong>
             <ul id="warningList"></ul>
         </div>
         
+        <!-- Table -->
         <div class="table-container" id="tableContainer" style="display: none;">
             <table>
                 <thead>
@@ -337,14 +448,16 @@
     <script>
         let kmlData = null;
         let processedData = null;
+        let folderData = [];
+        let rawPlacemarks = [];
         
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const processBtn = document.getElementById('processBtn');
         const exportBtn = document.getElementById('exportBtn');
-        const fileName = document.getElementById('fileName');
         
-        // Drag & Drop handlers
+        // Upload handlers
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -358,78 +471,80 @@
             e.preventDefault();
             uploadArea.classList.remove('dragover');
             const file = e.dataTransfer.files[0];
-            handleFile(file);
+            if (file) handleFile(file);
         });
         
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            handleFile(file);
+            if (file) handleFile(file);
         });
         
         async function handleFile(file) {
-            if (!file) return;
+            const fileName = file.name.toLowerCase();
             
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (ext !== 'kml' && ext !== 'kmz') {
-                alert('File harus berformat KML atau KMZ');
-                return;
-            }
-            
-            fileName.textContent = `File: ${file.name}`;
-            fileName.style.display = 'block';
+            // Update step indicator
+            updateStep(1);
             
             try {
-                let kmlText;
-                if (ext === 'kmz') {
+                if (fileName.endsWith('.kmz')) {
                     const zip = await JSZip.loadAsync(file);
                     const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
                     if (!kmlFile) {
-                        alert('File KML tidak ditemukan di dalam KMZ');
+                        alert('File KML tidak ditemukan dalam KMZ');
                         return;
                     }
-                    kmlText = await zip.files[kmlFile].async('string');
+                    const kmlText = await zip.files[kmlFile].async('text');
+                    parseKMLForFolders(kmlText);
+                } else if (fileName.endsWith('.kml')) {
+                    const text = await file.text();
+                    parseKMLForFolders(text);
                 } else {
-                    kmlText = await file.text();
+                    alert('Format file tidak didukung. Gunakan .kml atau .kmz');
                 }
-                
-                kmlData = parseKML(kmlText);
-                processBtn.disabled = false;
-                document.getElementById('stats').style.display = 'none';
-                document.getElementById('tableContainer').style.display = 'none';
-                document.getElementById('warnings').classList.remove('show');
-                exportBtn.disabled = true;
-            } catch (err) {
-                alert('Error membaca file: ' + err.message);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error membaca file: ' + error.message);
             }
         }
         
-        function parseKML(kmlText) {
+        function updateStep(stepNumber) {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                if (i < stepNumber) {
+                    step.classList.add('completed');
+                } else if (i === stepNumber) {
+                    step.classList.add('active');
+                }
+            }
+        }
+        
+        function parseKMLForFolders(kmlText) {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(kmlText, 'text/xml');
             
-            const poles = [];
-            const fats = [];
-            const folderDebug = [];
+            folderData = [];
+            rawPlacemarks = [];
             
-            // Fungsi rekursif untuk mencari folder parent utama
-            function getMainFolder(folder) {
-                let current = folder;
-                let mainFolder = null;
+            // Fungsi untuk mendapatkan immediate parent folder dari placemark
+            function getImmediateFolder(element) {
+                let current = element;
                 
-                // Cari parent folder sampai ke Document
-                while (current && current.tagName === 'Folder') {
-                    const nameEl = current.getElementsByTagName('name')[0];
-                    if (nameEl) {
-                        const name = nameEl.textContent.trim();
-                        // Jika ini bukan folder "Point", simpan sebagai main folder
-                        if (name.toUpperCase() !== 'POINT') {
-                            mainFolder = name;
+                // Naik ke atas sampai ketemu Folder
+                while (current && current.parentNode) {
+                    current = current.parentNode;
+                    if (current.tagName === 'Folder') {
+                        const nameEl = current.querySelector(':scope > name');
+                        if (nameEl) {
+                            const name = nameEl.textContent.trim();
+                            // Skip folder dengan nama "Point" atau nama yang terlalu generic
+                            if (name && name.toUpperCase() !== 'POINT') {
+                                return name;
+                            }
                         }
                     }
-                    current = current.parentNode;
                 }
-                
-                return mainFolder;
+                return null;
             }
             
             // Fungsi untuk mengambil semua Placemark
@@ -454,37 +569,30 @@
                     
                     if (isNaN(lat) || isNaN(lon)) continue;
                     
-                    // Cari main folder dari placemark ini
-                    const mainFolder = getMainFolder(placemark.parentNode);
+                    // Cari immediate parent folder dari placemark ini
+                    const immediateFolder = getImmediateFolder(placemark);
                     
-                    if (!mainFolder) continue;
+                    if (!immediateFolder) continue;
                     
-                    const isFAT = mainFolder.toUpperCase().includes('FAT');
+                    // Simpan raw placemark
+                    rawPlacemarks.push({
+                        name: name,
+                        lat: lat,
+                        lon: lon,
+                        folder: immediateFolder
+                    });
                     
-                    // Tambahkan ke debug jika belum ada
-                    if (!folderDebug.find(f => f.name === mainFolder)) {
-                        folderDebug.push({
-                            name: mainFolder,
-                            isFAT: isFAT
-                        });
+                    // Track folder
+                    let folder = folderData.find(f => f.name === immediateFolder);
+                    if (!folder) {
+                        folder = {
+                            name: immediateFolder,
+                            count: 0,
+                            type: 'ignore' // default: ignore
+                        };
+                        folderData.push(folder);
                     }
-                    
-                    if (isFAT) {
-                        fats.push({ 
-                            name: name, 
-                            lat: lat, 
-                            lon: lon, 
-                            used: false,
-                            folder: mainFolder
-                        });
-                    } else {
-                        poles.push({ 
-                            name: name, 
-                            lat: lat, 
-                            lon: lon,
-                            folder: mainFolder
-                        });
-                    }
+                    folder.count++;
                 }
             }
             
@@ -492,19 +600,111 @@
             const doc = xmlDoc.getElementsByTagName('Document')[0] || xmlDoc.documentElement;
             extractPlacemarks(doc);
             
+            // Tampilkan folder selection UI
+            displayFolderSelection();
+            
+            // Sembunyikan upload area
+            document.getElementById('uploadArea').style.display = 'none';
+            
+            // Update step
+            updateStep(2);
+        }
+        
+        function displayFolderSelection() {
+            const folderList = document.getElementById('folderList');
+            
+            if (folderData.length === 0) {
+                folderList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">Tidak ada folder ditemukan</div>';
+                return;
+            }
+            
+            folderList.innerHTML = folderData.map((folder, idx) => `
+                <div class="folder-item">
+                    <div class="folder-name">${folder.name}</div>
+                    <div class="folder-count">(${folder.count} points)</div>
+                    <select class="folder-type-select" id="folderType${idx}" onchange="updateFolderType(${idx}, this.value)">
+                        <option value="ignore" selected>❌ Abaikan</option>
+                        <option value="fat">📍 FAT (Fiber Access Terminal)</option>
+                        <option value="pole">🗼 POLE (Tiang)</option>
+                    </select>
+                </div>
+            `).join('');
+            
+            document.getElementById('folderSelection').classList.add('show');
+        }
+        
+        function updateFolderType(idx, type) {
+            folderData[idx].type = type;
+        }
+        
+        function confirmFolderSelection() {
+            // Validasi: pastikan ada minimal 1 FAT dan 1 POLE
+            const hasFAT = folderData.some(f => f.type === 'fat');
+            const hasPOLE = folderData.some(f => f.type === 'pole');
+            
+            if (!hasFAT) {
+                alert('⚠️ Pilih minimal 1 folder sebagai FAT');
+                return;
+            }
+            
+            if (!hasPOLE) {
+                alert('⚠️ Pilih minimal 1 folder sebagai POLE');
+                return;
+            }
+            
+            // Process data berdasarkan pilihan user
+            processSelectedFolders();
+            
+            // Hide folder selection, show controls
+            document.getElementById('folderSelection').classList.remove('show');
+            document.getElementById('controls').style.display = 'flex';
+            
+            // Update step
+            updateStep(3);
+        }
+        
+        function processSelectedFolders() {
+            const poles = [];
+            const fats = [];
+            
+            // Filter placemarks berdasarkan pilihan folder
+            rawPlacemarks.forEach(pm => {
+                const folder = folderData.find(f => f.name === pm.folder);
+                if (!folder) return;
+                
+                if (folder.type === 'fat') {
+                    fats.push({
+                        name: pm.name,
+                        lat: pm.lat,
+                        lon: pm.lon,
+                        used: false,
+                        folder: pm.folder
+                    });
+                } else if (folder.type === 'pole') {
+                    poles.push({
+                        name: pm.name,
+                        lat: pm.lat,
+                        lon: pm.lon,
+                        folder: pm.folder
+                    });
+                }
+            });
+            
+            kmlData = { poles, fats };
+            
             // Tampilkan debug info
             const debugInfo = document.getElementById('debugInfo');
-            let debugHTML = '<h4>📂 Struktur Folder Terdeteksi:</h4>';
-            folderDebug.forEach(folder => {
-                const cssClass = folder.isFAT ? 'fat' : 'pole';
-                const type = folder.isFAT ? '[FAT]' : '[POLE]';
-                debugHTML += `<div class="folder-item ${cssClass}">${type} ${folder.name}</div>`;
+            let debugHTML = '<h4>✓ Folder yang Dipilih:</h4>';
+            folderData.forEach(folder => {
+                if (folder.type === 'ignore') return;
+                const cssClass = folder.type === 'fat' ? 'fat' : 'pole';
+                const icon = folder.type === 'fat' ? '📍' : '🗼';
+                const label = folder.type === 'fat' ? 'FAT' : 'POLE';
+                debugHTML += `<div class="folder-item-debug ${cssClass}">${icon} [${label}] ${folder.name} (${folder.count} points)</div>`;
             });
             debugHTML += `<div style="margin-top: 10px; color: #64b5f6;">✓ Ditemukan ${poles.length} POLE dan ${fats.length} FAT</div>`;
             debugInfo.innerHTML = debugHTML;
             debugInfo.style.display = 'block';
-            
-            return { poles, fats };
         }
         
         function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -562,10 +762,10 @@
                 
                 // Pairing berhasil - POLE sebagai POLE, FAT sebagai FAT
                 results.push({
-                    poleName: candidate.pole.name,  // Nama dari POLE
-                    fatName: candidate.fat.name,    // Nama dari FAT
-                    lat: candidate.pole.lat,        // Koordinat dari POLE
-                    lon: candidate.pole.lon,        // Koordinat dari POLE
+                    poleName: candidate.pole.name,
+                    fatName: candidate.fat.name,
+                    lat: candidate.pole.lat,
+                    lon: candidate.pole.lon,
                     distance: candidate.distance.toFixed(2)
                 });
                 
@@ -619,6 +819,9 @@
             
             document.getElementById('tableContainer').style.display = 'block';
             exportBtn.disabled = false;
+            
+            // Update step
+            updateStep(4);
         }
         
         function exportCSV() {
@@ -629,7 +832,23 @@
             
             let csv = 'No,Nama POLE,Nama FAT,Latitude,Longitude,Jarak (m)\n';
             processedData.forEach((row, idx) => {
-                csv += `${idx + 1},"${row.poleName}","${row.fatName}",${row.lat},${row.lon},${row.distance}\n`;
+                // Format Latitude ke 9 karakter
+                let latStr = row.lat.toFixed(7); // Mulai dengan 7 decimal places
+                if (latStr.length > 9) {
+                    latStr = latStr.substring(0, 9); // Potong jadi 9 karakter
+                } else {
+                    latStr = latStr.padEnd(9, '0'); // Pad dengan 0 jika kurang
+                }
+                
+                // Format Longitude ke 10 karakter
+                let lonStr = row.lon.toFixed(7); // Mulai dengan 7 decimal places
+                if (lonStr.length > 10) {
+                    lonStr = lonStr.substring(0, 10); // Potong jadi 10 karakter
+                } else {
+                    lonStr = lonStr.padEnd(10, '0'); // Pad dengan 0 jika kurang
+                }
+                
+                csv += `${idx + 1},"${row.poleName}","${row.fatName}",${latStr},${lonStr},${row.distance}\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
