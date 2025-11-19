@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KML Placemark Renamer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #242424;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .header p {
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-box {
+            border: 2px dashed #555;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            background: #242424;
+        }
+        
+        .upload-box:hover {
+            border-color: #666;
+            background: #2a2a2a;
+        }
+        
+        .upload-box.has-file {
+            border-color: #4a90e2;
+            background: #1a2332;
+        }
+        
+        .upload-box input[type="file"] {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-box h3 {
+            color: #ffffff;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .upload-box p {
+            color: #888;
+            font-size: 13px;
+        }
+        
+        .filename {
+            margin-top: 10px;
+            color: #64b5f6;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .settings {
+            background: #242424;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #3a3a3a;
+        }
+        
+        .settings h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .setting-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .setting-row label {
+            flex: 1;
+            color: #b0b0b0;
+        }
+        
+        .setting-row input {
+            width: 100px;
+            padding: 8px 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        .setting-row input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #3a7bc8;
+        }
+        
+        .btn-primary:disabled {
+            background: #3a3a3a;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+            display: none;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            border-left: 4px solid;
+        }
+        
+        .status.info {
+            background: #1a2332;
+            color: #64b5f6;
+            border-color: #2196f3;
+        }
+        
+        .status.success {
+            background: #1a3a2a;
+            color: #81c784;
+            border-color: #27ae60;
+        }
+        
+        .status.error {
+            background: #3a2020;
+            color: #ef5350;
+            border-color: #ef4444;
+        }
+        
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #3a3a3a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4a90e2;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ KML Placemark Renamer</h1>
+            <p>Rename placemark berdasarkan kecocokan posisi spasial</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <div class="upload-box" id="uploadBoxA" onclick="document.getElementById('fileA').click()">
+                    <div class="upload-icon">📍</div>
+                    <h3>File A (Referensi)</h3>
+                    <p>Placemark dengan nama yang benar</p>
+                    <input type="file" id="fileA" accept=".kml,.kmz" onchange="handleFileUpload('A', this)">
+                    <div class="filename" id="filenameA"></div>
+                </div>
+                
+                <div class="upload-box" id="uploadBoxB" onclick="document.getElementById('fileB').click()">
+                    <div class="upload-icon">📌</div>
+                    <h3>File B (Target)</h3>
+                    <p>Placemark yang akan direname</p>
+                    <input type="file" id="fileB" accept=".kml,.kmz" onchange="handleFileUpload('B', this)">
+                    <div class="filename" id="filenameB"></div>
+                </div>
+            </div>
+            
+            <div class="settings">
+                <h3>⚙️ Pengaturan</h3>
+                <div class="setting-row">
+                    <label>Toleransi Jarak (meter):</label>
+                    <input type="number" id="tolerance" value="1" min="0.1" step="0.1">
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="processBtn" onclick="processFiles()" disabled>
+                    🚀 Proses Rename
+                </button>
+                <button class="btn btn-success" id="downloadBtn" onclick="downloadResult()">
+                    💾 Download Hasil (KMZ)
+                </button>
+            </div>
+            
+            <div class="progress" id="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Memproses...</div>
+            </div>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        let fileDataA = null;
+        let fileDataB = null;
+        let resultKML = null;
+        let zipDataB = null;
+        let isKMZ_B = false;
+        let originalFilenameB = '';
+        
+        function handleFileUpload(fileType, input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const uploadBox = document.getElementById(`uploadBox${fileType}`);
+            const filenameDiv = document.getElementById(`filename${fileType}`);
+            
+            uploadBox.classList.add('has-file');
+            filenameDiv.textContent = `✓ ${file.name}`;
+            
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                try {
+                    let kmlContent;
+                    let zipData = null;
+                    
+                    if (file.name.toLowerCase().endsWith('.kmz')) {
+                        // Handle KMZ file
+                        const arrayBuffer = e.target.result;
+                        const zip = await JSZip.loadAsync(arrayBuffer);
+                        const kmlFile = Object.keys(zip.files).find(name => name.toLowerCase().endsWith('.kml'));
+                        
+                        if (!kmlFile) {
+                            throw new Error('File KML tidak ditemukan dalam KMZ');
+                        }
+                        
+                        kmlContent = await zip.files[kmlFile].async('string');
+                        zipData = zip;
+                    } else {
+                        // Handle KML file
+                        kmlContent = e.target.result;
+                    }
+                    
+                    const parser = new DOMParser();
+                    const kmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+                    
+                    if (fileType === 'A') {
+                        fileDataA = kmlDoc;
+                    } else {
+                        fileDataB = kmlDoc;
+                        zipDataB = zipData;
+                        isKMZ_B = file.name.toLowerCase().endsWith('.kmz');
+                        originalFilenameB = file.name;
+                    }
+                    
+                    if (fileDataA && fileDataB) {
+                        document.getElementById('processBtn').disabled = false;
+                    }
+                } catch (error) {
+                    showStatus('error', `Error membaca ${fileType}: ${error.message}`);
+                }
+            };
+            
+            if (file.name.toLowerCase().endsWith('.kmz')) {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+        
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+            
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            
+            return R * c;
+        }
+        
+        function extractCoordinates(placemark) {
+            const point = placemark.querySelector('Point coordinates');
+            if (!point) return null;
+            
+            const coords = point.textContent.trim().split(',');
+            return {
+                lon: parseFloat(coords[0]),
+                lat: parseFloat(coords[1]),
+                alt: coords[2] ? parseFloat(coords[2]) : 0
+            };
+        }
+        
+        function extractName(placemark) {
+            const nameElement = placemark.querySelector('name');
+            return nameElement ? nameElement.textContent.trim() : '';
+        }
+        
+        function buildPlacemarkMap(doc) {
+            const placemarks = Array.from(doc.querySelectorAll('Placemark'));
+            return placemarks.map(pm => {
+                const coords = extractCoordinates(pm);
+                const name = extractName(pm);
+                return { element: pm, coords, name };
+            }).filter(item => item.coords !== null);
+        }
+        
+        async function processFiles() {
+            const tolerance = parseFloat(document.getElementById('tolerance').value);
+            
+            showProgress(true, 0, 'Memulai proses...');
+            document.getElementById('processBtn').disabled = true;
+            
+            try {
+                const placemarksA = buildPlacemarkMap(fileDataA);
+                const placemarksB = buildPlacemarkMap(fileDataB);
+                
+                showProgress(true, 10, `Menemukan ${placemarksA.length} placemark di File A dan ${placemarksB.length} placemark di File B`);
+                
+                if (placemarksA.length === 0) {
+                    throw new Error('Tidak ada placemark valid di File A');
+                }
+                
+                if (placemarksB.length === 0) {
+                    throw new Error('Tidak ada placemark valid di File B');
+                }
+                
+                let matched = 0;
+                let unmatched = 0;
+                const unmatchedElements = [];
+                
+                for (let i = 0; i < placemarksB.length; i++) {
+                    const pmB = placemarksB[i];
+                    
+                    let bestMatch = null;
+                    let minDistance = Infinity;
+                    
+                    for (const pmA of placemarksA) {
+                        const distance = haversineDistance(
+                            pmB.coords.lat, pmB.coords.lon,
+                            pmA.coords.lat, pmA.coords.lon
+                        );
+                        
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            bestMatch = pmA;
+                        }
+                    }
+                    
+                    if (bestMatch && minDistance <= tolerance) {
+                        const nameElement = pmB.element.querySelector('name');
+                        if (nameElement) {
+                            nameElement.textContent = bestMatch.name;
+                        } else {
+                            const newName = pmB.element.ownerDocument.createElement('name');
+                            newName.textContent = bestMatch.name;
+                            pmB.element.insertBefore(newName, pmB.element.firstChild);
+                        }
+                        matched++;
+                    } else {
+                        unmatchedElements.push(pmB.element);
+                        unmatched++;
+                    }
+                    
+                    const progress = 10 + (i / placemarksB.length) * 70;
+                    showProgress(true, progress, `Memproses: ${i + 1}/${placemarksB.length}`);
+                }
+                
+                if (unmatched > 0) {
+                    const kmlDoc = fileDataB;
+                    let documentElem = kmlDoc.querySelector('Document');
+                    
+                    if (!documentElem) {
+                        documentElem = kmlDoc.querySelector('kml');
+                    }
+                    
+                    const unmatchedFolder = kmlDoc.createElement('Folder');
+                    const folderName = kmlDoc.createElement('name');
+                    folderName.textContent = 'Unmatched';
+                    unmatchedFolder.appendChild(folderName);
+                    
+                    for (const elem of unmatchedElements) {
+                        const parent = elem.parentNode;
+                        if (parent) {
+                            parent.removeChild(elem);
+                        }
+                        unmatchedFolder.appendChild(elem);
+                    }
+                    
+                    if (documentElem) {
+                        documentElem.appendChild(unmatchedFolder);
+                    }
+                }
+                
+                showProgress(true, 85, 'Membuat file KMZ...');
+                
+                const serializer = new XMLSerializer();
+                const kmlString = serializer.serializeToString(fileDataB);
+                
+                const zip = new JSZip();
+                zip.file('doc.kml', kmlString);
+                
+                if (zipDataB) {
+                    showProgress(true, 90, 'Menyalin foto dan file lainnya...');
+                    
+                    for (const [filename, fileData] of Object.entries(zipDataB.files)) {
+                        if (!filename.endsWith('.kml') && !fileData.dir) {
+                            const content = await fileData.async('uint8array');
+                            zip.file(filename, content);
+                        }
+                    }
+                }
+                
+                showProgress(true, 95, 'Mengompres file...');
+                
+                resultKML = await zip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: { level: 6 }
+                });
+                
+                showProgress(true, 100, 'Selesai!');
+                
+                showStatus('success', `✓ Proses selesai! ${matched} placemark cocok, ${unmatched} tidak cocok (dipindah ke folder Unmatched). ${zipDataB ? 'Semua foto dan file tetap tersimpan.' : ''}`);
+                
+                document.getElementById('downloadBtn').style.display = 'block';
+                
+                setTimeout(() => {
+                    showProgress(false);
+                }, 1000);
+                
+            } catch (error) {
+                showStatus('error', `Error: ${error.message}`);
+                console.error('Full error:', error);
+                document.getElementById('processBtn').disabled = false;
+                showProgress(false);
+            }
+        }
+        
+        function downloadResult() {
+            const url = URL.createObjectURL(resultKML);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            const newFilename = originalFilenameB.replace(/\.(kml|kmz)$/i, '_renamed.kmz');
+            a.download = newFilename;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function showStatus(type, message) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            status.style.display = 'block';
+        }
+        
+        function showProgress(show, percent = 0, text = '') {
+            const progress = document.getElementById('progress');
+            const fill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (show) {
+                progress.style.display = 'block';
+                fill.style.width = percent + '%';
+                progressText.textContent = text;
+            } else {
+                progress.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
