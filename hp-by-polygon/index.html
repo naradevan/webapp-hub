@@ -6,16 +6,16 @@
     <title>Enhanced KML/KMZ Placemark Organizer</title>
     <style>
         :root {
-            --bg-color: #1e1e1e;
+            --bg-color: #1a1a1a;
             --text-color: #e0e0e0;
-            --primary-color: #4a6fa5;
-            --secondary-color: #3a5a7a;
-            --accent-color: #5d8bf4;
-            --error-color: #d32f2f;
-            --success-color: #388e3c;
+            --primary-color: #333;
+            --secondary-color: #2a2a2a;
+            --accent-color: #555;
+            --error-color: #666;
+            --success-color: #444;
             --border-color: #444;
             --input-bg: #2d2d2d;
-            --card-bg: #252525;
+            --card-bg: #212121;
         }
 
         body {
@@ -106,27 +106,35 @@
         }
 
         .btn-reset {
-            background-color: var(--error-color);
+            background-color: #555;
         }
 
         .btn-reset:hover {
-            background-color: #b71c1c;
+            background-color: #666;
         }
 
         .btn-kml {
-            background-color: #2e7d32;
+            background-color: #444;
         }
 
         .btn-kml:hover {
-            background-color: #4caf50;
+            background-color: #555;
         }
 
         .btn-kmz {
-            background-color: #7b1fa2;
+            background-color: #444;
         }
 
         .btn-kmz:hover {
-            background-color: #9c27b0;
+            background-color: #555;
+        }
+
+        .btn-csv {
+            background-color: #444;
+        }
+
+        .btn-csv:hover {
+            background-color: #555;
         }
 
         .status-panel {
@@ -209,9 +217,9 @@
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top: 4px solid var(--accent-color);
+            border-top: 4px solid #666;
             width: 30px;
             height: 30px;
             animation: spin 1s linear infinite;
@@ -274,6 +282,7 @@
         <div class="controls">
             <button class="btn btn-kml" id="downloadKmlBtn" disabled>Download KML</button>
             <button class="btn btn-kmz" id="downloadKmzBtn" disabled>Download KMZ</button>
+            <button class="btn btn-csv" id="downloadCsvBtn" disabled>Download CSV</button>
             <button class="btn btn-reset" id="resetBtn">Reset</button>
         </div>
         
@@ -322,6 +331,7 @@
         const fileInfo = document.getElementById('fileInfo');
         const downloadKmlBtn = document.getElementById('downloadKmlBtn');
         const downloadKmzBtn = document.getElementById('downloadKmzBtn');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
         const resetBtn = document.getElementById('resetBtn');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
@@ -364,6 +374,7 @@
         dropZone.addEventListener('drop', handleDrop);
         downloadKmlBtn.addEventListener('click', () => downloadResult('kml'));
         downloadKmzBtn.addEventListener('click', () => downloadResult('kmz'));
+        downloadCsvBtn.addEventListener('click', downloadCsv);
         resetBtn.addEventListener('click', resetApp);
         
         // File handling
@@ -469,6 +480,7 @@
                 appState.processingComplete = true;
                 downloadKmlBtn.disabled = false;
                 downloadKmzBtn.disabled = false;
+                downloadCsvBtn.disabled = false;
                 processingStatusEl.textContent = 'Complete';
                 
                 showMessage('success', 'Processing complete! Ready to download.');
@@ -1014,6 +1026,80 @@
             return await zip.generateAsync({ type: 'blob' });
         }
         
+        // Download CSV with formatted coordinates
+        function downloadCsv() {
+            if (!appState.processedKml || appState.points.length === 0) {
+                showMessage('error', 'No points to export!');
+                return;
+            }
+            
+            try {
+                // Create CSV content
+                let csvContent = 'Name,Latitude,Longitude,Folder\n';
+                
+                // Helper function to format coordinate with 6 decimal places (preserving trailing zeros)
+                function formatCoordinate(value) {
+                    // Convert to number and fix to 6 decimal places
+                    const num = parseFloat(value);
+                    return num.toFixed(6);
+                }
+                
+                // Process folders
+                appState.folders.forEach(folder => {
+                    folder.points.forEach(pointPlacemark => {
+                        const name = pointPlacemark.getElementsByTagName('name')[0]?.textContent || 'Unnamed';
+                        const coordinatesElement = pointPlacemark.getElementsByTagName('coordinates')[0];
+                        
+                        if (coordinatesElement) {
+                            const coords = coordinatesElement.textContent.trim().split(/[\s,]+/);
+                            const lon = coords[0];
+                            const lat = coords[1];
+                            
+                            const formattedLat = formatCoordinate(lat);
+                            const formattedLon = formatCoordinate(lon);
+                            
+                            csvContent += `"${name}",${formattedLat},${formattedLon},"${folder.name}"\n`;
+                        }
+                    });
+                });
+                
+                // Process unmatched points
+                appState.unmatchedPoints.forEach(pointPlacemark => {
+                    const name = pointPlacemark.getElementsByTagName('name')[0]?.textContent || 'Unnamed';
+                    const coordinatesElement = pointPlacemark.getElementsByTagName('coordinates')[0];
+                    
+                    if (coordinatesElement) {
+                        const coords = coordinatesElement.textContent.trim().split(/[\s,]+/);
+                        const lon = coords[0];
+                        const lat = coords[1];
+                        
+                        const formattedLat = formatCoordinate(lat);
+                        const formattedLon = formatCoordinate(lon);
+                        
+                        csvContent += `"${name}",${formattedLat},${formattedLon},"Outside Polygon"\n`;
+                    }
+                });
+                
+                // Create and download blob
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const fileName = appState.fileName.replace(/\.(kml|kmz)$/i, '') + '_coordinates.csv';
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('success', 'CSV download started!');
+            } catch (error) {
+                console.error('Error creating CSV:', error);
+                showMessage('error', 'Error creating CSV: ' + error.message);
+            }
+        }
+        
         // UI Helpers
         function updateResultsUI() {
             folderPreview.innerHTML = '';
@@ -1154,6 +1240,7 @@
             
             downloadKmlBtn.disabled = true;
             downloadKmzBtn.disabled = true;
+            downloadCsvBtn.disabled = true;
             
             polygonCountEl.textContent = '0';
             pointCountEl.textContent = '0';
