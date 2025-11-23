@@ -136,16 +136,16 @@ export function generateHPPlacemark(data) {
     inlineStyle = `
       <Style id="inline">
         <IconStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff</color>
           <colorMode>normal</colorMode>
           <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
         </IconStyle>
         <LineStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff/color>
           <colorMode>normal</colorMode>
         </LineStyle>
         <PolyStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff</color>
           <colorMode>normal</colorMode>
         </PolyStyle>
       </Style>`;
@@ -154,16 +154,16 @@ export function generateHPPlacemark(data) {
     inlineStyle = `
       <Style id="inline">
         <IconStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff</color>
           <colorMode>normal</colorMode>
           <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
         </IconStyle>
         <LineStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff</color>
           <colorMode>normal</colorMode>
         </LineStyle>
         <PolyStyle>
-          <color>ffffffff</color>
+          <color>ff0000ff</color>
           <colorMode>normal</colorMode>
         </PolyStyle>
       </Style>`;

@@ -49,7 +49,7 @@ export function generateFATPlacemark(data) {
   
   return `
     <Placemark>
-      <n>${data.fatId}</n>
+      <name>${data.fatId}</name>
       <styleUrl>${styleUrl}</styleUrl>
       <ExtendedData>
         <SchemaData schemaUrl="#S_BAHAN_FAT_SSSSSS">
@@ -83,7 +83,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff00ff55</color>
         <scale>1.4</scale>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -92,7 +92,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff00ff55</color>
         <scale>1.2</scale>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -106,7 +106,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.4</scale>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -115,7 +115,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.2</scale>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>

@@ -42,7 +42,7 @@ export function generateHPtoFATPaths(hpData, fatData) {
 export function generatePathPlacemark(path) {
   return `
     <Placemark>
-      <n>${path.name}</n>
+      <nameame>${path.name}</name>
       <styleUrl>#pathStyle</styleUrl>
       <LineString>
         <coordinates>

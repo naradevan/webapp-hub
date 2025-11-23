@@ -41,13 +41,13 @@ export function convertPOLERow(row, config) {
 export function generatePOLEPlacemark(data) {
   return `
     <Placemark>
-      <n>${data.poleId}</n>
+      <name>${data.poleId}</name>
       <styleUrl>#pointStyleMap</styleUrl>
       <Style id="inline">
         <IconStyle>
           <color>ffffffff</color>
           <colorMode>normal</colorMode>
-          <Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Icon>
+          <Iconame><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Iconame>
         </IconStyle>
         <LineStyle>
           <color>ffffffff</color>
@@ -86,14 +86,14 @@ export function getPOLEStyles() {
     
     <Style id="hlightPointStyle">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>

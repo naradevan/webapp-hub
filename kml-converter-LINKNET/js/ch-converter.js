@@ -35,13 +35,13 @@ export function convertCHRow(row, config) {
 export function generateCHPlacemark(data) {
   return `
     <Placemark>
-      <n>${data.clampHookId}</n>
+      <name>${data.clampHookId}</name>
       <styleUrl>#pointStyleMap</styleUrl>
       <Style id="inline">
         <IconStyle>
           <color>ff0000ff</color>
           <colorMode>normal</colorMode>
-          <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Icon>
+          <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_square.png</href></Iconame>
         </IconStyle>
         <LineStyle>
           <color>ff0000ff</color>
@@ -76,14 +76,14 @@ export function getCHStyles() {
     
     <Style id="hlightPointStyle">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Iconame>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
