@@ -5,17 +5,15 @@
 export const FAT_CONFIG = {
   name: 'FAT',
   
-  // Column mapping (0-indexed)
   columns: {
-    poleId: 0,          // Pole ID (New)
-    lat: 1,             // Coordinate (Lat) NEW
-    lon: 2,             // Coordinate (Long) NEW
-    provider: 3,        // Pole Provider (New)
-    type: 4,            // Pole Type
-    fatId: 5            // FAT ID/NETWORK ID
+    poleId: 0,
+    lat: 1,
+    lon: 2,
+    provider: 3,
+    type: 4,
+    fatId: 5
   },
   
-  // Expected headers for validation
   expectedHeaders: [
     'Pole ID (New)',
     'Coordinate (Lat) NEW',
@@ -26,7 +24,6 @@ export const FAT_CONFIG = {
   ]
 };
 
-// Convert CSV row to FAT data object
 export function convertFATRow(row, config) {
   const cols = row.split(',').map(c => c.trim());
   
@@ -40,16 +37,14 @@ export function convertFATRow(row, config) {
   };
 }
 
-// Generate KML placemark for FAT
 export function generateFATPlacemark(data) {
-  // Conditional styling based on FAT ID length
   const styleUrl = data.fatId.length < 9 
-    ? '#pointStyleMapShort0'   // RED square (FDT)
-    : '#pointStyleMap0';        // GREEN triangle (FAT)
+    ? '#pointStyleMapShort0'
+    : '#pointStyleMap0';
   
   return `
     <Placemark>
-      <n>${data.fatId}</n>
+      <name>${data.fatId}</name>
       <styleUrl>${styleUrl}</styleUrl>
       <ExtendedData>
         <SchemaData schemaUrl="#S_BAHAN_FAT_SSSSSS">
@@ -67,7 +62,6 @@ export function generateFATPlacemark(data) {
     </Placemark>`;
 }
 
-// Get FAT KML styles
 export function getFATStyles() {
   return `
     <Schema name="BAHAN_FAT" id="S_BAHAN_FAT_SSSSSS">

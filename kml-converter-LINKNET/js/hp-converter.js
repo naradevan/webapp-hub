@@ -243,8 +243,8 @@ export function getHPStyles() {
     </StyleMap>
     <Style id="hlightPointStyle0">
       <IconStyle>
-        <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+        <color>ffffffff</color>
+        <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
       </IconStyle>
       <BalloonStyle>
         <text><![CDATA[<table border="0">
@@ -282,8 +282,8 @@ export function getHPStyles() {
     </Style>
     <Style id="normPointStyle0">
       <IconStyle>
-        <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+        <color>ffffffff</color>
+        <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
       </IconStyle>
       <BalloonStyle>
         <text><![CDATA[<table border="0">

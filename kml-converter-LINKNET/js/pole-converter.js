@@ -5,16 +5,14 @@
 export const POLE_CONFIG = {
   name: 'POLE',
   
-  // Column mapping (0-indexed)
   columns: {
-    poleId: 0,          // Pole ID (New)
-    lat: 1,             // Coordinate (Lat) NEW
-    lon: 2,             // Coordinate (Long) NEW
-    provider: 3,        // Pole Provider (New)
-    type: 4             // Pole Type
+    poleId: 0,
+    lat: 1,
+    lon: 2,
+    provider: 3,
+    type: 4
   },
   
-  // Expected headers for validation
   expectedHeaders: [
     'Pole ID (New)',
     'Coordinate (Lat) NEW',
@@ -24,7 +22,6 @@ export const POLE_CONFIG = {
   ]
 };
 
-// Convert CSV row to POLE data object
 export function convertPOLERow(row, config) {
   const cols = row.split(',').map(c => c.trim());
   
@@ -37,11 +34,10 @@ export function convertPOLERow(row, config) {
   };
 }
 
-// Generate KML placemark for POLE
 export function generatePOLEPlacemark(data) {
   return `
     <Placemark>
-      <n>${data.poleId}</n>
+      <name>${data.poleId}</name>
       <styleUrl>#pointStyleMap1</styleUrl>
       <ExtendedData>
         <SchemaData schemaUrl="#S_BAHAN_POLE_SSSSS">
@@ -58,7 +54,6 @@ export function generatePOLEPlacemark(data) {
     </Placemark>`;
 }
 
-// Get POLE KML styles
 export function getPOLEStyles() {
   return `
     <Schema name="BAHAN_POLE" id="S_BAHAN_POLE_SSSSS">
@@ -71,7 +66,8 @@ export function getPOLEStyles() {
     
     <Style id="hlightPointStyle1">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+        <color>ffffffff</color>
+        <Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Icon>
       </IconStyle>
       <BalloonStyle>
         <text><![CDATA[<table border="0">
@@ -86,7 +82,8 @@ export function getPOLEStyles() {
     </Style>
     <Style id="normPointStyle1">
       <IconStyle>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+        <color>ffffffff</color>
+        <Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Icon>
       </IconStyle>
       <BalloonStyle>
         <text><![CDATA[<table border="0">
