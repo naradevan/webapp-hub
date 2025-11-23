@@ -68,7 +68,7 @@ export function generateCHPlacemark(data) {
 // Get Clamp/Hook KML styles
 export function getCHStyles() {
   return `
-    <Schema name="BAHAN_CH" id="S_BAHAN_CH">
+    <Schema name="BAHAN_CH" id="S_BAHAN_CH_SSS">
       <SimpleField type="string" name="Clamp_Hook_ID"><displayName>&lt;b&gt;Clamp_Hook_ID&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Clamp_Hook_LATITUDE"><displayName>&lt;b&gt;Clamp_Hook_LATITUDE&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Clamp_Hook_LONGITUDE"><displayName>&lt;b&gt;Clamp_Hook_LONGITUDE&lt;/b&gt;</displayName></SimpleField>
@@ -78,11 +78,15 @@ export function getCHStyles() {
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap">
       <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>

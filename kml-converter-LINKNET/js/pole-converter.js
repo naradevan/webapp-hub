@@ -76,7 +76,7 @@ export function generatePOLEPlacemark(data) {
 // Get POLE KML styles
 export function getPOLEStyles() {
   return `
-    <Schema name="BAHAN_POLE" id="S_BAHAN_POLE">
+    <Schema name="BAHAN_POLE" id="S_BAHAN_POLE_SSSSS">
       <SimpleField type="string" name="Pole_ID__New_"><displayName>&lt;b&gt;Pole ID (New)&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Coordinate__Lat__NEW"><displayName>&lt;b&gt;Coordinate (Lat) NEW&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Coordinate__Long__NEW"><displayName>&lt;b&gt;Coordinate (Long) NEW&lt;/b&gt;</displayName></SimpleField>
@@ -88,11 +88,15 @@ export function getPOLEStyles() {
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap">
       <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>

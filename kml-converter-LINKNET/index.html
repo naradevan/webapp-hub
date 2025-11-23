@@ -543,7 +543,12 @@
             const data = [];
             
             for (const placemark of placemarks) {
-                const nameEl = placemark.getElementsByTagName('name')[0];
+                // Try to get name from either <n> or <name> tag
+                let nameEl = placemark.getElementsByTagName('n')[0];
+                if (!nameEl) {
+                    nameEl = placemark.getElementsByTagName('name')[0];
+                }
+                
                 const coordsEl = placemark.getElementsByTagName('coordinates')[0];
                 
                 if (coordsEl) {
@@ -619,6 +624,65 @@
                     const kmlData = await parseKML(file);
                     data = kmlData.map(item => {
                         const coords = parseCoordinates(item.lat, item.lon);
+                        
+                        // Map KML data to proper structure based on type
+                        if (type === 'HP') {
+                            return {
+                                homepassId: '',
+                                clusterName: '',
+                                prefixAddress: '',
+                                streetName: '',
+                                houseNumber: item.name,  // Use name as house number
+                                block: '',
+                                floor: '',
+                                rt: '',
+                                rw: '',
+                                district: '',
+                                subDistrict: '',
+                                fdtCode: '',
+                                fatCode: '',
+                                lat: coords.lat,
+                                lon: coords.lon,
+                                category: 'RESIDENCE',
+                                postCode: '',
+                                addressPoleFat: '',
+                                ovUg: '',
+                                houseComment: '',
+                                buildingName: '',
+                                tower: '',
+                                aptn: '',
+                                fiberNode: '',
+                                idArea: '',
+                                clampHookId: '',
+                                deploymentType: '',
+                                needSurvey: ''
+                            };
+                        } else if (type === 'FAT') {
+                            return {
+                                poleId: '',
+                                lat: coords.lat,
+                                lon: coords.lon,
+                                provider: '',
+                                type: '',
+                                fatId: item.name  // Use name as FAT ID
+                            };
+                        } else if (type === 'POLE') {
+                            return {
+                                poleId: item.name,  // Use name as Pole ID
+                                lat: coords.lat,
+                                lon: coords.lon,
+                                provider: '',
+                                type: ''
+                            };
+                        } else if (type === 'CH') {
+                            return {
+                                clampHookId: item.name,  // Use name as Clamp Hook ID
+                                lat: coords.lat,
+                                lon: coords.lon
+                            };
+                        }
+                        
+                        // Default fallback
                         return {
                             name: item.name,
                             lat: coords.lat,

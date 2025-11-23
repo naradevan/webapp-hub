@@ -70,7 +70,7 @@ export function generateFATPlacemark(data) {
 // Get FAT KML styles
 export function getFATStyles() {
   return `
-    <Schema name="BAHAN_FAT" id="S_BAHAN_FAT">
+    <Schema name="BAHAN_FAT" id="S_BAHAN_FAT_SSSSSS">
       <SimpleField type="string" name="Pole_ID__New_"><displayName>&lt;b&gt;Pole ID (New)&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Coordinate__Lat__NEW"><displayName>&lt;b&gt;Coordinate (Lat) NEW&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Coordinate__Long__NEW"><displayName>&lt;b&gt;Coordinate (Long) NEW&lt;/b&gt;</displayName></SimpleField>
@@ -81,17 +81,21 @@ export function getFATStyles() {
     
     <Style id="hlightPointStyle">
       <IconStyle>
-        <color>ff00ff55</color>
+        <color>ff00ff00</color>
         <scale>1.4</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
-        <color>ff00ff55</color>
+        <color>ff00ff00</color>
         <scale>1.2</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap">
       <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
@@ -100,17 +104,21 @@ export function getFATStyles() {
     
     <Style id="hlightPointStyleShort">
       <IconStyle>
-        <color>ffffffff</color>
+        <color>ff0000ff</color>
         <scale>1.4</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyleShort">
       <IconStyle>
-        <color>ffffffff</color>
+        <color>ff0000ff</color>
         <scale>1.2</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMapShort">
       <Pair><key>normal</key><styleUrl>#normPointStyleShort</styleUrl></Pair>

@@ -253,12 +253,16 @@ export function getHPStyles() {
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap">
       <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
@@ -269,12 +273,16 @@ export function getHPStyles() {
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle0">
       <IconStyle>
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
+      <BalloonStyle></BalloonStyle>
+      <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap0">
       <Pair><key>normal</key><styleUrl>#normPointStyle0</styleUrl></Pair>
