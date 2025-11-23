@@ -42,7 +42,7 @@ export function generateHPtoFATPaths(hpData, fatData) {
 export function generatePathPlacemark(path) {
   return `
     <Placemark>
-      <nameame>${path.name}</name>
+      <name>${path.name}</name>
       <styleUrl>#pathStyle</styleUrl>
       <LineString>
         <coordinates>
@@ -59,7 +59,7 @@ export function getPathStyle() {
     <Style id="pathStyle">
       <LineStyle>
         <color>ff00ffff</color>
-        <width>2</width>
+        <width>1</width>
       </LineStyle>
     </Style>`;
 }
