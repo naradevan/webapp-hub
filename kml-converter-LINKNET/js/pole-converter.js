@@ -41,23 +41,8 @@ export function convertPOLERow(row, config) {
 export function generatePOLEPlacemark(data) {
   return `
     <Placemark>
-      <name>${data.poleId}</name>
-      <styleUrl>#pointStyleMap</styleUrl>
-      <Style id="inline">
-        <IconStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-          <Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Icon>
-        </IconStyle>
-        <LineStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-        </LineStyle>
-        <PolyStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-        </PolyStyle>
-      </Style>
+      <n>${data.poleId}</n>
+      <styleUrl>#pointStyleMap1</styleUrl>
       <ExtendedData>
         <SchemaData schemaUrl="#S_BAHAN_POLE_SSSSS">
           <SimpleData name="Pole_ID__New_">${data.poleId}</SimpleData>
@@ -84,22 +69,38 @@ export function getPOLEStyles() {
       <SimpleField type="string" name="Pole_Type"><displayName>&lt;b&gt;Pole Type&lt;/b&gt;</displayName></SimpleField>
     </Schema>
     
-    <Style id="hlightPointStyle">
+    <Style id="hlightPointStyle1">
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_POLE/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_POLE/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_POLE/Pole_Type]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <Style id="normPointStyle">
+    <Style id="normPointStyle1">
       <IconStyle>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_POLE/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_POLE/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_POLE/Pole_Type]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <StyleMap id="pointStyleMap">
-      <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle</styleUrl></Pair>
+    <StyleMap id="pointStyleMap1">
+      <Pair><key>normal</key><styleUrl>#normPointStyle1</styleUrl></Pair>
+      <Pair><key>highlight</key><styleUrl>#hlightPointStyle1</styleUrl></Pair>
     </StyleMap>`;
 }

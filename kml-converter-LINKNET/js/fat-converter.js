@@ -49,7 +49,7 @@ export function generateFATPlacemark(data) {
   
   return `
     <Placemark>
-      <name>${data.fatId}</name>
+      <n>${data.fatId}</n>
       <styleUrl>${styleUrl}</styleUrl>
       <ExtendedData>
         <SchemaData schemaUrl="#S_BAHAN_FAT_SSSSSS">
@@ -85,7 +85,16 @@ export function getFATStyles() {
         <scale>1.4</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_FAT/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_FAT/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_FAT/Pole_Type]</td></tr>
+  <tr><td><b>FAT ID/NETWORK ID</b></td><td>$[BAHAN_FAT/FAT_ID_NETWORK_ID]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle0">
@@ -94,7 +103,16 @@ export function getFATStyles() {
         <scale>1.2</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_FAT/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_FAT/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_FAT/Pole_Type]</td></tr>
+  <tr><td><b>FAT ID/NETWORK ID</b></td><td>$[BAHAN_FAT/FAT_ID_NETWORK_ID]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMap0">
@@ -108,7 +126,16 @@ export function getFATStyles() {
         <scale>1.4</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_FAT/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_FAT/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_FAT/Pole_Type]</td></tr>
+  <tr><td><b>FAT ID/NETWORK ID</b></td><td>$[BAHAN_FAT/FAT_ID_NETWORK_ID]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyleShort0">
@@ -117,7 +144,16 @@ export function getFATStyles() {
         <scale>1.2</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
-      <BalloonStyle></BalloonStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Pole ID (New)</b></td><td>$[BAHAN_FAT/Pole_ID__New_]</td></tr>
+  <tr><td><b>Coordinate (Lat) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Lat__NEW]</td></tr>
+  <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_FAT/Coordinate__Long__NEW]</td></tr>
+  <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_FAT/Pole_Provider__New_]</td></tr>
+  <tr><td><b>Pole Type</b></td><td>$[BAHAN_FAT/Pole_Type]</td></tr>
+  <tr><td><b>FAT ID/NETWORK ID</b></td><td>$[BAHAN_FAT/FAT_ID_NETWORK_ID]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <StyleMap id="pointStyleMapShort0">
