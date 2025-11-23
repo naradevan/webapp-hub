@@ -82,7 +82,7 @@ export function convertHPRow(row, config) {
 }
 
 export function generateHPPlacemark(data) {
-  const styleUrl = data.category.trim() === 'RESIDENCE' ? '#pointStyleMap00' : '#pointStyleMap0';
+  const styleUrl = data.category.trim() === 'RESIDENCE' ? '#pointStyleMapBiz0' : '#pointStyleMapBiz';
   
   return `
     <Placemark>
@@ -159,7 +159,7 @@ export function getHPStyles() {
       <SimpleField type="string" name="NEED_SURVEY"><displayName>&lt;b&gt;NEED_SURVEY&lt;/b&gt;</displayName></SimpleField>
     </Schema>
     
-    <Style id="hlightPointStyle00">
+    <Style id="hlightPointStyleBiz0">
       <IconStyle>
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
@@ -198,7 +198,7 @@ export function getHPStyles() {
       </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <Style id="normPointStyle00">
+    <Style id="normPointStyleBiz0">
       <IconStyle>
         <color>ff0000ff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
@@ -237,11 +237,11 @@ export function getHPStyles() {
       </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <StyleMap id="pointStyleMap00">
-      <Pair><key>normal</key><styleUrl>#normPointStyle00</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle00</styleUrl></Pair>
+    <StyleMap id="pointStyleMapBiz0">
+      <Pair><key>normal</key><styleUrl>#normPointStyleBiz0</styleUrl></Pair>
+      <Pair><key>highlight</key><styleUrl>#hlightPointStyleBiz0</styleUrl></Pair>
     </StyleMap>
-    <Style id="hlightPointStyle0">
+    <Style id="hlightPointStyleBiz">
       <IconStyle>
         <color>ffffffff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
@@ -280,7 +280,7 @@ export function getHPStyles() {
       </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <Style id="normPointStyle0">
+    <Style id="normPointStyleBiz">
       <IconStyle>
         <color>ffffffff</color>
         <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
@@ -319,9 +319,9 @@ export function getHPStyles() {
       </BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <StyleMap id="pointStyleMap0">
-      <Pair><key>normal</key><styleUrl>#normPointStyle0</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle0</styleUrl></Pair>
+    <StyleMap id="pointStyleMapBiz">
+      <Pair><key>normal</key><styleUrl>#normPointStyleBiz</styleUrl></Pair>
+      <Pair><key>highlight</key><styleUrl>#hlightPointStyleBiz</styleUrl></Pair>
     </StyleMap>`;
 }
 
