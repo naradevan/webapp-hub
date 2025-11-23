@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified KML Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid #404040;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #888;
+            font-weight: 300;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .upload-card {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-card:hover {
+            border-color: #606060;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .upload-card.active {
+            border-color: #888;
+            background: #323232;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .card-badge {
+            background: #404040;
+            color: #aaa;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .upload-zone {
+            border: 2px dashed #505050;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #252525;
+        }
+
+        .upload-zone:hover {
+            border-color: #707070;
+            background: #2a2a2a;
+        }
+
+        .upload-zone.dragover {
+            border-color: #999;
+            background: #333;
+        }
+
+        .upload-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            background: #1f1f1f;
+            border-radius: 6px;
+            border-left: 3px solid #666;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .file-stats {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .warning-box {
+            display: none;
+            background: #3a2a1a;
+            border: 1px solid #665533;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box.show {
+            display: block;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #ffaa00;
+            margin-bottom: 10px;
+        }
+
+        .warning-list {
+            list-style: none;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .warning-list li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .warning-list li:before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: #ffaa00;
+        }
+
+        .options-section {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background: #323232;
+        }
+
+        .checkbox-label input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-text {
+            font-size: 1em;
+            color: #ddd;
+        }
+
+        .checkbox-note {
+            font-size: 0.85em;
+            color: #888;
+            margin-left: 30px;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1em;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #555 0%, #444 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #666 0%, #555 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #444 0%, #333 100%);
+            color: #ccc;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #555 0%, #444 100%);
+        }
+
+        .status-panel {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            min-height: 150px;
+        }
+
+        .status-title {
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .log-container {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            color: #aaa;
+        }
+
+        .log-entry.success {
+            color: #88cc88;
+        }
+
+        .log-entry.error {
+            color: #ff8888;
+        }
+
+        .log-entry.info {
+            color: #88ccff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-bar.show {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #666, #888);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UNIFIED KML CONVERTER</h1>
+            <div class="subtitle">Convert CSV/KML/KMZ to organized KML output</div>
+        </header>
+
+        <!-- Upload Grid -->
+        <div class="upload-grid">
+            <!-- HP Upload -->
+            <div class="upload-card" id="hp-card">
+                <div class="card-header">
+                    <div class="card-title">HOMEPASS</div>
+                    <div class="card-badge">HP</div>
+                </div>
+                <div class="upload-zone" id="hp-zone" onclick="document.getElementById('hp-input').click()">
+                    <div class="upload-icon">📍</div>
+                    <div class="upload-text">Click or drag CSV/KML/KMZ</div>
+                </div>
+                <input type="file" id="hp-input" accept=".csv,.kml,.kmz">
+                <div class="file-info" id="hp-info">
+                    <div class="file-name" id="hp-filename"></div>
+                    <div class="file-stats" id="hp-stats"></div>
+                </div>
+            </div>
+
+            <!-- FAT Upload -->
+            <div class="upload-card" id="fat-card">
+                <div class="card-header">
+                    <div class="card-title">FAT & FDT</div>
+                    <div class="card-badge">FAT</div>
+                </div>
+                <div class="upload-zone" id="fat-zone" onclick="document.getElementById('fat-input').click()">
+                    <div class="upload-icon">🔺</div>
+                    <div class="upload-text">Click or drag CSV/KML/KMZ</div>
+                </div>
+                <input type="file" id="fat-input" accept=".csv,.kml,.kmz">
+                <div class="file-info" id="fat-info">
+                    <div class="file-name" id="fat-filename"></div>
+                    <div class="file-stats" id="fat-stats"></div>
+                </div>
+            </div>
+
+            <!-- POLE Upload -->
+            <div class="upload-card" id="pole-card">
+                <div class="card-header">
+                    <div class="card-title">POLE</div>
+                    <div class="card-badge">POLE</div>
+                </div>
+                <div class="upload-zone" id="pole-zone" onclick="document.getElementById('pole-input').click()">
+                    <div class="upload-icon">📌</div>
+                    <div class="upload-text">Click or drag CSV/KML/KMZ</div>
+                </div>
+                <input type="file" id="pole-input" accept=".csv,.kml,.kmz">
+                <div class="file-info" id="pole-info">
+                    <div class="file-name" id="pole-filename"></div>
+                    <div class="file-stats" id="pole-stats"></div>
+                </div>
+            </div>
+
+            <!-- CH Upload -->
+            <div class="upload-card" id="ch-card">
+                <div class="card-header">
+                    <div class="card-title">CLAMP/HOOK</div>
+                    <div class="card-badge">CH</div>
+                </div>
+                <div class="upload-zone" id="ch-zone" onclick="document.getElementById('ch-input').click()">
+                    <div class="upload-icon">🔗</div>
+                    <div class="upload-text">Click or drag CSV/KML/KMZ</div>
+                </div>
+                <input type="file" id="ch-input" accept=".csv,.kml,.kmz">
+                <div class="file-info" id="ch-info">
+                    <div class="file-name" id="ch-filename"></div>
+                    <div class="file-stats" id="ch-stats"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box" id="warning-box">
+            <div class="warning-title">⚠️ Header Validation Warnings</div>
+            <ul class="warning-list" id="warning-list"></ul>
+        </div>
+
+        <!-- Options -->
+        <div class="options-section">
+            <label class="checkbox-label">
+                <input type="checkbox" id="generate-paths">
+                <span class="checkbox-text">Generate HP → FAT Paths</span>
+            </label>
+            <div class="checkbox-note">Requires both HP and FAT data. Matches by FAT_CODE.</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button class="btn btn-primary" id="generate-kml" disabled>Generate KML</button>
+            <button class="btn btn-secondary" id="generate-kmz" disabled>Generate KMZ</button>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="status-panel">
+            <div class="status-title">Processing Log</div>
+            <div class="log-container" id="log-container">
+                <div class="log-entry">Ready to process files...</div>
+            </div>
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { HP_CONFIG, convertHPRow, generateHPPlacemark, getHPStyles, separateHPByCategory } from './js/hp-converter.js';
+        import { FAT_CONFIG, convertFATRow, generateFATPlacemark, getFATStyles } from './js/fat-converter.js';
+        import { POLE_CONFIG, convertPOLERow, generatePOLEPlacemark, getPOLEStyles } from './js/pole-converter.js';
+        import { CH_CONFIG, convertCHRow, generateCHPlacemark, getCHStyles } from './js/ch-converter.js';
+        import { generateHPtoFATPaths, generatePathPlacemark, getPathStyle } from './js/path-generator.js';
+
+        // State
+        const state = {
+            hp: null,
+            fat: null,
+            pole: null,
+            ch: null
+        };
+
+        // Utility: Format coordinates
+        function formatCoordinate(value, isLat) {
+            const num = parseFloat(value);
+            if (isNaN(num)) return value;
+            
+            const fixed = num.toFixed(6);
+            
+            if (isLat) {
+                // Ensure 9 characters: "-6.226252"
+                return fixed.padStart(9, ' ').substring(0, 9);
+            } else {
+                // Ensure 10 characters: "107.294000"
+                return fixed.padStart(10, ' ').substring(0, 10);
+            }
+        }
+
+        // Utility: Detect coordinate from string (handles "lat lon" or "lat,lon" or "lat")
+        function parseCoordinates(latStr, lonStr) {
+            // Check if latStr contains both lat and lon
+            if (latStr && latStr.includes(' ')) {
+                const parts = latStr.trim().split(/\s+/);
+                return {
+                    lat: formatCoordinate(parts[0], true),
+                    lon: formatCoordinate(parts[1], false)
+                };
+            } else if (latStr && latStr.includes(',')) {
+                const parts = latStr.trim().split(',');
+                return {
+                    lat: formatCoordinate(parts[0], true),
+                    lon: formatCoordinate(parts[1], false)
+                };
+            } else {
+                return {
+                    lat: formatCoordinate(latStr, true),
+                    lon: formatCoordinate(lonStr, false)
+                };
+            }
+        }
+
+        // Utility: Log message
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Utility: Parse CSV
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            return lines;
+        }
+
+        // Utility: Parse KML/KMZ (basic extraction)
+        async function parseKML(file) {
+            let kmlText;
+            
+            if (file.name.endsWith('.kmz')) {
+                // Extract KML from KMZ (ZIP)
+                const JSZip = window.JSZip || await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+                const zip = await JSZip.loadAsync(file);
+                const kmlFile = zip.file(/\.kml$/i)[0];
+                if (!kmlFile) throw new Error('No KML file found in KMZ');
+                kmlText = await kmlFile.async('string');
+            } else {
+                kmlText = await file.text();
+            }
+            
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(kmlText, 'text/xml');
+            
+            const placemarks = xmlDoc.getElementsByTagName('Placemark');
+            const data = [];
+            
+            for (const placemark of placemarks) {
+                const nameEl = placemark.getElementsByTagName('name')[0];
+                const coordsEl = placemark.getElementsByTagName('coordinates')[0];
+                
+                if (coordsEl) {
+                    const coords = coordsEl.textContent.trim().split(',');
+                    data.push({
+                        name: nameEl ? nameEl.textContent.trim() : 'Unknown',
+                        lon: coords[0]?.trim() || '',
+                        lat: coords[1]?.trim() || ''
+                    });
+                }
+            }
+            
+            return data;
+        }
+
+        // Validate headers
+        function validateHeaders(actualHeaders, expectedHeaders, dataType) {
+            const warnings = [];
+            
+            for (let i = 0; i < expectedHeaders.length; i++) {
+                const expected = expectedHeaders[i].toLowerCase().replace(/\s+/g, '');
+                const actual = (actualHeaders[i] || '').toLowerCase().replace(/\s+/g, '');
+                
+                if (expected !== actual) {
+                    warnings.push(`${dataType} Column ${i + 1}: Expected "${expectedHeaders[i]}", got "${actualHeaders[i] || 'MISSING'}"`);
+                }
+            }
+            
+            return warnings;
+        }
+
+        // Process uploaded file
+        async function processFile(file, type, config) {
+            log(`Processing ${type} file: ${file.name}...`);
+            
+            try {
+                let data, warnings = [];
+                
+                if (file.name.endsWith('.csv')) {
+                    const text = await file.text();
+                    const lines = parseCSV(text);
+                    
+                    if (lines.length < 2) throw new Error('CSV file is empty or invalid');
+                    
+                    // Validate headers
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    warnings = validateHeaders(headers, config.expectedHeaders, type);
+                    
+                    // Process data rows (skip header)
+                    data = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        let rowData;
+                        
+                        if (type === 'HP') {
+                            rowData = convertHPRow(lines[i], config);
+                        } else if (type === 'FAT') {
+                            rowData = convertFATRow(lines[i], config);
+                        } else if (type === 'POLE') {
+                            rowData = convertPOLERow(lines[i], config);
+                        } else if (type === 'CH') {
+                            rowData = convertCHRow(lines[i], config);
+                        }
+                        
+                        // Format coordinates
+                        const coords = parseCoordinates(rowData.lat, rowData.lon);
+                        rowData.lat = coords.lat;
+                        rowData.lon = coords.lon;
+                        
+                        data.push(rowData);
+                    }
+                } else {
+                    // KML/KMZ
+                    const kmlData = await parseKML(file);
+                    data = kmlData.map(item => {
+                        const coords = parseCoordinates(item.lat, item.lon);
+                        return {
+                            name: item.name,
+                            lat: coords.lat,
+                            lon: coords.lon
+                        };
+                    });
+                }
+                
+                log(`✓ ${type}: ${data.length} points loaded`, 'success');
+                
+                // Update UI
+                document.getElementById(`${type.toLowerCase()}-card`).classList.add('active');
+                document.getElementById(`${type.toLowerCase()}-info`).classList.add('show');
+                document.getElementById(`${type.toLowerCase()}-filename`).textContent = file.name;
+                document.getElementById(`${type.toLowerCase()}-stats`).textContent = `${data.length} points loaded`;
+                
+                // Show warnings if any
+                if (warnings.length > 0) {
+                    const warningBox = document.getElementById('warning-box');
+                    const warningList = document.getElementById('warning-list');
+                    
+                    warnings.forEach(w => {
+                        const li = document.createElement('li');
+                        li.textContent = w;
+                        warningList.appendChild(li);
+                    });
+                    
+                    warningBox.classList.add('show');
+                    log(`⚠ ${warnings.length} header validation warning(s)`, 'error');
+                }
+                
+                return data;
+            } catch (error) {
+                log(`✗ Error processing ${type}: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Generate KML output
+        function generateKML() {
+            log('Generating KML output...');
+            
+            let kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document>
+    <name>Unified KML Output</name>
+    <open>1</open>
+    
+    ${state.hp ? getHPStyles() : ''}
+    ${state.fat ? getFATStyles() : ''}
+    ${state.pole ? getPOLEStyles() : ''}
+    ${state.ch ? getCHStyles() : ''}
+    ${document.getElementById('generate-paths').checked ? getPathStyle() : ''}
+`;
+
+            // Add HP folders (HOME and HOME-BIZ)
+            if (state.hp) {
+                const { home, homeBiz } = separateHPByCategory(state.hp);
+                
+                kmlContent += `
+    <Folder>
+        <name>HOME</name>
+        <open>1</open>`;
+                
+                for (const hp of home) {
+                    kmlContent += generateHPPlacemark(hp);
+                }
+                
+                kmlContent += `
+    </Folder>
+    
+    <Folder>
+        <name>HOME-BIZ</name>
+        <open>1</open>`;
+                
+                for (const hp of homeBiz) {
+                    kmlContent += generateHPPlacemark(hp);
+                }
+                
+                kmlContent += `
+    </Folder>`;
+            }
+
+            // Add FAT folder
+            if (state.fat) {
+                kmlContent += `
+    <Folder>
+        <name>FAT</name>
+        <open>1</open>`;
+                
+                for (const fat of state.fat) {
+                    kmlContent += generateFATPlacemark(fat);
+                }
+                
+                kmlContent += `
+    </Folder>`;
+            }
+
+            // Add POLE folder
+            if (state.pole) {
+                kmlContent += `
+    <Folder>
+        <name>POLE</name>
+        <open>1</open>`;
+                
+                for (const pole of state.pole) {
+                    kmlContent += generatePOLEPlacemark(pole);
+                }
+                
+                kmlContent += `
+    </Folder>`;
+            }
+
+            // Add CH folder
+            if (state.ch) {
+                kmlContent += `
+    <Folder>
+        <name>CLAMP_HOOK</name>
+        <open>1</open>`;
+                
+                for (const ch of state.ch) {
+                    kmlContent += generateCHPlacemark(ch);
+                }
+                
+                kmlContent += `
+    </Folder>`;
+            }
+
+            // Add paths if enabled
+            if (document.getElementById('generate-paths').checked && state.hp && state.fat) {
+                const paths = generateHPtoFATPaths(state.hp, state.fat);
+                
+                kmlContent += `
+    <Folder>
+        <name>HP_TO_FAT_PATHS</name>
+        <open>1</open>`;
+                
+                for (const path of paths) {
+                    kmlContent += generatePathPlacemark(path);
+                }
+                
+                kmlContent += `
+    </Folder>`;
+                
+                log(`✓ Generated ${paths.length} HP→FAT paths`, 'success');
+            }
+
+            kmlContent += `
+</Document>
+</kml>`;
+
+            log('✓ KML generation complete!', 'success');
+            return kmlContent;
+        }
+
+        // Download KML
+        function downloadKML() {
+            const kml = generateKML();
+            const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.kml';
+            a.click();
+            URL.revokeObjectURL(url);
+            log('✓ KML file downloaded!', 'success');
+        }
+
+        // Download KMZ
+        async function downloadKMZ() {
+            const kml = generateKML();
+            
+            // Use JSZip to create KMZ
+            const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
+            const zip = new JSZip();
+            zip.file('doc.kml', kml);
+            
+            const kmzBlob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(kmzBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.kmz';
+            a.click();
+            URL.revokeObjectURL(url);
+            log('✓ KMZ file downloaded!', 'success');
+        }
+
+        // Check if can generate
+        function checkCanGenerate() {
+            const hasAnyData = state.hp || state.fat || state.pole || state.ch;
+            const pathsEnabled = document.getElementById('generate-paths').checked;
+            const pathsValid = pathsEnabled ? (state.hp && state.fat) : true;
+            
+            const canGenerate = hasAnyData && pathsValid;
+            
+            document.getElementById('generate-kml').disabled = !canGenerate;
+            document.getElementById('generate-kmz').disabled = !canGenerate;
+            
+            if (pathsEnabled && !pathsValid) {
+                log('⚠ Path generation requires both HP and FAT data', 'error');
+            }
+        }
+
+        // File input handlers
+        document.getElementById('hp-input').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                state.hp = await processFile(e.target.files[0], 'HP', HP_CONFIG);
+                checkCanGenerate();
+            }
+        });
+
+        document.getElementById('fat-input').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                state.fat = await processFile(e.target.files[0], 'FAT', FAT_CONFIG);
+                checkCanGenerate();
+            }
+        });
+
+        document.getElementById('pole-input').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                state.pole = await processFile(e.target.files[0], 'POLE', POLE_CONFIG);
+                checkCanGenerate();
+            }
+        });
+
+        document.getElementById('ch-input').addEventListener('change', async (e) => {
+            if (e.target.files[0]) {
+                state.ch = await processFile(e.target.files[0], 'CH', CH_CONFIG);
+                checkCanGenerate();
+            }
+        });
+
+        // Drag and drop handlers
+        ['hp', 'fat', 'pole', 'ch'].forEach(type => {
+            const zone = document.getElementById(`${type}-zone`);
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    document.getElementById(`${type}-input`).files = e.dataTransfer.files;
+                    
+                    const config = type === 'hp' ? HP_CONFIG : 
+                                   type === 'fat' ? FAT_CONFIG :
+                                   type === 'pole' ? POLE_CONFIG : CH_CONFIG;
+                    
+                    state[type] = await processFile(file, type.toUpperCase(), config);
+                    checkCanGenerate();
+                }
+            });
+        });
+
+        // Button handlers
+        document.getElementById('generate-kml').addEventListener('click', downloadKML);
+        document.getElementById('generate-kmz').addEventListener('click', downloadKMZ);
+        document.getElementById('generate-paths').addEventListener('change', checkCanGenerate);
+    </script>
+</body>
+</html>
