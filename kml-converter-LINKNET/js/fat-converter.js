@@ -44,15 +44,15 @@ export function convertFATRow(row, config) {
 export function generateFATPlacemark(data) {
   // Conditional styling based on FAT ID length
   const styleUrl = data.fatId.length < 9 
-    ? '#pointStyleMapShort'   // White square
-    : '#pointStyleMap';        // Green triangle
+    ? '#pointStyleMapShort0'   // RED square (FDT)
+    : '#pointStyleMap0';        // GREEN triangle (FAT)
   
   return `
     <Placemark>
-      <name>${data.fatId}</name>
+      <n>${data.fatId}</n>
       <styleUrl>${styleUrl}</styleUrl>
       <ExtendedData>
-        <SchemaData schemaUrl="#S_BAHAN_FAT">
+        <SchemaData schemaUrl="#S_BAHAN_FAT_SSSSSS">
           <SimpleData name="Pole_ID__New_">${data.poleId}</SimpleData>
           <SimpleData name="Coordinate__Lat__NEW">${data.lat}</SimpleData>
           <SimpleData name="Coordinate__Long__NEW">${data.lon}</SimpleData>
@@ -79,30 +79,30 @@ export function getFATStyles() {
       <SimpleField type="string" name="FAT_ID_NETWORK_ID"><displayName>&lt;b&gt;FAT ID/NETWORK ID&lt;/b&gt;</displayName></SimpleField>
     </Schema>
     
-    <Style id="hlightPointStyle">
+    <Style id="hlightPointStyle0">
       <IconStyle>
-        <color>ff00ff00</color>
+        <color>ff00ff55</color>
         <scale>1.4</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <Style id="normPointStyle">
+    <Style id="normPointStyle0">
       <IconStyle>
-        <color>ff00ff00</color>
+        <color>ff00ff55</color>
         <scale>1.2</scale>
         <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <StyleMap id="pointStyleMap">
-      <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle</styleUrl></Pair>
+    <StyleMap id="pointStyleMap0">
+      <Pair><key>normal</key><styleUrl>#normPointStyle0</styleUrl></Pair>
+      <Pair><key>highlight</key><styleUrl>#hlightPointStyle0</styleUrl></Pair>
     </StyleMap>
     
-    <Style id="hlightPointStyleShort">
+    <Style id="hlightPointStyleShort0">
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.4</scale>
@@ -111,7 +111,7 @@ export function getFATStyles() {
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <Style id="normPointStyleShort">
+    <Style id="normPointStyleShort0">
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.2</scale>
@@ -120,8 +120,8 @@ export function getFATStyles() {
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
-    <StyleMap id="pointStyleMapShort">
-      <Pair><key>normal</key><styleUrl>#normPointStyleShort</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyleShort</styleUrl></Pair>
+    <StyleMap id="pointStyleMapShort0">
+      <Pair><key>normal</key><styleUrl>#normPointStyleShort0</styleUrl></Pair>
+      <Pair><key>highlight</key><styleUrl>#hlightPointStyleShort0</styleUrl></Pair>
     </StyleMap>`;
 }

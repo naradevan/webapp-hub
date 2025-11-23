@@ -24,7 +24,7 @@ export function generateHPtoFATPaths(hpData, fatData) {
     
     if (matchingFat) {
       paths.push({
-        name: `${hp.houseNumber} → ${matchingFat.fatId}`,
+        name: `${hp.houseNumber} to ${matchingFat.fatId}`,
         hpLat: hp.lat,
         hpLon: hp.lon,
         fatLat: matchingFat.lat,

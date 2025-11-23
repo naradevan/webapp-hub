@@ -53,7 +53,7 @@ export function generateCHPlacemark(data) {
         </PolyStyle>
       </Style>
       <ExtendedData>
-        <SchemaData schemaUrl="#S_BAHAN_CH">
+        <SchemaData schemaUrl="#S_BAHAN_CH_SSS">
           <SimpleData name="Clamp_Hook_ID">${data.clampHookId}</SimpleData>
           <SimpleData name="Clamp_Hook_LATITUDE">${data.lat}</SimpleData>
           <SimpleData name="Clamp_Hook_LONGITUDE">${data.lon}</SimpleData>

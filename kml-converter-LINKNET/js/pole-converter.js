@@ -59,7 +59,7 @@ export function generatePOLEPlacemark(data) {
         </PolyStyle>
       </Style>
       <ExtendedData>
-        <SchemaData schemaUrl="#S_BAHAN_POLE">
+        <SchemaData schemaUrl="#S_BAHAN_POLE_SSSSS">
           <SimpleData name="Pole_ID__New_">${data.poleId}</SimpleData>
           <SimpleData name="Coordinate__Lat__NEW">${data.lat}</SimpleData>
           <SimpleData name="Coordinate__Long__NEW">${data.lon}</SimpleData>
