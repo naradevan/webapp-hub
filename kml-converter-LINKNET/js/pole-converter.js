@@ -47,7 +47,7 @@ export function generatePOLEPlacemark(data) {
         <IconStyle>
           <color>ffffffff</color>
           <colorMode>normal</colorMode>
-          <Iconame><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Iconame>
+          <Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-blank.png</href></Icon>
         </IconStyle>
         <LineStyle>
           <color>ffffffff</color>
@@ -86,14 +86,14 @@ export function getPOLEStyles() {
     
     <Style id="hlightPointStyle">
       <IconStyle>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
     </Style>
     <Style id="normPointStyle">
       <IconStyle>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>

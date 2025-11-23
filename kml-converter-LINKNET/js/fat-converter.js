@@ -83,7 +83,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff00ff55</color>
         <scale>1.4</scale>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -92,7 +92,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff00ff55</color>
         <scale>1.2</scale>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -106,7 +106,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.4</scale>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
@@ -115,7 +115,7 @@ export function getFATStyles() {
       <IconStyle>
         <color>ff0000ff</color>
         <scale>1.2</scale>
-        <Iconame><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Iconame>
+        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/square.png</href></Icon>
       </IconStyle>
       <BalloonStyle></BalloonStyle>
       <ListStyle></ListStyle>
