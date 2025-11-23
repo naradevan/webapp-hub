@@ -58,7 +58,7 @@ export function getPathStyle() {
   return `
     <Style id="pathStyle">
       <LineStyle>
-        <color>ff00ffff</color>
+        <color>#ff00ff</color>
         <width>1</width>
       </LineStyle>
     </Style>`;
