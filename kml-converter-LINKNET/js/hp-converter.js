@@ -324,3 +324,19 @@ export function getHPStyles() {
       <Pair><key>highlight</key><styleUrl>#hlightPointStyle0</styleUrl></Pair>
     </StyleMap>`;
 }
+
+// Separate HP data by category (RESIDENCE vs BUSINESS)
+export function separateHPByCategory(hpData) {
+  const home = [];
+  const homeBiz = [];
+  
+  for (const hp of hpData) {
+    if (hp.category.trim() === 'RESIDENCE') {
+      home.push(hp);
+    } else {
+      homeBiz.push(hp);
+    }
+  }
+  
+  return { home, homeBiz };
+}
