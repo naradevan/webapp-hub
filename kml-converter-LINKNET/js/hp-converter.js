@@ -82,7 +82,7 @@ export function convertHPRow(row, config) {
 }
 
 export function generateHPPlacemark(data) {
-  const styleUrl = data.category === 'BUSINESS' ? '#pointStyleMap0' : '#pointStyleMap00';
+  const styleUrl = data.category.trim() === 'RESIDENCE' ? '#pointStyleMap00' : '#pointStyleMap0';
   
   return `
     <Placemark>
