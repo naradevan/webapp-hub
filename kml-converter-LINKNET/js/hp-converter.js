@@ -117,56 +117,56 @@ export function generateHPPlacemark(data) {
   if (category === 'RESIDENCE' && clampHook === '-') {
     styleUrl = '#pointStyleMap0';
     inlineStyle = `
-      <Style id="inline">
-        <IconStyle>
-          <color>ff0000ff</color>
-          <colorMode>normal</colorMode>
-        </IconStyle>
-        <LineStyle>
-          <color>ff0000ff</color>
-          <colorMode>normal</colorMode>
-        </LineStyle>
-        <PolyStyle>
-          <color>ff0000ff</color>
-          <colorMode>normal</colorMode>
-        </PolyStyle>
-      </Style>`;
+			<Style id="inline">
+				<IconStyle>
+					<color>ff0000ff</color>
+					<colorMode>normal</colorMode>
+				</IconStyle>
+				<LineStyle>
+					<color>ff0000ff</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ff0000ff</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>`;
   } else if (category !== 'RESIDENCE' && clampHook === '-') {
     styleUrl = '#pointStyleMap0';
     inlineStyle = `
-      <Style id="inline">
-        <IconStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-          <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
-        </IconStyle>
-        <LineStyle>
-          <color>ffffffff/color>
-          <colorMode>normal</colorMode>
-        </LineStyle>
-        <PolyStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-        </PolyStyle>
-      </Style>`;
+			<Style id="inline">
+				<IconStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+					<Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
+				</IconStyle>
+				<LineStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>`;
   } else if (category !== 'RESIDENCE' && clampHook !== '-') {
     styleUrl = '#pointStyleMap0';
     inlineStyle = `
-      <Style id="inline">
-        <IconStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-          <Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
-        </IconStyle>
-        <LineStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-        </LineStyle>
-        <PolyStyle>
-          <color>ffffffff</color>
-          <colorMode>normal</colorMode>
-        </PolyStyle>
-      </Style>`;
+			<Style id="inline">
+				<IconStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+					<Icon><href>http://maps.google.com/mapfiles/kml/paddle/B.png</href></Icon>
+				</IconStyle>
+				<LineStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+				</LineStyle>
+				<PolyStyle>
+					<color>ffffffff</color>
+					<colorMode>normal</colorMode>
+				</PolyStyle>
+			</Style>`;
   } else {
     styleUrl = '#pointStyleMap';
     inlineStyle = '';
@@ -217,77 +217,189 @@ export function generateHPPlacemark(data) {
 // Get HP KML styles
 export function getHPStyles() {
   return `
-    <Schema name="BAHAN_HP" id="S_BAHAN_HP">
-      <SimpleField type="string" name="HOMEPASS_ID"><displayName>&lt;b&gt;HOMEPASS_ID&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="CLUSTER_NAME"><displayName>&lt;b&gt;CLUSTER_NAME&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="PREFIX_ADDRESS"><displayName>&lt;b&gt;PREFIX_ADDRESS&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="STREET_NAME"><displayName>&lt;b&gt;STREET_NAME&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="HOUSE_NUMBER"><displayName>&lt;b&gt;HOUSE_NUMBER&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="BLOCK"><displayName>&lt;b&gt;BLOCK&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="FLOOR"><displayName>&lt;b&gt;FLOOR&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="RT"><displayName>&lt;b&gt;RT&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="RW"><displayName>&lt;b&gt;RW&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="DISTRICT"><displayName>&lt;b&gt;DISTRICT&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="SUB_DISTRICT"><displayName>&lt;b&gt;SUB_DISTRICT&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="FDT_CODE"><displayName>&lt;b&gt;FDT_CODE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="FAT_CODE"><displayName>&lt;b&gt;FAT_CODE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="BUILDING_LATITUDE"><displayName>&lt;b&gt;BUILDING_LATITUDE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="BUILDING_LONGITUDE"><displayName>&lt;b&gt;BUILDING_LONGITUDE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="Category_BizPass"><displayName>&lt;b&gt;Category BizPass&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="POST_CODE"><displayName>&lt;b&gt;POST CODE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="ADDRESS_POLE___FAT"><displayName>&lt;b&gt;ADDRESS POLE / FAT&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="OV_UG"><displayName>&lt;b&gt;OV_UG&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="HOUSE_COMMENT_"><displayName>&lt;b&gt;HOUSE_COMMENT_&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="BUILDING_NAME"><displayName>&lt;b&gt;BUILDING_NAME&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="TOWER"><displayName>&lt;b&gt;TOWER&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="APTN"><displayName>&lt;b&gt;APTN&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="FIBER_NODE__HFC_"><displayName>&lt;b&gt;FIBER_NODE__HFC_&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="ID_Area"><displayName>&lt;b&gt;ID_Area&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="Clamp_Hook_ID"><displayName>&lt;b&gt;Clamp_Hook_ID&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="DEPLOYMENT_TYPE"><displayName>&lt;b&gt;DEPLOYMENT_TYPE&lt;/b&gt;</displayName></SimpleField>
-      <SimpleField type="string" name="NEED_SURVEY"><displayName>&lt;b&gt;NEED_SURVEY&lt;/b&gt;</displayName></SimpleField>
-    </Schema>
-    
-    <Style id="hlightPointStyle">
-      <IconStyle>
+    	<Schema name="BAHAN_HP" id="S_BAHAN_HP_SSSSSSSSSSSSSSSSSSSSSSSSSS">
+		<SimpleField type="string" name="HOMEPASS_ID"><displayName>&lt;b&gt;HOMEPASS_ID&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="CLUSTER_NAME"><displayName>&lt;b&gt;CLUSTER_NAME&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="PREFIX_ADDRESS"><displayName>&lt;b&gt;PREFIX_ADDRESS&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="STREET_NAME"><displayName>&lt;b&gt;STREET_NAME&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="HOUSE_NUMBER"><displayName>&lt;b&gt;HOUSE_NUMBER&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="BLOCK"><displayName>&lt;b&gt;BLOCK&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="FLOOR"><displayName>&lt;b&gt;FLOOR&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="RT"><displayName>&lt;b&gt;RT&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="RW"><displayName>&lt;b&gt;RW&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="DISTRICT"><displayName>&lt;b&gt;DISTRICT&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="SUB_DISTRICT"><displayName>&lt;b&gt;SUB_DISTRICT&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="FDT_CODE"><displayName>&lt;b&gt;FDT_CODE&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="FAT_CODE"><displayName>&lt;b&gt;FAT_CODE&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="BUILDING_LATITUDE"><displayName>&lt;b&gt;BUILDING_LATITUDE&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="BUILDING_LONGITUDE"><displayName>&lt;b&gt;BUILDING_LONGITUDE&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="Category_BizPass"><displayName>&lt;b&gt;Category BizPass&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="POST_CODE"><displayName>&lt;b&gt;POST CODE&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="ADDRESS_POLE___FAT"><displayName>&lt;b&gt;ADDRESS POLE / FAT&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="OV_UG"><displayName>&lt;b&gt;OV_UG&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="HOUSE_COMMENT_"><displayName>&lt;b&gt;HOUSE_COMMENT_&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="BUILDING_NAME"><displayName>&lt;b&gt;BUILDING_NAME&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="TOWER"><displayName>&lt;b&gt;TOWER&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="APTN"><displayName>&lt;b&gt;APTN&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="FIBER_NODE__HFC_"><displayName>&lt;b&gt;FIBER_NODE__HFC_&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="ID_Area"><displayName>&lt;b&gt;ID_Area&lt;/b&gt;</displayName></SimpleField>
+		<SimpleField type="string" name="Clamp_Hook_ID"><displayName>&lt;b&gt;Clamp_Hook_ID&lt;/b&gt;</displayName></SimpleField>
+        <SimpleField type="string" name="DEPLOYMENT_TYPE"><displayName>&lt;b&gt;DEPLOYMENT_TYPE&lt;/b&gt;</displayName></SimpleField>
+        <SimpleField type="string" name="NEED_SURVEY"><displayName>&lt;b&gt;NEED_SURVEY&lt;/b&gt;</displayName></SimpleField>
+	</Schema>
+	<Style id="hlightPointStyle">
+		<IconStyle>
+			<color>ff0000ff</color>
+			<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+		</IconStyle>
+		<BalloonStyle><text><![CDATA[<table border="0">
+  <tr><td><b>HOMEPASS_ID</b></td><td>$[BAHAN_HP/HOMEPASS_ID]</td></tr>
+  <tr><td><b>CLUSTER_NAME</b></td><td>$[BAHAN_HP/CLUSTER_NAME]</td></tr>
+  <tr><td><b>PREFIX_ADDRESS</b></td><td>$[BAHAN_HP/PREFIX_ADDRESS]</td></tr>
+  <tr><td><b>STREET_NAME</b></td><td>$[BAHAN_HP/STREET_NAME]</td></tr>
+  <tr><td><b>HOUSE_NUMBER</b></td><td>$[BAHAN_HP/HOUSE_NUMBER]</td></tr>
+  <tr><td><b>BLOCK</b></td><td>$[BAHAN_HP/BLOCK]</td></tr>
+  <tr><td><b>FLOOR</b></td><td>$[BAHAN_HP/FLOOR]</td></tr>
+  <tr><td><b>RT</b></td><td>$[BAHAN_HP/RT]</td></tr>
+  <tr><td><b>RW</b></td><td>$[BAHAN_HP/RW]</td></tr>
+  <tr><td><b>DISTRICT</b></td><td>$[BAHAN_HP/DISTRICT]</td></tr>
+  <tr><td><b>SUB_DISTRICT</b></td><td>$[BAHAN_HP/SUB_DISTRICT]</td></tr>
+  <tr><td><b>FDT_CODE</b></td><td>$[BAHAN_HP/FDT_CODE]</td></tr>
+  <tr><td><b>FAT_CODE</b></td><td>$[BAHAN_HP/FAT_CODE]</td></tr>
+  <tr><td><b>BUILDING_LATITUDE</b></td><td>$[BAHAN_HP/BUILDING_LATITUDE]</td></tr>
+  <tr><td><b>BUILDING_LONGITUDE</b></td><td>$[BAHAN_HP/BUILDING_LONGITUDE]</td></tr>
+  <tr><td><b>Category BizPass</b></td><td>$[BAHAN_HP/Category_BizPass]</td></tr>
+  <tr><td><b>POST CODE</b></td><td>$[BAHAN_HP/POST_CODE]</td></tr>
+  <tr><td><b>ADDRESS POLE / FAT</b></td><td>$[BAHAN_HP/ADDRESS_POLE___FAT]</td></tr>
+  <tr><td><b>OV_UG</b></td><td>$[BAHAN_HP/OV_UG]</td></tr>
+  <tr><td><b>HOUSE_COMMENT_</b></td><td>$[BAHAN_HP/HOUSE_COMMENT_]</td></tr>
+  <tr><td><b>BUILDING_NAME</b></td><td>$[BAHAN_HP/BUILDING_NAME]</td></tr>
+  <tr><td><b>TOWER</b></td><td>$[BAHAN_HP/TOWER]</td></tr>
+  <tr><td><b>APTN</b></td><td>$[BAHAN_HP/APTN]</td></tr>
+  <tr><td><b>FIBER_NODE__HFC_</b></td><td>$[BAHAN_HP/FIBER_NODE__HFC_]</td></tr>
+  <tr><td><b>ID_Area</b></td><td>$[BAHAN_HP/ID_Area]</td></tr>
+  <tr><td><b>Clamp_Hook_ID</b></td><td>$[BAHAN_HP/Clamp_Hook_ID]</td></tr>
+  <tr><td><b>DEPLOYMENT_TYPE</b></td><td>$[BAHAN_HP/DEPLOYMENT_TYPE]</td></tr>
+  <tr><td><b>NEED_SURVEY</b></td><td>$[BAHAN_HP/NEED_SURVEY]</td></tr>
+</table>]]></text></BalloonStyle>
+	</Style>
+	<Style id="hlightPointStyle0">
+		<IconStyle>
         <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
-      </IconStyle>
-      <BalloonStyle></BalloonStyle>
-      <ListStyle></ListStyle>
-    </Style>
-    <Style id="normPointStyle">
-      <IconStyle>
+			<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
+		</IconStyle>
+		<BalloonStyle><text><![CDATA[<table border="0">
+  <tr><td><b>HOMEPASS_ID</b></td><td>$[BAHAN_HP/HOMEPASS_ID]</td></tr>
+  <tr><td><b>CLUSTER_NAME</b></td><td>$[BAHAN_HP/CLUSTER_NAME]</td></tr>
+  <tr><td><b>PREFIX_ADDRESS</b></td><td>$[BAHAN_HP/PREFIX_ADDRESS]</td></tr>
+  <tr><td><b>STREET_NAME</b></td><td>$[BAHAN_HP/STREET_NAME]</td></tr>
+  <tr><td><b>HOUSE_NUMBER</b></td><td>$[BAHAN_HP/HOUSE_NUMBER]</td></tr>
+  <tr><td><b>BLOCK</b></td><td>$[BAHAN_HP/BLOCK]</td></tr>
+  <tr><td><b>FLOOR</b></td><td>$[BAHAN_HP/FLOOR]</td></tr>
+  <tr><td><b>RT</b></td><td>$[BAHAN_HP/RT]</td></tr>
+  <tr><td><b>RW</b></td><td>$[BAHAN_HP/RW]</td></tr>
+  <tr><td><b>DISTRICT</b></td><td>$[BAHAN_HP/DISTRICT]</td></tr>
+  <tr><td><b>SUB_DISTRICT</b></td><td>$[BAHAN_HP/SUB_DISTRICT]</td></tr>
+  <tr><td><b>FDT_CODE</b></td><td>$[BAHAN_HP/FDT_CODE]</td></tr>
+  <tr><td><b>FAT_CODE</b></td><td>$[BAHAN_HP/FAT_CODE]</td></tr>
+  <tr><td><b>BUILDING_LATITUDE</b></td><td>$[BAHAN_HP/BUILDING_LATITUDE]</td></tr>
+  <tr><td><b>BUILDING_LONGITUDE</b></td><td>$[BAHAN_HP/BUILDING_LONGITUDE]</td></tr>
+  <tr><td><b>Category BizPass</b></td><td>$[BAHAN_HP/Category_BizPass]</td></tr>
+  <tr><td><b>POST CODE</b></td><td>$[BAHAN_HP/POST_CODE]</td></tr>
+  <tr><td><b>ADDRESS POLE / FAT</b></td><td>$[BAHAN_HP/ADDRESS_POLE___FAT]</td></tr>
+  <tr><td><b>OV_UG</b></td><td>$[BAHAN_HP/OV_UG]</td></tr>
+  <tr><td><b>HOUSE_COMMENT_</b></td><td>$[BAHAN_HP/HOUSE_COMMENT_]</td></tr>
+  <tr><td><b>BUILDING_NAME</b></td><td>$[BAHAN_HP/BUILDING_NAME]</td></tr>
+  <tr><td><b>TOWER</b></td><td>$[BAHAN_HP/TOWER]</td></tr>
+  <tr><td><b>APTN</b></td><td>$[BAHAN_HP/APTN]</td></tr>
+  <tr><td><b>FIBER_NODE__HFC_</b></td><td>$[BAHAN_HP/FIBER_NODE__HFC_]</td></tr>
+  <tr><td><b>ID_Area</b></td><td>$[BAHAN_HP/ID_Area]</td></tr>
+  <tr><td><b>Clamp_Hook_ID</b></td><td>$[BAHAN_HP/Clamp_Hook_ID]</td></tr>
+  <tr><td><b>DEPLOYMENT_TYPE</b></td><td>$[BAHAN_HP/DEPLOYMENT_TYPE]</td></tr>
+  <tr><td><b>NEED_SURVEY</b></td><td>$[BAHAN_HP/NEED_SURVEY]</td></tr>
+</table>]]></text></BalloonStyle>
+	</Style>
+	<Style id="normPointStyle">
+		<IconStyle>
         <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
-      </IconStyle>
-      <BalloonStyle></BalloonStyle>
-      <ListStyle></ListStyle>
-    </Style>
-    <StyleMap id="pointStyleMap">
-      <Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle</styleUrl></Pair>
-    </StyleMap>
-    <Style id="hlightPointStyle0">
-      <IconStyle>
+			<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+		</IconStyle>
+		<BalloonStyle><text><![CDATA[<table border="0">
+  <tr><td><b>HOMEPASS_ID</b></td><td>$[BAHAN_HP/HOMEPASS_ID]</td></tr>
+  <tr><td><b>CLUSTER_NAME</b></td><td>$[BAHAN_HP/CLUSTER_NAME]</td></tr>
+  <tr><td><b>PREFIX_ADDRESS</b></td><td>$[BAHAN_HP/PREFIX_ADDRESS]</td></tr>
+  <tr><td><b>STREET_NAME</b></td><td>$[BAHAN_HP/STREET_NAME]</td></tr>
+  <tr><td><b>HOUSE_NUMBER</b></td><td>$[BAHAN_HP/HOUSE_NUMBER]</td></tr>
+  <tr><td><b>BLOCK</b></td><td>$[BAHAN_HP/BLOCK]</td></tr>
+  <tr><td><b>FLOOR</b></td><td>$[BAHAN_HP/FLOOR]</td></tr>
+  <tr><td><b>RT</b></td><td>$[BAHAN_HP/RT]</td></tr>
+  <tr><td><b>RW</b></td><td>$[BAHAN_HP/RW]</td></tr>
+  <tr><td><b>DISTRICT</b></td><td>$[BAHAN_HP/DISTRICT]</td></tr>
+  <tr><td><b>SUB_DISTRICT</b></td><td>$[BAHAN_HP/SUB_DISTRICT]</td></tr>
+  <tr><td><b>FDT_CODE</b></td><td>$[BAHAN_HP/FDT_CODE]</td></tr>
+  <tr><td><b>FAT_CODE</b></td><td>$[BAHAN_HP/FAT_CODE]</td></tr>
+  <tr><td><b>BUILDING_LATITUDE</b></td><td>$[BAHAN_HP/BUILDING_LATITUDE]</td></tr>
+  <tr><td><b>BUILDING_LONGITUDE</b></td><td>$[BAHAN_HP/BUILDING_LONGITUDE]</td></tr>
+  <tr><td><b>Category BizPass</b></td><td>$[BAHAN_HP/Category_BizPass]</td></tr>
+  <tr><td><b>POST CODE</b></td><td>$[BAHAN_HP/POST_CODE]</td></tr>
+  <tr><td><b>ADDRESS POLE / FAT</b></td><td>$[BAHAN_HP/ADDRESS_POLE___FAT]</td></tr>
+  <tr><td><b>OV_UG</b></td><td>$[BAHAN_HP/OV_UG]</td></tr>
+  <tr><td><b>HOUSE_COMMENT_</b></td><td>$[BAHAN_HP/HOUSE_COMMENT_]</td></tr>
+  <tr><td><b>BUILDING_NAME</b></td><td>$[BAHAN_HP/BUILDING_NAME]</td></tr>
+  <tr><td><b>TOWER</b></td><td>$[BAHAN_HP/TOWER]</td></tr>
+  <tr><td><b>APTN</b></td><td>$[BAHAN_HP/APTN]</td></tr>
+  <tr><td><b>FIBER_NODE__HFC_</b></td><td>$[BAHAN_HP/FIBER_NODE__HFC_]</td></tr>
+  <tr><td><b>ID_Area</b></td><td>$[BAHAN_HP/ID_Area]</td></tr>
+  <tr><td><b>Clamp_Hook_ID</b></td><td>$[BAHAN_HP/Clamp_Hook_ID]</td></tr>
+  <tr><td><b>DEPLOYMENT_TYPE</b></td><td>$[BAHAN_HP/DEPLOYMENT_TYPE]</td></tr>
+  <tr><td><b>NEED_SURVEY</b></td><td>$[BAHAN_HP/NEED_SURVEY]</td></tr>
+</table>]]></text></BalloonStyle>
+	</Style>
+	<Style id="normPointStyle0">
+		<IconStyle>
         <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png</href></Icon>
-      </IconStyle>
-      <BalloonStyle></BalloonStyle>
-      <ListStyle></ListStyle>
-    </Style>
-    <Style id="normPointStyle0">
-      <IconStyle>
-        <color>ff0000ff</color>
-        <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
-      </IconStyle>
-      <BalloonStyle></BalloonStyle>
-      <ListStyle></ListStyle>
-    </Style>
-    <StyleMap id="pointStyleMap0">
-      <Pair><key>normal</key><styleUrl>#normPointStyle0</styleUrl></Pair>
-      <Pair><key>highlight</key><styleUrl>#hlightPointStyle0</styleUrl></Pair>
-    </StyleMap>`;
+			<Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+		</IconStyle>
+		<BalloonStyle><text><![CDATA[<table border="0">
+  <tr><td><b>HOMEPASS_ID</b></td><td>$[BAHAN_HP/HOMEPASS_ID]</td></tr>
+  <tr><td><b>CLUSTER_NAME</b></td><td>$[BAHAN_HP/CLUSTER_NAME]</td></tr>
+  <tr><td><b>PREFIX_ADDRESS</b></td><td>$[BAHAN_HP/PREFIX_ADDRESS]</td></tr>
+  <tr><td><b>STREET_NAME</b></td><td>$[BAHAN_HP/STREET_NAME]</td></tr>
+  <tr><td><b>HOUSE_NUMBER</b></td><td>$[BAHAN_HP/HOUSE_NUMBER]</td></tr>
+  <tr><td><b>BLOCK</b></td><td>$[BAHAN_HP/BLOCK]</td></tr>
+  <tr><td><b>FLOOR</b></td><td>$[BAHAN_HP/FLOOR]</td></tr>
+  <tr><td><b>RT</b></td><td>$[BAHAN_HP/RT]</td></tr>
+  <tr><td><b>RW</b></td><td>$[BAHAN_HP/RW]</td></tr>
+  <tr><td><b>DISTRICT</b></td><td>$[BAHAN_HP/DISTRICT]</td></tr>
+  <tr><td><b>SUB_DISTRICT</b></td><td>$[BAHAN_HP/SUB_DISTRICT]</td></tr>
+  <tr><td><b>FDT_CODE</b></td><td>$[BAHAN_HP/FDT_CODE]</td></tr>
+  <tr><td><b>FAT_CODE</b></td><td>$[BAHAN_HP/FAT_CODE]</td></tr>
+  <tr><td><b>BUILDING_LATITUDE</b></td><td>$[BAHAN_HP/BUILDING_LATITUDE]</td></tr>
+  <tr><td><b>BUILDING_LONGITUDE</b></td><td>$[BAHAN_HP/BUILDING_LONGITUDE]</td></tr>
+  <tr><td><b>Category BizPass</b></td><td>$[BAHAN_HP/Category_BizPass]</td></tr>
+  <tr><td><b>POST CODE</b></td><td>$[BAHAN_HP/POST_CODE]</td></tr>
+  <tr><td><b>ADDRESS POLE / FAT</b></td><td>$[BAHAN_HP/ADDRESS_POLE___FAT]</td></tr>
+  <tr><td><b>OV_UG</b></td><td>$[BAHAN_HP/OV_UG]</td></tr>
+  <tr><td><b>HOUSE_COMMENT_</b></td><td>$[BAHAN_HP/HOUSE_COMMENT_]</td></tr>
+  <tr><td><b>BUILDING_NAME</b></td><td>$[BAHAN_HP/BUILDING_NAME]</td></tr>
+  <tr><td><b>TOWER</b></td><td>$[BAHAN_HP/TOWER]</td></tr>
+  <tr><td><b>APTN</b></td><td>$[BAHAN_HP/APTN]</td></tr>
+  <tr><td><b>FIBER_NODE__HFC_</b></td><td>$[BAHAN_HP/FIBER_NODE__HFC_]</td></tr>
+  <tr><td><b>ID_Area</b></td><td>$[BAHAN_HP/ID_Area]</td></tr>
+  <tr><td><b>Clamp_Hook_ID</b></td><td>$[BAHAN_HP/Clamp_Hook_ID]</td></tr>
+  <tr><td><b>DEPLOYMENT_TYPE</b></td><td>$[BAHAN_HP/DEPLOYMENT_TYPE]</td></tr>
+  <tr><td><b>NEED_SURVEY</b></td><td>$[BAHAN_HP/NEED_SURVEY]</td></tr>
+  
+</table>]]></text></BalloonStyle>
+	</Style>
+	<StyleMap id="pointStyleMap">
+		<Pair><key>normal</key><styleUrl>#normPointStyle0</styleUrl></Pair>
+		<Pair><key>highlight</key><styleUrl>#hlightPointStyle</styleUrl></Pair>
+	</StyleMap>
+	<StyleMap id="pointStyleMap0">
+		<Pair><key>normal</key><styleUrl>#normPointStyle</styleUrl></Pair>
+		<Pair><key>highlight</key><styleUrl>#hlightPointStyle0</styleUrl></Pair>
+	</StyleMap>`;
 }
 
 // Separate HP data by category (HOME vs HOME-BIZ)
