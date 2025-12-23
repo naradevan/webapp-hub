@@ -11,6 +11,7 @@ export const POLE_CONFIG = {
     lon: 2,
     provider: 3,
     type: 4
+    line: 5
   },
   
   expectedHeaders: [
@@ -18,7 +19,7 @@ export const POLE_CONFIG = {
     'Coordinate (Lat) NEW',
     'Coordinate (Long) NEW',
     'Pole Provider (New)',
-    'Pole Type'
+    'Pole Type',
     'LINE'
   ]
 };
@@ -31,7 +32,8 @@ export function convertPOLERow(row, config) {
     lat: cols[config.columns.lat] || '',
     lon: cols[config.columns.lon] || '',
     provider: cols[config.columns.provider] || '',
-    type: cols[config.columns.type] || ''
+    type: cols[config.columns.type] || '',
+    line: cols[config.columns.line] || ''  // Tambah ini
   };
 }
 
@@ -47,7 +49,7 @@ export function generatePOLEPlacemark(data) {
           <SimpleData name="Coordinate__Long__NEW">${data.lon}</SimpleData>
           <SimpleData name="Pole_Provider__New_">${data.provider}</SimpleData>
           <SimpleData name="Pole_Type">${data.type}</SimpleData>
-          <SimpleData name="LINE">${data.type}</SimpleData>
+          <SimpleData name="LINE">${data.line}</SimpleData>
         </SchemaData>
       </ExtendedData>
       <Point>
