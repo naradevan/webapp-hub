@@ -10,7 +10,7 @@ export const POLE_CONFIG = {
     lat: 1,
     lon: 2,
     provider: 3,
-    type: 4
+    type: 4,
     line: 5
   },
   
