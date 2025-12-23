@@ -19,6 +19,7 @@ export const POLE_CONFIG = {
     'Coordinate (Long) NEW',
     'Pole Provider (New)',
     'Pole Type'
+    'LINE'
   ]
 };
 
@@ -46,6 +47,7 @@ export function generatePOLEPlacemark(data) {
           <SimpleData name="Coordinate__Long__NEW">${data.lon}</SimpleData>
           <SimpleData name="Pole_Provider__New_">${data.provider}</SimpleData>
           <SimpleData name="Pole_Type">${data.type}</SimpleData>
+          <SimpleData name="LINE">${data.type}</SimpleData>
         </SchemaData>
       </ExtendedData>
       <Point>
@@ -62,6 +64,7 @@ export function getPOLEStyles() {
       <SimpleField type="string" name="Coordinate__Long__NEW"><displayName>&lt;b&gt;Coordinate (Long) NEW&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Pole_Provider__New_"><displayName>&lt;b&gt;Pole Provider (New)&lt;/b&gt;</displayName></SimpleField>
       <SimpleField type="string" name="Pole_Type"><displayName>&lt;b&gt;Pole Type&lt;/b&gt;</displayName></SimpleField>
+      <SimpleField type="string" name="LINE"><displayName>&lt;b&gt;LINE&lt;/b&gt;</displayName></SimpleField>
     </Schema>
     
     <Style id="hlightPointStyle1">
@@ -76,6 +79,7 @@ export function getPOLEStyles() {
   <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Long__NEW]</td></tr>
   <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_POLE/Pole_Provider__New_]</td></tr>
   <tr><td><b>Pole Type</b></td><td>$[BAHAN_POLE/Pole_Type]</td></tr>
+  <tr><td><b>LINE</b></td><td>$[BAHAN_POLE/LINE]</td></tr>
 </table>]]></text>
       </BalloonStyle>
       <ListStyle></ListStyle>
@@ -92,6 +96,7 @@ export function getPOLEStyles() {
   <tr><td><b>Coordinate (Long) NEW</b></td><td>$[BAHAN_POLE/Coordinate__Long__NEW]</td></tr>
   <tr><td><b>Pole Provider (New)</b></td><td>$[BAHAN_POLE/Pole_Provider__New_]</td></tr>
   <tr><td><b>Pole Type</b></td><td>$[BAHAN_POLE/Pole_Type]</td></tr>
+  <tr><td><b>LINE</b></td><td>$[BAHAN_POLE/LINE]</td></tr>
 </table>]]></text>
       </BalloonStyle>
       <ListStyle></ListStyle>
