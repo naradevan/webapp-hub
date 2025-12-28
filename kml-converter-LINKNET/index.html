@@ -196,7 +196,7 @@
         }
 
         .warning-list li:before {
-            content: "⚠";
+            content: "⚠ ";
             position: absolute;
             left: 0;
             color: #ffaa00;
@@ -246,6 +246,7 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -285,6 +286,70 @@
 
         .btn-secondary:hover {
             background: linear-gradient(135deg, #555 0%, #444 100%);
+        }
+
+        /* Asset Download Section */
+        .assets-section {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .assets-title {
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .assets-subtitle {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .btn-asset {
+            padding: 12px 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            border: 2px solid #505050;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #252525;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-asset:hover {
+            border-color: #707070;
+            background: #2a2a2a;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-asset:active {
+            transform: translateY(0);
+        }
+
+        .download-icon {
+            font-size: 1.2em;
         }
 
         .status-panel {
@@ -354,6 +419,20 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .assets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -390,7 +469,7 @@
                     <div class="card-badge">FAT</div>
                 </div>
                 <div class="upload-zone" id="fat-zone" onclick="document.getElementById('fat-input').click()">
-                    <div class="upload-icon">🔺</div>
+                    <div class="upload-icon">📶</div>
                     <div class="upload-text">Click or drag CSV/KML/KMZ</div>
                 </div>
                 <input type="file" id="fat-input" accept=".csv,.kml,.kmz">
@@ -456,6 +535,35 @@
             <button class="btn btn-secondary" id="generate-kmz" disabled>Generate KMZ</button>
         </div>
 
+        <!-- Asset Download Section -->
+        <div class="assets-section">
+            <div class="assets-title">
+                <span>📥</span>
+                <span>Download CSV Templates</span>
+            </div>
+            <div class="assets-subtitle">
+                Download sample CSV templates to get started with proper formatting
+            </div>
+            <div class="assets-grid">
+                <a href="./assets/BAHAN_HP.csv" download class="btn-asset">
+                    <span class="download-icon">⬇️</span>
+                    <span>BAHAN_HP.csv</span>
+                </a>
+                <a href="./assets/BAHAN_FAT.csv" download class="btn-asset">
+                    <span class="download-icon">⬇️</span>
+                    <span>BAHAN_FAT.csv</span>
+                </a>
+                <a href="./assets/BAHAN_POLE.csv" download class="btn-asset">
+                    <span class="download-icon">⬇️</span>
+                    <span>BAHAN_POLE.csv</span>
+                </a>
+                <a href="./assets/BAHAN_CH.csv" download class="btn-asset">
+                    <span class="download-icon">⬇️</span>
+                    <span>BAHAN_CH.csv</span>
+                </a>
+            </div>
+        </div>
+
         <!-- Status Panel -->
         <div class="status-panel">
             <div class="status-title">Processing Log</div>
@@ -491,17 +599,14 @@
             const fixed = num.toFixed(6);
             
             if (isLat) {
-                // Ensure 9 characters: "-6.226252"
                 return fixed.padStart(9, ' ').substring(0, 9);
             } else {
-                // Ensure 10 characters: "107.294000"
                 return fixed.padStart(10, ' ').substring(0, 10);
             }
         }
 
-        // Utility: Detect coordinate from string (handles "lat lon" or "lat,lon" or "lat")
+        // Utility: Detect coordinate from string
         function parseCoordinates(latStr, lonStr) {
-            // Check if latStr contains both lat and lon
             if (latStr && latStr.includes(' ')) {
                 const parts = latStr.trim().split(/\s+/);
                 return {
@@ -538,12 +643,11 @@
             return lines;
         }
 
-        // Utility: Parse KML/KMZ (basic extraction)
+        // Utility: Parse KML/KMZ
         async function parseKML(file) {
             let kmlText;
             
             if (file.name.endsWith('.kmz')) {
-                // Extract KML from KMZ (ZIP)
                 const JSZip = window.JSZip || await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
                 const zip = await JSZip.loadAsync(file);
                 const kmlFile = zip.file(/\.kml$/i)[0];
@@ -560,7 +664,6 @@
             const data = [];
             
             for (const placemark of placemarks) {
-                // Try to get name from either <n> or <name> tag
                 let nameEl = placemark.getElementsByTagName('n')[0];
                 if (!nameEl) {
                     nameEl = placemark.getElementsByTagName('name')[0];
@@ -610,11 +713,9 @@
                     
                     if (lines.length < 2) throw new Error('CSV file is empty or invalid');
                     
-                    // Validate headers
                     const headers = lines[0].split(',').map(h => h.trim());
                     warnings = validateHeaders(headers, config.expectedHeaders, type);
                     
-                    // Process data rows (skip header)
                     data = [];
                     for (let i = 1; i < lines.length; i++) {
                         let rowData;
@@ -629,7 +730,6 @@
                             rowData = convertCHRow(lines[i], config);
                         }
                         
-                        // Format coordinates
                         const coords = parseCoordinates(rowData.lat, rowData.lon);
                         rowData.lat = coords.lat;
                         rowData.lon = coords.lon;
@@ -637,69 +737,40 @@
                         data.push(rowData);
                     }
                 } else {
-                    // KML/KMZ
                     const kmlData = await parseKML(file);
                     data = kmlData.map(item => {
                         const coords = parseCoordinates(item.lat, item.lon);
                         
-                        // Map KML data to proper structure based on type
                         if (type === 'HP') {
                             return {
-                                homepassId: '',
-                                clusterName: '',
-                                prefixAddress: '',
-                                streetName: '',
-                                houseNumber: item.name,  // Use name as house number
-                                block: '',
-                                floor: '',
-                                rt: '',
-                                rw: '',
-                                district: '',
-                                subDistrict: '',
-                                fdtCode: '',
-                                fatCode: '',
-                                lat: coords.lat,
-                                lon: coords.lon,
-                                category: 'RESIDENCE',
-                                postCode: '',
-                                addressPoleFat: '',
-                                ovUg: '',
-                                houseComment: '',
-                                buildingName: '',
-                                tower: '',
-                                aptn: '',
-                                fiberNode: '',
-                                idArea: '',
-                                clampHookId: '',
-                                deploymentType: '',
-                                needSurvey: ''
+                                homepassId: '', clusterName: '', prefixAddress: '',
+                                streetName: '', houseNumber: item.name, block: '',
+                                floor: '', rt: '', rw: '', district: '',
+                                subDistrict: '', fdtCode: '', fatCode: '',
+                                lat: coords.lat, lon: coords.lon,
+                                category: 'RESIDENCE', postCode: '',
+                                addressPoleFat: '', ovUg: '', houseComment: '',
+                                buildingName: '', tower: '', aptn: '',
+                                fiberNode: '', idArea: '', clampHookId: '',
+                                deploymentType: '', needSurvey: ''
                             };
                         } else if (type === 'FAT') {
                             return {
-                                poleId: '',
-                                lat: coords.lat,
-                                lon: coords.lon,
-                                provider: '',
-                                type: '',
-                                fatId: item.name  // Use name as FAT ID
+                                poleId: '', lat: coords.lat, lon: coords.lon,
+                                provider: '', type: '', fatId: item.name
                             };
                         } else if (type === 'POLE') {
                             return {
-                                poleId: item.name,  // Use name as Pole ID
-                                lat: coords.lat,
-                                lon: coords.lon,
-                                provider: '',
-                                type: ''
+                                poleId: item.name, lat: coords.lat,
+                                lon: coords.lon, provider: '', type: ''
                             };
                         } else if (type === 'CH') {
                             return {
-                                clampHookId: item.name,  // Use name as Clamp Hook ID
-                                lat: coords.lat,
-                                lon: coords.lon
+                                clampHookId: item.name,
+                                lat: coords.lat, lon: coords.lon
                             };
                         }
                         
-                        // Default fallback
                         return {
                             name: item.name,
                             lat: coords.lat,
@@ -710,13 +781,11 @@
                 
                 log(`✓ ${type}: ${data.length} points loaded`, 'success');
                 
-                // Update UI
                 document.getElementById(`${type.toLowerCase()}-card`).classList.add('active');
                 document.getElementById(`${type.toLowerCase()}-info`).classList.add('show');
                 document.getElementById(`${type.toLowerCase()}-filename`).textContent = file.name;
                 document.getElementById(`${type.toLowerCase()}-stats`).textContent = `${data.length} points loaded`;
                 
-                // Show warnings if any
                 if (warnings.length > 0) {
                     const warningBox = document.getElementById('warning-box');
                     const warningList = document.getElementById('warning-list');
@@ -755,7 +824,6 @@
     ${document.getElementById('generate-paths').checked ? getPathStyle() : ''}
 `;
 
-            // Add HP folders (HOME and HOME-BIZ)
             if (state.hp) {
                 const { home, homeBiz } = separateHPByCategory(state.hp);
                 
@@ -783,7 +851,6 @@
     </Folder>`;
             }
 
-            // Add FAT folder
             if (state.fat) {
                 kmlContent += `
     <Folder>
@@ -798,7 +865,6 @@
     </Folder>`;
             }
 
-            // Add POLE folder
             if (state.pole) {
                 kmlContent += `
     <Folder>
@@ -813,7 +879,6 @@
     </Folder>`;
             }
 
-            // Add CH folder
             if (state.ch) {
                 kmlContent += `
     <Folder>
@@ -828,7 +893,6 @@
     </Folder>`;
             }
 
-            // Add paths if enabled
             if (document.getElementById('generate-paths').checked && state.hp && state.fat) {
                 const paths = generateHPtoFATPaths(state.hp, state.fat);
                 
@@ -872,7 +936,6 @@
         async function downloadKMZ() {
             const kml = generateKML();
             
-            // Use JSZip to create KMZ
             const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm')).default;
             const zip = new JSZip();
             zip.file('doc.kml', kml);
