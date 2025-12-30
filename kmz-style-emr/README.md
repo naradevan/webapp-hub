@@ -82,14 +82,38 @@ Format wajib: `AngkaC` (Subfeeder) atau `AngkaC/AngkaT` (Cluster).
 | **24 Core** | 🟢 Hijau |
 
 ### 3. Tiang (Pole)
+| Tipe Tiang (Keyword) | Kategori | Warna (Hex) | Visual | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| **NEW POLE 9** | New 9m | `#FF0000` | 🔴 Merah | Tiang Baru 9 Meter (9-4 / 9-5) |
+| **NEW POLE 7-4** / **7-5** | New 7m Std | `#00FF00` | 🟢 Hijau | Tiang Baru 7 Meter Standard |
+| **NEW POLE 7-3** | New 7m (7-3) | `#00FFFF` | 🔵 Cyan | Tiang Baru 7 Meter (Spek 7-3) |
+| **NEW POLE 7-2.5** | New 7m (7-2.5) | `#AA00FF` | 🟣 Ungu | Tiang Baru 7 Meter (Spek 7-2.5) |
+| **EXISTING POLE** | Existing | `#550000` | 🟤 Coklat Tua | Semua Tiang Existing / Partner |
 
-| Tipe Tiang | Cluster Mode | Subfeeder Mode |
-| :--- | :--- | :--- |
-| **New 9m (9-4/9-5)** | 🔴 Merah | 🟤 Coklat Tua |
-| **New 7m (7-4/7-5)** | 🟢 Hijau | 🟤 Coklat Tua |
-| **New 7m (7-3)** | 🔵 Cyan | 🟤 Coklat Tua |
-| **New 7m (7-2.5)** | 🟣 Ungu | 🟤 Coklat Tua |
-| **Existing (Semua)** | 🟤 Coklat Tua | 🟤 Coklat Tua |
+> **Catatan:** Logic ini berlaku otomatis. Script akan membaca nama folder atau nama placemark. Jika mengandung kata "NEW" dan angka spesifik (misal "9-4"), warna akan berubah sesuai tabel di atas. Jika hanya tertulis "POLE" tanpa spesifikasi "NEW", akan dianggap Existing (Coklat).
+
+---
+
+## 2. Logic Kabel & Aksesoris (Subfeeder Mode)
+
+Selain tiang, berikut adalah aturan baku untuk komponen lain di mode Subfeeder:
+
+| Komponen | Keyword Deteksi | Warna | Keterangan |
+| :--- | :--- | :--- | :--- |
+| **Kabel Distribusi** | `CABLE`, `288C`, `144C`, dll | *Dynamic* | Mengikuti warna core (lihat tabel bawah) |
+| **Joint Closure (JC)** | `JC`, `JOINT CLOSURE` | *Dynamic* | Icon `5` (Kotak), warna ikut core kabel |
+| **Slack Hanger** | `SLACK`, `HANGER` | `#FF0000` | 🔴 Merah (Icon `4`) |
+
+### Tabel Warna Core Kabel (Subfeeder)
+Warna ini digunakan untuk Kabel dan Joint Closure (JC):
+
+* **288 Core:** `#FFAA00` (Oranye)
+* **144 Core:** `#FFFF00` (Kuning)
+* **96 Core:** `#FF0000` (Merah)
+* **72 Core:** `#0000FF` (Biru Tua)
+* **48 Core:** `#AA00FF` (Ungu)
+* **24 Core:** `#00FF00` (Hijau)
+* **Default:** `#00AAFF` (Biru Langit - jika core tidak dikenali)
 
 ---
 
@@ -103,6 +127,3 @@ Format wajib: `AngkaC` (Subfeeder) atau `AngkaC/AngkaT` (Cluster).
 
 3.  **Warna Tiang salah di Subfeeder?**
     * Pastikan Anda sudah memilih **SUBFEEDER MODE** sebelum upload. Mode Cluster menggunakan warna-warni, sedangkan Subfeeder menggunakan standar satu warna (Coklat).
-
----
-**Versi 19 - Built for High Precision Planning.**
