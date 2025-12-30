@@ -1,10 +1,10 @@
-# KMZ Styler & Restructure Tool (V19)
+# KMZ Styler & Restructure Tool (V25)
 
 **Ultimate Edition: Cluster & Subfeeder Support**
 
 Webapp ini adalah tool otomatisasi untuk standarisasi file KMZ/KML perencanaan jaringan Fiber Optik. Versi ini dilengkapi dengan **Dual Mode Logic** yang membedakan penanganan antara jaringan Cluster (Distribusi) dan Subfeeder (Backbone/Feeder).
 
-## 🚀 Fitur Baru di V19
+## 🚀 Fitur Baru di V25
 
 ### 1. Dual Mode System
 Terdapat tombol Toggle di bagian atas untuk memilih jenis file:
@@ -127,3 +127,4 @@ Warna ini digunakan untuk Kabel dan Joint Closure (JC):
 
 3.  **Warna Tiang salah di Subfeeder?**
     * Pastikan Anda sudah memilih **SUBFEEDER MODE** sebelum upload. Mode Cluster menggunakan warna-warni, sedangkan Subfeeder menggunakan standar satu warna (Coklat).
+
