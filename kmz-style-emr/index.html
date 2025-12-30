@@ -3,110 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler EMR</title>
+    <title>KMZ Styler V25 (Ultimate Fix)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- UI STYLE DARI FILE UPLOADAN LU (V12 STYLE) --- */
-        :root {
-            --bg-body: #0d0d0d;
-            --bg-surface: #171717;
-            --bg-surface-hover: #222;
-            --border: #333;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --text-main: #ededed;
-            --text-muted: #888;
-            --success: #22c55e;
-            --error: #ef4444;
-            --radius: 8px;
-        }
-
+        :root { --bg-body: #0d0d0d; --bg-surface: #171717; --bg-surface-hover: #222; --border: #333; --primary: #3b82f6; --primary-hover: #2563eb; --text-main: #ededed; --text-muted: #888; --success: #22c55e; --error: #ef4444; --radius: 8px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding-top: 5vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 680px;
-            padding: 0 1.5rem;
-        }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-main); line-height: 1.5; min-height: 100vh; display: flex; justify-content: center; padding-top: 5vh; }
+        .container { width: 100%; max-width: 680px; padding: 0 1.5rem; }
         header { margin-bottom: 2rem; text-align: center; }
-        h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to bottom right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 0.5rem; background: linear-gradient(to bottom right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { color: var(--text-muted); font-size: 0.95rem; }
-
-        .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-        }
-
-        /* TOGGLE SWITCH */
-        .mode-selector {
-            display: flex;
-            background: #222;
-            padding: 4px;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-        .mode-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        .mode-option.active {
-            color: #fff;
-            background: var(--primary);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .file-drop-area {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255,255,255,0.01);
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            color: var(--text-muted);
-        }
+        .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        .mode-selector { display: flex; background: #222; padding: 4px; border-radius: 8px; margin-bottom: 1.5rem; }
+        .mode-option { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); border-radius: 6px; transition: all 0.2s; }
+        .mode-option.active { color: #fff; background: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .file-drop-area { border: 2px dashed var(--border); border-radius: var(--radius); height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; background: rgba(255,255,255,0.01); margin-bottom: 1.5rem; color: var(--text-muted); }
         .file-drop-area:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); color: var(--text-main); }
         .file-drop-area.active { border-color: var(--success); background: rgba(34, 197, 94, 0.05); }
         #fileLabel { font-size: 0.95rem; pointer-events: none; transition: color 0.2s; }
         input[type="file"] { display: none; }
-
         .btn-group { display: flex; gap: 10px; justify-content: center; }
         button { padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
         button.primary { background: var(--primary); color: white; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2); }
@@ -114,7 +29,6 @@
         button.primary:disabled { background: var(--bg-surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
         button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         button.secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
-
         #status { margin-top: 1.5rem; font-size: 0.9rem; text-align: center; min-height: 24px; }
         .folder-list { background: #111; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; max-height: 400px; overflow-y: auto; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 0.85rem; }
         .tree-item { margin-left: 1.5rem; border-left: 1px solid #333; padding-left: 0.75rem; margin-bottom: 0.25rem; position: relative; }
@@ -130,8 +44,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>KMZ Styler EMR</h1>
-            <p class="subtitle">Update 30/12/2025</p>
+            <h1>KMZ Styler EMR STANDARD V25</h1>
+            <p class="subtitle">update by 30/12/2025</p>
         </header>
 
         <div class="card">
@@ -162,9 +76,11 @@
     </div>
 
     <script>
-        let CURRENT_MODE = 'cluster'; // Default
+        // --- CONFIGURATION ---
+        let CURRENT_MODE = 'cluster'; 
+        const TEXT_SIZE = 1.0; // Label scale
 
-        // --- 1. CLUSTER SETUP ---
+        // --- CLUSTER STRUCTURE ---
         const STRUCTURE_CLUSTER = [
             'BOUNDARY FAT', 'FAT', 'HP COVER', 'HP UNCOVER',
             'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 'EXISTING POLE EMR 9-4',
@@ -173,78 +89,77 @@
             'DISTRIBUTION CABLE', 'SLACK HANGER', 'SLING WIRE'
         ];
 
-        // --- 2. SUBFEEDER SETUP (No FDT Folder, No Sling Wire) ---
+        const RULES_CLUSTER = [
+            { folder: '-', placemark: '288C', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '144C', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '96C', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '72C', line: '-', polygon: '-', colorCode: '#0000FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '48C', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            
+            // BOUNDARY FAT
+            { folder: 'BOUNDARY FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#009999', styleLink: '-' },
+            
+            { folder: 'FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/triangle.png' },
+            { folder: 'HP COVER', placemark: '-', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            { folder: 'HP UNCOVER', placemark: '-', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            
+            // POLES
+            { folder: 'NEW POLE 9-4', placemark: 'NEW POLE 9-4', line: '-', polygon: '-', colorCode: '#FF0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-4', placemark: 'NEW POLE 7-4', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-3', placemark: 'NEW POLE 7-3', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-2.5', placemark: 'NEW POLE 7-2.5', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-2.5', placemark: 'EXISTING POLE EMR 7-2.5', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-3', placemark: 'EXISTING POLE EMR 7-3', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-4', placemark: 'EXISTING POLE EMR 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 9-4', placemark: 'EXISTING POLE EMR 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 7-4', placemark: 'EXISTING POLE PARTNER 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 9-4', placemark: 'EXISTING POLE PARTNER 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            
+            // CABLES
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '24C', polygon: '-', colorCode: '#00FF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '36C', polygon: '-', colorCode: '#FF00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '48C', polygon: '-', colorCode: '#AA00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '72C', polygon: '-', colorCode: '#550000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '96C', polygon: '-', colorCode: '#FF0000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '144C', polygon: '-', colorCode: '#FFFF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '288C', polygon: '-', colorCode: '#00AAFF', styleLink: '-' },
+            
+            // OTHERS
+            { folder: 'SLING WIRE', placemark: '-', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: '-' },
+            { folder: 'FDT', placemark: 'FDT', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
+        ];
+
+        // --- SUBFEEDER STRUCTURE ---
         const STRUCTURE_SUBFEEDER = [
-            'JOINT CLOSURE', // JC & FDT masuk sini
-            'EXISTING POLE EMR 7-2.5', 
-            'EXISTING POLE EMR 7-3', 
-            'EXISTING POLE EMR 7-4', 
-            'EXISTING POLE EMR 7-5', // Added
-            'EXISTING POLE EMR 9-5', // Added
-            'EXISTING POLE EMR 9-4',
-            'EXISTING POLE PARTNER 7-4', 
-            'EXISTING POLE PARTNER 9-4',
-            'NEW POLE 7-5', // Added
-            'NEW POLE 9-5', // Added
-            'NEW POLE 7-4', 
-            'NEW POLE 9-4',
-            'CABLE',
-            'SLACK HANGER'
+            'JOINT CLOSURE', 
+            'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 
+            'EXISTING POLE EMR 7-5', 'EXISTING POLE EMR 9-5', 'EXISTING POLE EMR 9-4',
+            'EXISTING POLE PARTNER 7-4', 'EXISTING POLE PARTNER 9-4',
+            'NEW POLE 7-5', 'NEW POLE 9-5', 'NEW POLE 7-4', 'NEW POLE 9-4',
+            'CABLE', 'SLACK HANGER'
+        ];
+
+        const RULES_SUBFEEDER = [
+            // Safe fallback rules for subfeeder
+            { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
         ];
 
         const PROTECTED_FOLDERS = ['HP COVER', 'HP UNCOVER'];
-
-        // --- STYLING RULES ---
-        const RULES_COMMON = [
-            // CABLE (Global)
-            { type: 'cable', name: '288C', color: '#FFAA00' },
-            { type: 'cable', name: '144C', color: '#FFFF00' },
-            { type: 'cable', name: '96C', color: '#FF0000' },
-            { type: 'cable', name: '72C', color: '#550000' },
-            { type: 'cable', name: '48C', color: '#AA00FF' },
-            { type: 'cable', name: '36C', color: '#FF00FF' },
-            { type: 'cable', name: '24C', color: '#00FF00' },
-            { type: 'cable', name: '12C', color: '#00FFFF' },
-
-            // JC (Kotak - Link 6)
-            { type: 'jc', name: '288C', color: '#FFAA00' },
-            { type: 'jc', name: '144C', color: '#FFFF00' },
-            { type: 'jc', name: '96C', color: '#FF0000' },
-            { type: 'jc', name: '72C', color: '#550000' },
-            { type: 'jc', name: '48C', color: '#AA00FF' },
-            { type: 'jc', name: '36C', color: '#FF00FF' },
-            { type: 'jc', name: '24C', color: '#00FF00' },
-
-            // FDT (Bulat - Link 3)
-            { type: 'fdt', name: '288C', color: '#AA0000' },
-            { type: 'fdt', name: '144C', color: '#FFFF00' },
-            { type: 'fdt', name: '96C', color: '#00FFFF' },
-            { type: 'fdt', name: '72C', color: '#0000FF' },
-            { type: 'fdt', name: '48C', color: '#AA00FF' },
-
-            // POLES (General Mapping)
-            { type: 'pole', name: 'NEW POLE 9-4', color: '#FF0000' }, // Override in Subfeeder if needed
-            { type: 'pole', name: 'NEW POLE 7-4', color: '#00FF00' },
-            { type: 'pole', name: 'NEW POLE 7-3', color: '#00FFFF' },
-            { type: 'pole', name: 'NEW POLE 7-2.5', color: '#AA00FF' },
-            { type: 'pole', name: 'EXISTING', color: '#550000' } // Fallback for all existing
-        ];
-
         let kmzFile = null;
         let processedKMZ = null;
 
-        // UI Handlers
+        const kmzInput = document.getElementById('kmzFile');
+        const processBtn = document.getElementById('processBtn');
+        const statusDiv = document.getElementById('status');
+        const fileLabel = document.getElementById('fileLabel');
+        const dropArea = document.getElementById('dropArea');
+
         function setMode(mode) {
             CURRENT_MODE = mode;
             document.querySelectorAll('.mode-option').forEach(el => el.classList.remove('active'));
             document.getElementById(`btn-${mode}`).classList.add('active');
         }
-
-        const dropArea = document.getElementById('dropArea');
-        const kmzInput = document.getElementById('kmzFile');
-        const processBtn = document.getElementById('processBtn');
-        const statusDiv = document.getElementById('status');
-        const fileLabel = document.getElementById('fileLabel');
 
         dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('active'); });
         dropArea.addEventListener('dragleave', () => dropArea.classList.remove('active'));
@@ -277,16 +192,10 @@
                     xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
                 }
 
-                // 1. RESTRUCTURE (Distribute items to folders)
                 const tree = restructureKML(xmlDoc);
-                
-                // 2. APPLY STYLES (Apply icons/colors)
                 applyStyles(xmlDoc);
-
-                // 3. DISPLAY
                 displayTree(tree);
 
-                // 4. EXPORT
                 const serializer = new XMLSerializer();
                 const newKml = serializer.serializeToString(xmlDoc);
                 const zipOut = new JSZip();
@@ -320,138 +229,164 @@
 
         document.getElementById('resetBtn').addEventListener('click', () => location.reload());
 
-        // ==========================================
-        //       CORE LOGIC (V19 BRAIN)
-        // ==========================================
+        // --- CORE LOGIC ---
+
+        function getLineContext(placemarkNode) {
+            const regex = /(?:LINE|LN|KABEL)[\s\-_]+([A-Z0-9]+)/i;
+            const ignoreKeywords = ['DISTRIBUTION', 'DISTRIBUSI', 'SLACK', 'SLING', 'HANGER', 'FAT', 'FDT', 'POLE', 'TIANG', 'COVER', 'ODP', 'SPLITTER'];
+            let curr = placemarkNode.parentElement;
+            while (curr) {
+                let name = '';
+                for(let i=0; i<curr.children.length; i++) { if(curr.children[i].tagName === 'name') { name = curr.children[i].textContent.trim(); break; } }
+                if (name) {
+                    const upperName = name.toUpperCase();
+                    const match = name.match(regex);
+                    const isBlacklisted = ignoreKeywords.some(bad => upperName.includes(bad));
+                    if (!isBlacklisted && match) return `LINE ${match[1].toUpperCase()}`;
+                }
+                if (curr.tagName === 'Document') break;
+                curr = curr.parentElement;
+            }
+            return null;
+        }
+
+        function findFallbackGroupName(placemarkNode, structureList) {
+            const ignoreList = [...structureList, 'DISTRIBUTION', 'ODP', 'SPLITTER', 'CLUSTER ID'];
+            let bestName = 'LINE A'; 
+            let curr = placemarkNode.parentElement;
+            while (curr) {
+                 let name = '';
+                for(let i=0; i<curr.children.length; i++) { if(curr.children[i].tagName === 'name') { name = curr.children[i].textContent.trim(); break; } }
+                if (name && curr.tagName === 'Folder') {
+                    const upper = name.toUpperCase();
+                    const isStandard = ignoreList.some(s => upper.includes(s));
+                    if (!isStandard) bestName = name; 
+                }
+                if (curr.tagName === 'Document' || (name && name.toUpperCase().includes('CLUSTER ID'))) break;
+                curr = curr.parentElement;
+            }
+            return bestName;
+        }
 
         function restructureKML(xmlDoc) {
             const kmlDoc = xmlDoc.querySelector('Document');
             const targetStructure = (CURRENT_MODE === 'subfeeder') ? STRUCTURE_SUBFEEDER : STRUCTURE_CLUSTER;
 
-            // 1. Safeguard Boundary
             let boundaryClusterNode = null;
             const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
             const boundaryOriginal = allFolders.find(f => f.querySelector('name')?.textContent?.toUpperCase().includes('BOUNDARY CLUSTER'));
             if (boundaryOriginal) boundaryClusterNode = boundaryOriginal.cloneNode(true);
 
-            // 2. Collect Items (excluding Boundary)
             const allPlacemarks = Array.from(xmlDoc.querySelectorAll('Placemark')).filter(pm => {
                 if (boundaryOriginal && boundaryOriginal.contains(pm)) return false;
                 return true;
             });
 
-            // Buckets
-            const fdtBucket = []; // Only used in Cluster Mode
-            const lineBuckets = {}; // Main organizer
+            const fdtBucket = []; 
+            const lineBuckets = {}; 
             const othersBucket = [];
 
-            const addToLineBucket = (lineName, folderName, item) => {
+            const addToLineBucket = (lineName, folderName, item, subFolderName = null) => {
                 if (!lineBuckets[lineName]) lineBuckets[lineName] = {};
-                if (!lineBuckets[lineName][folderName]) lineBuckets[lineName][folderName] = [];
-                lineBuckets[lineName][folderName].push(item);
+                if (!lineBuckets[lineName][folderName]) lineBuckets[lineName][folderName] = {};
+                const subKey = subFolderName || 'MAIN';
+                if (!lineBuckets[lineName][folderName][subKey]) lineBuckets[lineName][folderName][subKey] = [];
+                lineBuckets[lineName][folderName][subKey].push(item);
             };
 
-            // REGEX for Cable: "24C/2T" or similar
             const strictCableRegex = /\b\d{2,3}C\/\d{1,2}T\b/i;
 
             allPlacemarks.forEach(pm => {
                 const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
                 const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
-                const fullText = name + ' ' + desc; // GABUNGAN NAMA + DESKRIPSI UNTUK CEK LEBIH TELITI
-
+                const fullText = name + ' ' + desc;
+                
+                const isLine = pm.querySelector('LineString') !== null;
                 const parentFolder = pm.parentElement;
                 const parentName = (parentFolder.querySelector('name')?.textContent || '').toUpperCase();
+                const grandParentName = (parentFolder.parentElement?.querySelector('name')?.textContent || '').toUpperCase();
                 
-                // Determine Line Name (Cluster only)
                 let lineName = 'MAIN';
                 if (CURRENT_MODE === 'cluster') {
-                    // (Logic deteksi Line A/B standard)
-                    const lineMatch = parentName.match(/(?:LINE|LN|KABEL)[\s\-_]+([A-Z0-9]+)/i);
-                    if (lineMatch) lineName = `LINE ${lineMatch[1]}`;
-                    else lineName = 'LINE A';
+                    lineName = getLineContext(pm);
+                    if (!lineName) lineName = findFallbackGroupName(pm, targetStructure);
                 }
 
-                // DETECT TARGET FOLDER
                 let targetType = 'UNKNOWN';
+                let subFolderName = null;
 
-                // Check Protected Folders (HP Cover)
-                if (parentName.includes('HP COVER')) targetType = 'HP COVER';
+                // PROTECTED FOLDERS (V22/V23 Fix)
+                if (parentName.includes('HP COVER')) { targetType = 'HP COVER'; } 
+                else if (grandParentName.includes('HP COVER')) { targetType = 'HP COVER'; subFolderName = parentName; } 
                 else if (parentName.includes('HP UNCOVER')) targetType = 'HP UNCOVER';
+                else if (grandParentName.includes('HP UNCOVER')) { targetType = 'HP UNCOVER'; subFolderName = parentName; }
                 
                 if (targetType === 'UNKNOWN') {
                     if (CURRENT_MODE === 'subfeeder') {
-                        // --- SUBFEEDER LOGIC (V19) ---
-                        
-                        // 1. CABLE (Cek Strict)
-                        if (strictCableRegex.test(fullText) || name.includes('CABLE')) {
-                            targetType = 'CABLE';
-                        }
-                        // 2. JOINT CLOSURE (Cek Nama)
-                        else if (name.includes('JC') || fullText.includes('JOINT CLOSURE')) {
-                            targetType = 'JOINT CLOSURE';
-                        }
-                        // 3. FDT / Splice (Cek Full Text for Core Count) -> MASUK FOLDER JOINT CLOSURE
-                        else if (/\b(288C|144C|96C|72C|48C)\b/.test(fullText)) {
-                            targetType = 'JOINT CLOSURE';
-                        }
-                        // 4. POLES
+                        if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE'))) { targetType = 'CABLE'; }
+                        else if (!isLine && (name.includes('JC') || fullText.includes('JOINT CLOSURE') || /\b(288C|144C|96C|72C|48C)\b/.test(fullText))) { targetType = 'JOINT CLOSURE'; }
                         else {
-                            // Cek satu-satu rule pole
                             const poleMatch = targetStructure.find(type => type.includes('POLE') && (name.includes(type) || parentName.includes(type)));
                             if (poleMatch) targetType = poleMatch;
                         }
-
                     } else {
-                        // --- CLUSTER LOGIC ---
-                        if (name.includes('FDT') || desc.includes('FDT')) targetType = 'FDT_GLOBAL'; // Masuk bucket khusus
-                        else if (strictCableRegex.test(fullText) || name.includes('CABLE')) targetType = 'DISTRIBUTION CABLE';
+                        // Cluster Mode
+                        if (!isLine && (name.includes('FDT') || desc.includes('FDT') || (/\b(288C|144C|96C|72C|48C)\b/.test(fullText) && !strictCableRegex.test(fullText)))) { targetType = 'FDT_GLOBAL'; }
+                        else if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE'))) targetType = 'DISTRIBUTION CABLE';
                         else {
-                             // Standard matching
                              const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
                              if (match) targetType = match;
                         }
                     }
                 }
 
-                // Fallback / Others
                 if (targetType === 'UNKNOWN') {
                     if (name.includes('SLING')) targetType = (CURRENT_MODE === 'subfeeder') ? 'UNKNOWN' : 'SLING WIRE';
                     else if (name.includes('SLACK')) targetType = 'SLACK HANGER';
+                    else {
+                        const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
+                        if(match) targetType = match;
+                    }
                 }
 
-                // MOVE ITEM
                 pm.remove();
-                if (targetType === 'FDT_GLOBAL') fdtBucket.push(pm);
-                else if (targetType !== 'UNKNOWN') addToLineBucket(lineName, targetType, pm);
+                if (targetType === 'FDT_GLOBAL' && CURRENT_MODE === 'cluster') fdtBucket.push(pm);
+                else if (targetType !== 'UNKNOWN') addToLineBucket(lineName, targetType, pm, subFolderName);
                 else othersBucket.push(pm);
             });
 
-            // 3. Reconstruct XML
             while (kmlDoc.firstChild) kmlDoc.removeChild(kmlDoc.firstChild);
             const root = xmlDoc.createElement('Folder');
-            const rootName = xmlDoc.createElement('name');
-            rootName.textContent = (CURRENT_MODE === 'subfeeder') ? 'SUBFEEDER ID' : 'CLUSTER ID';
-            root.appendChild(rootName);
+            root.appendChild(createName(xmlDoc, (CURRENT_MODE === 'subfeeder') ? 'SUBFEEDER ID' : 'CLUSTER ID'));
 
             if (boundaryClusterNode) root.appendChild(boundaryClusterNode);
             if (fdtBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'FDT', fdtBucket));
 
             if (CURRENT_MODE === 'subfeeder') {
-                // Flat Structure
                 const mainData = lineBuckets['MAIN'] || {};
                 targetStructure.forEach(folderName => {
-                    const items = mainData[folderName] || [];
-                    root.appendChild(createFolder(xmlDoc, folderName, items));
+                    const subData = mainData[folderName];
+                    if (subData) {
+                        const folder = xmlDoc.createElement('Folder');
+                        folder.appendChild(createName(xmlDoc, folderName));
+                        if (subData['MAIN']) subData['MAIN'].forEach(i => folder.appendChild(i));
+                        Object.keys(subData).forEach(k => { if (k !== 'MAIN') folder.appendChild(createFolder(xmlDoc, k, subData[k])); });
+                        root.appendChild(folder);
+                    } else { root.appendChild(createFolder(xmlDoc, folderName, [])); }
                 });
             } else {
-                // Nested Structure
                 Object.keys(lineBuckets).sort().forEach(ln => {
                     const lnFolder = xmlDoc.createElement('Folder');
-                    const lnName = xmlDoc.createElement('name'); lnName.textContent = ln; lnFolder.appendChild(lnName);
-                    
+                    lnFolder.appendChild(createName(xmlDoc, ln));
                     targetStructure.forEach(folderName => {
-                        const items = lineBuckets[ln][folderName] || [];
-                        lnFolder.appendChild(createFolder(xmlDoc, folderName, items));
+                        const subData = lineBuckets[ln][folderName];
+                        if (subData) {
+                            const folder = xmlDoc.createElement('Folder');
+                            folder.appendChild(createName(xmlDoc, folderName));
+                            if (subData['MAIN']) subData['MAIN'].forEach(i => folder.appendChild(i));
+                            Object.keys(subData).forEach(k => { if (k !== 'MAIN') folder.appendChild(createFolder(xmlDoc, k, subData[k])); });
+                            lnFolder.appendChild(folder);
+                        } else { lnFolder.appendChild(createFolder(xmlDoc, folderName, [])); }
                     });
                     root.appendChild(lnFolder);
                 });
@@ -463,22 +398,19 @@
             return { mode: CURRENT_MODE, lines: Object.keys(lineBuckets) };
         }
 
-        function createFolder(xml, name, items) {
-            const f = xml.createElement('Folder');
-            const n = xml.createElement('name'); n.textContent = name; f.appendChild(n);
-            items.forEach(i => f.appendChild(i));
-            return f;
+        function createName(xml, text) { const n = xml.createElement('name'); n.textContent = text; return n; }
+        function createFolder(xml, name, items) { 
+            const f = xml.createElement('Folder'); 
+            f.appendChild(createName(xml, name)); 
+            items.forEach(i => f.appendChild(i)); 
+            return f; 
         }
-
-        // ==========================================
-        //       STYLING LOGIC (V19)
-        // ==========================================
 
         function applyStyles(xmlDoc) {
             const placemarks = xmlDoc.querySelectorAll('Placemark');
             const doc = xmlDoc.querySelector('Document');
-            
-            // Add Boundary Style
+            const stylesCreated = new Set();
+
             const styleB = xmlDoc.createElement('Style'); styleB.id = 'style_boundary';
             styleB.innerHTML = `<LineStyle><color>4dffffff</color><width>2</width></LineStyle><PolyStyle><color>4dffffff</color></PolyStyle>`;
             doc.appendChild(styleB);
@@ -488,114 +420,69 @@
                 const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
                 const fullText = name + ' ' + desc;
                 const folderName = pm.parentElement.querySelector('name')?.textContent || '';
+                const grandParentName = pm.parentElement.parentElement?.querySelector('name')?.textContent || '';
 
-                // Handle Boundary
-                if (folderName.includes('BOUNDARY')) {
-                    setStyle(pm, 'style_boundary'); return;
-                }
+                // FIX V25: BOUNDARY CLUSTER ONLY
+                if (folderName.includes('BOUNDARY CLUSTER')) { setStyle(pm, 'style_boundary'); return; }
 
-                let color = '#FFFFFF';
-                let icon = ''; // Link icon
-                let type = 'unknown';
+                let rule = null;
 
-                // --- LOGIC DETEKSI STYLE ---
+                if (CURRENT_MODE === 'cluster') {
+                    // --- CLUSTER LOGIC ---
+                    rule = RULES_CLUSTER.find(r => {
+                        if (r.folder !== '-' && r.folder === folderName) return true;
+                        if (folderName === 'DISTRIBUTION CABLE' && r.line !== '-' && fullText.includes(r.line)) return true;
+                        if (r.placemark !== '-' && fullText.includes(r.placemark)) return true;
+                        return false;
+                    });
+                    
+                    // FIX V25: HP COVER SUBFOLDER FALLBACK (Grandparent Check)
+                    if (!rule) {
+                        if (grandParentName.includes('HP COVER')) rule = RULES_CLUSTER.find(r => r.folder === 'HP COVER');
+                        else if (grandParentName.includes('HP UNCOVER')) rule = RULES_CLUSTER.find(r => r.folder === 'HP UNCOVER');
+                    }
 
-                if (CURRENT_MODE === 'subfeeder') {
-                    // SUBFEEDER RULES
+                } else {
+                    // --- SUBFEEDER LOGIC ---
                     if (folderName === 'CABLE') {
-                        type = 'cable';
-                    } 
+                        const coreColors = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '48C': '#AA00FF' };
+                        const match = Object.keys(coreColors).find(k => fullText.includes(k));
+                        rule = { colorCode: match ? coreColors[match] : '#00AAFF', styleLink: '-', placemark: '-' };
+                    }
                     else if (folderName === 'JOINT CLOSURE') {
-                        // *CRITICAL LOGIC V19*
-                        // 1. Cek Nama dulu buat JC
-                        if (name.includes('JC')) {
-                            type = 'jc';
-                        }
-                        // 2. Cek Desc/Name buat FDT
-                        else if (fullText.includes('FDT') || /\b\d+C\b/.test(fullText)) {
-                            type = 'fdt'; // Gunakan icon bulat
-                        }
-                        else {
-                            type = 'jc'; // Default ke JC kalau di folder JC
-                        }
+                        const isJC = name.includes('JC');
+                        const coreMatch = fullText.match(/\b(\d+)C\b/);
+                        const core = coreMatch ? coreMatch[0] : '48C';
+                        const coreMap = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const color = coreMap[core] || '#AA00FF';
+                        
+                        if (isJC) rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
+                        else rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
                     }
                     else if (folderName.includes('POLE')) {
-                        type = 'pole';
-                        color = '#550000'; // All Subfeeder poles are Brown
-                        icon = 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png';
+                        rule = { colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png', placemark: '-' };
                     }
-                } else {
-                    // CLUSTER RULES
-                    if (folderName.includes('DISTRIBUTION')) type = 'cable';
-                    else if (folderName === 'FDT') type = 'fdt';
-                    else if (folderName.includes('POLE')) type = 'pole_cluster';
+                    else {
+                        rule = RULES_SUBFEEDER.find(r => r.folder === folderName);
+                    }
                 }
 
-                // --- RESOLVE COLOR & ICON ---
-                
-                // Specific Core Colors
-                const coreColors = [
-                    { k: '288C', c: '#AA0000' }, // Merah Tua
-                    { k: '144C', c: '#FFFF00' }, // Kuning
-                    { k: '96C', c: '#00FFFF' },  // Cyan
-                    { k: '72C', c: '#0000FF' },  // Biru
-                    { k: '48C', c: '#AA00FF' },  // Ungu
-                    { k: '24C', c: '#00FF00' },  // Hijau
-                ];
-
-                // 1. CABLE / JC / FDT COLOR MATCHING
-                if (['cable', 'jc', 'fdt'].includes(type)) {
-                    const match = coreColors.find(m => fullText.includes(m.k));
-                    if (match) color = match.c;
-                    else if (type === 'cable') color = '#00AAFF'; // Default Cable
-                    else if (type === 'jc') color = '#FFAA00';    // Default JC
-                    else if (type === 'fdt') color = '#AA0000';   // Default FDT
+                if (rule) {
+                    const safeName = rule.placemark !== '-' ? rule.placemark : folderName;
+                    const styleId = `style_${rule.colorCode.replace('#','')}_${safeName.replace(/[^a-z0-9]/gi,'')}_${Math.floor(Math.random()*1000)}`;
+                    
+                    if (!stylesCreated.has(styleId)) {
+                        const style = xmlDoc.createElement('Style'); style.id = styleId;
+                        const kmlColor = 'ff' + rule.colorCode.replace('#', '').match(/.{2}/g).reverse().join('');
+                        let styleContent = `<LabelStyle><color>${kmlColor}</color><scale>${TEXT_SIZE}</scale></LabelStyle>`;
+                        if (rule.styleLink !== '-') styleContent += `<IconStyle><color>${kmlColor}</color><scale>1.1</scale><Icon><href>${rule.styleLink}</href></Icon></IconStyle>`;
+                        styleContent += `<LineStyle><color>${kmlColor}</color><width>2</width></LineStyle><PolyStyle><color>66${kmlColor.substring(2)}</color></PolyStyle>`;
+                        style.innerHTML = styleContent;
+                        doc.appendChild(style);
+                        stylesCreated.add(styleId);
+                    }
+                    setStyle(pm, styleId);
                 }
-
-                // 2. ICON ASSIGNMENT
-                if (type === 'jc') icon = 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png'; // Kotak
-                else if (type === 'fdt') icon = 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png'; // Bulat
-                
-                // 3. POLE CLUSTER COLORS (Special)
-                if (type === 'pole_cluster') {
-                    icon = 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png';
-                    if (name.includes('9-4')) color = '#FF0000'; // Merah
-                    else if (name.includes('7-4')) color = '#00FF00'; // Hijau
-                    else if (name.includes('7-3')) color = '#00FFFF'; // Cyan
-                    else if (name.includes('7-2.5')) color = '#AA00FF'; // Ungu
-                    else color = '#550000'; // Coklat (Existing)
-                }
-
-                // 4. OTHER FOLDERS
-                if (folderName === 'HP COVER') { color = '#00FF00'; icon = 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png'; }
-                else if (folderName === 'HP UNCOVER') { color = '#FF0000'; icon = 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png'; }
-                else if (folderName === 'SLACK HANGER') { color = '#FF0000'; icon = 'http://maps.google.com/mapfiles/kml/shapes/target.png'; }
-                else if (folderName === 'SLING WIRE') { color = '#00FFFF'; }
-
-                // --- APPLY TO XML ---
-                const styleId = `style_${Math.floor(Math.random()*99999)}`;
-                const styleEl = xmlDoc.createElement('Style'); styleEl.id = styleId;
-                
-                const kmlColor = 'ff' + color.replace('#', '').match(/.{2}/g).reverse().join(''); // Hex to KML AABBGGRR
-                
-                let styleContent = '';
-                // Icon Style
-                if (icon) {
-                    styleContent += `<IconStyle><color>${kmlColor}</color><scale>1.1</scale><Icon><href>${icon}</href></Icon></IconStyle>`;
-                }
-                // Line Style
-                styleContent += `<LineStyle><color>${kmlColor}</color><width>2</width></LineStyle>`;
-                // Poly Style
-                styleContent += `<PolyStyle><color>66${kmlColor.substring(2)}</color></PolyStyle>`;
-                // Label Style
-                styleContent += `<LabelStyle><color>${kmlColor}</color></LabelStyle>`;
-
-                styleEl.innerHTML = styleContent;
-                doc.appendChild(styleEl);
-                
-                let url = pm.querySelector('styleUrl');
-                if (!url) { url = xmlDoc.createElement('styleUrl'); pm.appendChild(url); }
-                url.textContent = '#' + styleId;
             });
         }
 
@@ -608,7 +495,8 @@
         function displayTree(result) {
             const list = document.getElementById('folderList');
             const mode = result.mode;
-            let html = '';
+            let html = `<div class="tree-item"><span class="tree-folder" style="color:#aaa">BOUNDARY CLUSTER</span></div>`;
+            if (result.lines.includes('FDT') || mode === 'cluster') html += `<div class="tree-item"><span class="tree-folder">FDT</span></div>`;
             
             if (mode === 'subfeeder') {
                 html += `<div class="tree-item"><span class="tree-folder">SUBFEEDER ID</span></div>`;
@@ -623,8 +511,6 @@
             list.innerHTML = html;
             document.getElementById('preview').classList.remove('hidden');
         }
-
     </script>
 </body>
 </html>
-
