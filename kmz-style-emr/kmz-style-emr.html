@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMZ Style EMR STANDARD Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        /* --- MODERN UI VARIABLES --- */
+        :root {
+            --bg-body: #0d0d0d;
+            --bg-surface: #171717;
+            --bg-surface-hover: #222;
+            --border: #333;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #ededed;
+            --text-muted: #888;
+            --success: #22c55e;
+            --error: #ef4444;
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-top: 5vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 0 1.5rem;
+        }
+
+        /* --- HEADER --- */
+        header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to bottom right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* --- CARD & UPLOAD --- */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        /* PERBAIKAN POSISI TEKS: MENGGUNAKAN FLEXBOX CENTER */
+        .file-drop-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            height: 140px; /* Fix height biar proporsional */
+            display: flex; /* Flexbox active */
+            flex-direction: column;
+            align-items: center; /* Center Horizontal */
+            justify-content: center; /* Center Vertical */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.01);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            color: var(--text-muted);
+        }
+
+        .file-drop-area:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+            color: var(--text-main);
+        }
+
+        .file-drop-area.active {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        #fileLabel {
+            font-size: 0.95rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        input[type="file"] { display: none; }
+
+        /* --- BUTTONS --- */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        button.primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        button.primary:disabled {
+            background: var(--bg-surface-hover);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        button.secondary:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-surface-hover);
+        }
+
+        /* --- STATUS & PREVIEW --- */
+        #status {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        .folder-list {
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .tree-item {
+            margin-left: 1.5rem;
+            border-left: 1px solid #333;
+            padding-left: 0.75rem;
+            margin-bottom: 0.25rem;
+            position: relative;
+        }
+
+        .tree-item::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 0.5rem;
+            height: 1px;
+            background: #333;
+        }
+
+        .tree-folder { color: #fbbf24; font-weight: 600; }
+        .tree-subfolder { color: #4ade80; }
+        .tree-info { color: #666; font-size: 0.8em; margin-left: 0.5rem; }
+
+        .hidden { display: none; }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>KMZ Style EMR STANDARD</h1>
+            <p class="subtitle">Strict Cable Logic • Core-Based FDT • Smart Line Detection</p>
+	    <p class="30/12/2025</p>
+        </header>
+
+        <div class="card">
+            <label class="file-drop-area" id="dropArea">
+                <span id="fileLabel">Drag & drop KMZ here or click to upload</span>
+                <input type="file" id="kmzFile" accept=".kmz" />
+            </label>
+
+            <div class="btn-group">
+                <button id="processBtn" class="primary" disabled>Process File</button>
+                <button id="resetBtn" class="secondary">Reset</button>
+            </div>
+            
+            <div id="status"></div>
+        </div>
+
+        <div id="preview" class="hidden">
+            <div class="card" style="padding: 1rem;">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Structure Preview</h3>
+                <div class="folder-list" id="folderList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URUTAN FOLDER STANDAR
+        const STANDARD_STRUCTURE = [
+            'BOUNDARY FAT', 'FAT', 'HP COVER', 'HP UNCOVER',
+            'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 'EXISTING POLE EMR 9-4',
+            'EXISTING POLE PARTNER 7-4', 'EXISTING POLE PARTNER 9-4',
+            'NEW POLE 7-2.5', 'NEW POLE 7-3', 'NEW POLE 7-4', 'NEW POLE 9-4',
+            'DISTRIBUTION CABLE', 'SLACK HANGER', 'SLING WIRE'
+        ];
+
+        const PROTECTED_FOLDERS = ['HP COVER', 'HP UNCOVER'];
+
+        // Styling Rules (UPDATED V11: Strict Cables & Direct FDT)
+        const STYLING_RULES = [
+            // FDT CORE RULES
+            { folder: '-', placemark: '288C', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '144C', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '96C', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '72C', line: '-', polygon: '-', colorCode: '#0000FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '48C', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            
+            // Standard Rules
+            { folder: 'BOUNDARY FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#009999', styleLink: '-' },
+            { folder: 'FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/triangle.png' },
+            { folder: 'HP COVER', placemark: '-', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            { folder: 'HP UNCOVER', placemark: '-', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            
+            // POLES
+            { folder: 'NEW POLE 9-4', placemark: 'NEW POLE 9-4', line: '-', polygon: '-', colorCode: '#FF0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-4', placemark: 'NEW POLE 7-4', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-3', placemark: 'NEW POLE 7-3', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-2.5', placemark: 'NEW POLE 7-2.5', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-2.5', placemark: 'EXISTING POLE EMR 7-2.5', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-3', placemark: 'EXISTING POLE EMR 7-3', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-4', placemark: 'EXISTING POLE EMR 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 9-4', placemark: 'EXISTING POLE EMR 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 7-4', placemark: 'EXISTING POLE PARTNER 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 9-4', placemark: 'EXISTING POLE PARTNER 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            
+            // CABLES (STRICT MATCHING)
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '24C/2T', polygon: '-', colorCode: '#00FF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '36C/3T', polygon: '-', colorCode: '#FF00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '48C/4T', polygon: '-', colorCode: '#AA00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '72C/6T', polygon: '-', colorCode: '#550000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '96C/8T', polygon: '-', colorCode: '#FF0000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '144C/12T', polygon: '-', colorCode: '#FFFF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '288C/24T', polygon: '-', colorCode: '#00AAFF', styleLink: '-' },
+
+            // OTHERS
+            { folder: 'SLING WIRE', placemark: '-', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: '-' },
+            { folder: 'FDT', placemark: 'FDT', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
+        ];
+
+        let kmzFile = null;
+        let processedKMZ = null;
+
+        const kmzInput = document.getElementById('kmzFile');
+        const processBtn = document.getElementById('processBtn');
+        const statusDiv = document.getElementById('status');
+        const previewSection = document.getElementById('preview');
+        const fileLabel = document.getElementById('fileLabel');
+        const dropArea = document.getElementById('dropArea');
+
+        // Drag & Drop UI Handlers
+        dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('active'); });
+        dropArea.addEventListener('dragleave', () => dropArea.classList.remove('active'));
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('active');
+            if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        kmzInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            if(!file.name.toLowerCase().endsWith('.kmz')) {
+                alert('Please upload a valid .KMZ file');
+                return;
+            }
+            kmzFile = file;
+            fileLabel.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+            fileLabel.style.color = 'var(--primary)';
+            processBtn.disabled = false;
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!kmzFile) return;
+            processBtn.disabled = true;
+            statusDiv.innerHTML = '<span class="loading-spinner"></span>Processing...';
+
+            try {
+                const zip = new JSZip();
+                const contents = await zip.loadAsync(kmzFile);
+                const kmlName = Object.keys(contents.files).find(n => n.endsWith('.kml'));
+                const kmlString = await contents.files[kmlName].async('string');
+                const xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
+
+                const tree = restructureKML(xmlDoc);
+                applyStyles(xmlDoc, STYLING_RULES);
+                displayTree(tree);
+
+                const serializer = new XMLSerializer();
+                const newKml = serializer.serializeToString(xmlDoc);
+                zip.file(kmlName, newKml);
+                processedKMZ = await zip.generateAsync({ type: 'blob' });
+
+                statusDiv.innerHTML = '<span style="color:var(--success)">✅ Processing Complete!</span>';
+                
+                const dlBtn = document.createElement('button');
+                dlBtn.className = 'primary';
+                dlBtn.style.marginTop = '1rem';
+                dlBtn.style.background = 'var(--success)';
+                dlBtn.textContent = 'Download Result';
+                dlBtn.onclick = () => {
+                    const url = URL.createObjectURL(processedKMZ);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'STYLED_V11_' + kmzFile.name;
+                    a.click();
+                };
+                statusDiv.appendChild(document.createElement('br'));
+                statusDiv.appendChild(dlBtn);
+
+            } catch (err) {
+                statusDiv.innerHTML = `<span style="color:var(--error)">Error: ${err.message}</span>`;
+                console.error(err);
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => location.reload());
+
+        // --- CORE LOGIC V11 ---
+
+        function getLineContext(placemarkNode) {
+            const regex = /(?:LINE|LN|KABEL)[\s\-_]+([A-Z0-9]+)/i;
+            const ignoreKeywords = ['DISTRIBUTION', 'DISTRIBUSI', 'SLACK', 'SLING', 'HANGER', 'FAT', 'FDT', 'POLE', 'TIANG', 'COVER', 'ODP', 'SPLITTER'];
+
+            let curr = placemarkNode.parentElement;
+            while (curr) {
+                let name = '';
+                for(let i=0; i<curr.children.length; i++) {
+                    if(curr.children[i].tagName === 'name') {
+                        name = curr.children[i].textContent.trim();
+                        break;
+                    }
+                }
+                
+                if (name) {
+                    const upperName = name.toUpperCase();
+                    const match = name.match(regex);
+                    const isBlacklisted = ignoreKeywords.some(bad => upperName.includes(bad));
+                    if (match && !isBlacklisted) return `LINE ${match[1].toUpperCase()}`;
+                }
+                if (curr.tagName === 'Document') break;
+                curr = curr.parentElement;
+            }
+            return null;
+        }
+
+        function findFallbackGroupName(placemarkNode) {
+            const ignoreList = [...STANDARD_STRUCTURE, 'DISTRIBUTION', 'ODP', 'SPLITTER', 'CLUSTER ID'];
+            let bestName = 'LINE A'; 
+
+            let curr = placemarkNode.parentElement;
+            while (curr) {
+                 let name = '';
+                for(let i=0; i<curr.children.length; i++) {
+                    if(curr.children[i].tagName === 'name') {
+                        name = curr.children[i].textContent.trim();
+                        break;
+                    }
+                }
+
+                if (name && curr.tagName === 'Folder') {
+                    const upper = name.toUpperCase();
+                    const isStandard = ignoreList.some(s => upper.includes(s));
+                    if (!isStandard) bestName = name; 
+                }
+                if (curr.tagName === 'Document' || (name && name.toUpperCase().includes('CLUSTER ID'))) break;
+                curr = curr.parentElement;
+            }
+            return bestName;
+        }
+
+        function restructureKML(xmlDoc) {
+            const kmlDoc = xmlDoc.querySelector('Document');
+
+            // 1. SAFEGUARD BOUNDARY CLUSTER
+            let boundaryClusterNode = null;
+            const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
+            const boundaryOriginal = allFolders.find(f => {
+                const n = f.querySelector('name')?.textContent?.toUpperCase();
+                return n && n.includes('BOUNDARY CLUSTER');
+            });
+            if (boundaryOriginal) {
+                boundaryClusterNode = boundaryOriginal.cloneNode(true);
+            }
+
+            // 2. COLLECT ITEMS
+            const allPlacemarks = Array.from(xmlDoc.querySelectorAll('Placemark')).filter(pm => {
+                if (boundaryOriginal && boundaryOriginal.contains(pm)) return false;
+                return true;
+            });
+
+            const fdtBucket = [];
+            const lineBuckets = {}; 
+            const othersBucket = [];
+
+            const addToLineBucket = (line, type, item, subKey = null) => {
+                if (!lineBuckets[line]) lineBuckets[line] = {};
+                if (!lineBuckets[line][type]) {
+                     if (PROTECTED_FOLDERS.includes(type)) lineBuckets[line][type] = {};
+                     else lineBuckets[line][type] = [];
+                }
+                if (PROTECTED_FOLDERS.includes(type)) {
+                    const key = subKey || 'Main';
+                    if (!lineBuckets[line][type][key]) lineBuckets[line][type][key] = [];
+                    lineBuckets[line][type][key].push(item);
+                } else {
+                    lineBuckets[line][type].push(item);
+                }
+            };
+
+            // STRICT CABLE REGEX
+            const strictCableRegex = /\b\d{2,3}C\/\d{1,2}T\b/i;
+
+            allPlacemarks.forEach(pm => {
+                const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
+                const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                const fullText = name + ' ' + desc;
+
+                const parentFolder = pm.parentElement;
+                const parentName = (parentFolder.querySelector('name')?.textContent || '').toUpperCase();
+                const grandParentName = (parentFolder.parentElement?.querySelector('name')?.textContent || '').toUpperCase();
+
+                let lineName = getLineContext(pm);
+                if (!lineName) lineName = findFallbackGroupName(pm);
+
+                let targetType = 'UNKNOWN';
+                let subfolderName = null;
+                let isInsideProtected = false;
+                
+                for (const prot of PROTECTED_FOLDERS) {
+                    if (parentName.includes(prot)) {
+                        targetType = prot;
+                        isInsideProtected = true;
+                        break;
+                    }
+                    if (grandParentName.includes(prot)) {
+                        targetType = prot;
+                        subfolderName = parentName;
+                        isInsideProtected = true;
+                        break;
+                    }
+                }
+
+                if (!isInsideProtected) {
+                    const isStrictCable = strictCableRegex.test(fullText);
+                    
+                    if (!isStrictCable && (fullText.includes('FDT') || /\b(288C|144C|96C|72C|48C)\b/.test(fullText))) {
+                         if (!parentName.includes('LINE')) targetType = 'FDT_GLOBAL';
+                         else targetType = 'UNKNOWN';
+                    }
+                    
+                    if (targetType === 'UNKNOWN' && (isStrictCable || name.includes('CABLE'))) {
+                        targetType = 'DISTRIBUTION CABLE';
+                    }
+                    
+                    if (targetType === 'UNKNOWN') {
+                        if (name.includes('SLING')) targetType = 'SLING WIRE';
+                        else {
+                            for (const type of STANDARD_STRUCTURE) {
+                                if (type === 'DISTRIBUTION CABLE') continue;
+                                if (name.includes(type) || parentName.includes(type)) {
+                                    targetType = type;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                pm.remove(); 
+
+                if (targetType === 'FDT_GLOBAL') fdtBucket.push(pm);
+                else if (targetType !== 'UNKNOWN') addToLineBucket(lineName, targetType, pm, subfolderName);
+                else othersBucket.push(pm);
+            });
+
+            // --- REBUILD DOM ---
+            while (kmlDoc.firstChild) kmlDoc.removeChild(kmlDoc.firstChild);
+            const rootFolder = xmlDoc.createElement('Folder');
+            rootFolder.appendChild(createName(xmlDoc, 'CLUSTER ID'));
+
+            if (boundaryClusterNode) rootFolder.appendChild(boundaryClusterNode);
+            if (fdtBucket.length > 0) rootFolder.appendChild(createFolder(xmlDoc, 'FDT', fdtBucket));
+
+            Object.keys(lineBuckets).sort().forEach(line => {
+                const lineF = xmlDoc.createElement('Folder');
+                lineF.appendChild(createName(xmlDoc, line));
+                const lineData = lineBuckets[line];
+
+                STANDARD_STRUCTURE.forEach(stdType => {
+                    if (PROTECTED_FOLDERS.includes(stdType)) {
+                        const mainF = xmlDoc.createElement('Folder');
+                        mainF.appendChild(createName(xmlDoc, stdType));
+                        if (lineData[stdType]) {
+                            const subData = lineData[stdType];
+                            if (subData['Main']) subData['Main'].forEach(i => mainF.appendChild(i));
+                            Object.keys(subData).forEach(k => {
+                                if (k !== 'Main') mainF.appendChild(createFolder(xmlDoc, k, subData[k]));
+                            });
+                        }
+                        lineF.appendChild(mainF);
+                    } else {
+                        const items = lineData[stdType] || [];
+                        lineF.appendChild(createFolder(xmlDoc, stdType, items));
+                    }
+                });
+                rootFolder.appendChild(lineF);
+            });
+
+            if (othersBucket.length > 0) rootFolder.appendChild(createFolder(xmlDoc, 'OTHERS', othersBucket));
+            kmlDoc.appendChild(rootFolder);
+            
+            return { lines: Object.keys(lineBuckets), fdt: fdtBucket.length };
+        }
+
+        function createName(xml, text) {
+            const n = xml.createElement('name');
+            n.textContent = text;
+            return n;
+        }
+
+        function createFolder(xml, name, items) {
+            const f = xml.createElement('Folder');
+            f.appendChild(createName(xml, name));
+            items.forEach(i => f.appendChild(i));
+            return f;
+        }
+
+        function applyStyles(xml, rules) {
+            const placemarks = xml.querySelectorAll('Placemark');
+            const doc = xml.querySelector('Document');
+            const stylesCreated = new Set();
+
+            const BOUNDARY_STYLE_ID = 'style_boundary_custom';
+            const boundaryStyle = xml.createElement('Style');
+            boundaryStyle.id = BOUNDARY_STYLE_ID;
+            boundaryStyle.innerHTML = `<LineStyle><color>4dffffff</color><width>2</width></LineStyle><PolyStyle><color>4dffffff</color></PolyStyle>`;
+            doc.appendChild(boundaryStyle);
+
+            placemarks.forEach(pm => {
+                let p = pm.parentElement;
+                let isBoundary = false;
+                while(p) {
+                    if (p.querySelector('name')?.textContent?.toUpperCase().includes('BOUNDARY CLUSTER')) {
+                        isBoundary = true; break;
+                    }
+                    p = p.parentElement;
+                }
+                if (isBoundary) {
+                    let url = pm.querySelector('styleUrl');
+                    if (!url) { url = xml.createElement('styleUrl'); pm.appendChild(url); }
+                    url.textContent = '#' + BOUNDARY_STYLE_ID;
+                    return; 
+                }
+
+                const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
+                const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                const fullText = name + ' ' + desc;
+
+                let folderName = (pm.parentElement.querySelector('name')?.textContent || '').toUpperCase();
+                let grandFolderName = (pm.parentElement.parentElement?.querySelector('name')?.textContent || '').toUpperCase();
+                let rule = null;
+
+                if (folderName === 'FDT' || !folderName.includes('DISTRIBUTION')) {
+                     rule = rules.find(r => r.placemark !== '-' && fullText.includes(r.placemark) && !r.line.includes('/')); 
+                }
+
+                if (!rule) {
+                    if (folderName.includes('HP COVER') || grandFolderName.includes('HP COVER')) {
+                        rule = rules.find(r => r.folder === 'HP COVER');
+                    } else if (folderName.includes('HP UNCOVER') || grandFolderName.includes('HP UNCOVER')) {
+                        rule = rules.find(r => r.folder === 'HP UNCOVER');
+                    } else {
+                        if (!rule && (folderName.includes('DISTRIBUTION') || name.includes('CABLE'))) {
+                            rule = rules.find(r => r.line !== '-' && fullText.includes(r.line));
+                        }
+                        if (!rule) {
+                            rule = rules.find(r => r.folder !== '-' && folderName.includes(r.folder));
+                        }
+                    }
+                }
+
+                if (rule) {
+                    const styleId = `style_${rule.colorCode.replace('#','')}_${rule.placemark.replace(/[^a-z0-9]/gi,'')}`;
+                    
+                    if (!stylesCreated.has(styleId)) {
+                        const style = xml.createElement('Style');
+                        style.id = styleId;
+                        
+                        const labelStyle = xml.createElement('LabelStyle');
+                        labelStyle.innerHTML = `<color>${hexToKml(rule.colorCode)}</color>`;
+                        style.appendChild(labelStyle);
+
+                        if (rule.styleLink !== '-') {
+                            const iconStyle = xml.createElement('IconStyle');
+                            iconStyle.innerHTML = `<color>${hexToKml(rule.colorCode)}</color><scale>1.1</scale><Icon><href>${rule.styleLink}</href></Icon>`;
+                            style.appendChild(iconStyle);
+                        }
+                        
+                        const lineStyle = xml.createElement('LineStyle');
+                        lineStyle.innerHTML = `<color>${hexToKml(rule.colorCode)}</color><width>2</width>`;
+                        style.appendChild(lineStyle);
+
+                        const polyStyle = xml.createElement('PolyStyle');
+                        polyStyle.innerHTML = `<color>${hexToKml(rule.colorCode, '66')}</color>`;
+                        style.appendChild(polyStyle);
+
+                        doc.insertBefore(style, doc.firstChild);
+                        stylesCreated.add(styleId);
+                    }
+
+                    let url = pm.querySelector('styleUrl');
+                    if (!url) { url = xml.createElement('styleUrl'); pm.appendChild(url); }
+                    url.textContent = '#' + styleId;
+                }
+            });
+        }
+
+        function hexToKml(hex, alpha='ff') {
+            const c = hex.replace('#','');
+            return alpha + c.substring(4,6) + c.substring(2,4) + c.substring(0,2);
+        }
+
+        function displayTree(stats) {
+            const list = document.getElementById('folderList');
+            let html = `<div class="tree-item"><span class="tree-folder" style="color:#aaa">BOUNDARY CLUSTER (Opacity 30%)</span></div>`;
+            if (stats.fdt > 0) html += `<div class="tree-item"><span class="tree-folder">FDT</span> <span class="tree-info">(${stats.fdt} items)</span></div>`;
+            stats.lines.forEach(line => {
+                html += `<div class="tree-item"><span class="tree-folder">${line}</span></div>`;
+            });
+            list.innerHTML = html;
+            document.getElementById('preview').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
