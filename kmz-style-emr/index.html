@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler V25 (Ultimate Fix)</title>
+    <title>KMZ Styler V25 (Ultimate Fix Pole Color)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root { --bg-body: #0d0d0d; --bg-surface: #171717; --bg-surface-hover: #222; --border: #333; --primary: #3b82f6; --primary-hover: #2563eb; --text-main: #ededed; --text-muted: #888; --success: #22c55e; --error: #ef4444; --radius: 8px; }
@@ -453,14 +453,25 @@
                         const isJC = name.includes('JC');
                         const coreMatch = fullText.match(/\b(\d+)C\b/);
                         const core = coreMatch ? coreMatch[0] : '48C';
-                        const coreMap = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const coreMap = { '288C': '#FFAA00', '144C': '#550000', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
                         const color = coreMap[core] || '#AA00FF';
                         
                         if (isJC) rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
                         else rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
                     }
                     else if (folderName.includes('POLE')) {
-                        rule = { colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png', placemark: '-' };
+                        // --- LOGIC BARU (FIXED POLE COLOR SUBFEEDER) ---
+                        let pColor = '#550000'; // Default Existing (Coklat)
+                        const upperFolder = folderName.toUpperCase();
+
+                        if (upperFolder.includes('NEW')) {
+                            if (upperFolder.includes('9-')) pColor = '#FF0000'; // 9m New
+                            else if (upperFolder.includes('7-5') || upperFolder.includes('7-4')) pColor = '#00FF00'; // 7m Standard New
+                            else if (upperFolder.includes('7-3')) pColor = '#00FFFF'; // 7m 7-3 New
+                            else if (upperFolder.includes('7-2.5')) pColor = '#AA00FF'; // 7m 7-2.5 New
+                        }
+
+                        rule = { colorCode: pColor, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png', placemark: '-' };
                     }
                     else {
                         rule = RULES_SUBFEEDER.find(r => r.folder === folderName);
