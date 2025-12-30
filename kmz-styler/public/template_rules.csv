@@ -1,3 +1,23 @@
-﻿FOLDER ,PLACEMARK,LINE,POLYGON,COLOR CODE,STYLE LINK
+FOLDER ,PLACEMARK,LINE,POLYGON,COLOR CODE,STYLE LINK
 -,FAT,-,-,#FFFF00,http://maps.google.com/mapfiles/kml/shapes/triangle.png
-EXISTING POLE EMR 7-2.5,-,-,-,#550000,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+NEW POLE 9-4,-,-,-,#FF0000,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+NEW POLE 7-4,-,-,-,#00FF00,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+NEW POLE 7-3,-,-,-,#00FFFF,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+NEW POLE 7-2.5,-,-,-,#AA00FF,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+EXISTING,-,-,-,#550000,http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png
+HP COVER,-,-,-,#00FF00,http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png
+SLING WIRE,-,-,-,#00FFFF,-
+-,-,24C/2T,-,#00FF00,-
+-,-,36C/3T,-,#FF00FF,-
+-,-,48C/4T,-,#AA00FF,-
+-,-,72C/6T,-,#550000,-
+-,-,96C/8T,-,#FF0000,-
+-,-,144C/12T,-,#FFFF00,-
+-,-,288C/24T,-,#FFAA00,-
+-,FDT 288C,-,-,#AA0000,http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png
+-,FDT 144C,-,-,#FFFF00,http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png
+-,FDT 96C,-,-,#00FFFF,http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png
+-,FDT 72C,-,-,#0000FF,http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png
+-,FDT 48C,-,-,#AA00FF,http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png
+SLACK HANGER,-,-,-,#ff0000,http://maps.google.com/mapfiles/kml/shapes/target.png
+BOUNDARY FAT,-,-,-,#009999,-
