@@ -122,7 +122,7 @@
             { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '72C', polygon: '-', colorCode: '#550000', styleLink: '-' },
             { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '96C', polygon: '-', colorCode: '#FF0000', styleLink: '-' },
             { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '144C', polygon: '-', colorCode: '#FFFF00', styleLink: '-' },
-            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '288C', polygon: '-', colorCode: '#00AAFF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '288C', polygon: '-', colorCode: '#FFAA00', styleLink: '-' },
             
             // OTHERS
             { folder: 'SLING WIRE', placemark: '-', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: '-' },
@@ -453,7 +453,7 @@
                         const isJC = name.includes('JC');
                         const coreMatch = fullText.match(/\b(\d+)C\b/);
                         const core = coreMatch ? coreMatch[0] : '48C';
-                        const coreMap = { '288C': '#FFAA00', '144C': '#550000', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const coreMap = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
                         const color = coreMap[core] || '#AA00FF';
                         
                         if (isJC) rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
@@ -525,3 +525,4 @@
     </script>
 </body>
 </html>
+
