@@ -161,9 +161,20 @@ Aplikasi akan memaksa struktur folder menjadi seperti ini agar rapi:
  ┃  ┣ 📂 BOUNDARY FAT
  ┃  ┣ 📂 FAT
  ┃  ┣ 📂 HP COVER (Berisi subfolder per FAT)
+ ┃  ┣ 📂 HP UNCOVER
+ ┃  ┣ 📂 EXISTING POLE EMR 7-2.5
+ ┃  ┣ 📂 EXISTING POLE EMR 7-3
+ ┃  ┣ 📂 EXISTING POLE EMR 7-4
+ ┃  ┣ 📂 EXISTING POLE EMR 9-4
+ ┃  ┣ 📂 EXISTING POLE PARTNER 7-4
+ ┃  ┣ 📂 EXISTING POLE PARTNER 9-4
+ ┃  ┣ 📂 NEW POLE 7-2.5
+ ┃  ┣ 📂 NEW POLE 7-3
  ┃  ┣ 📂 NEW POLE 7-4
+ ┃  ┣ 📂 NEW POLE 9-4
  ┃  ┣ 📂 DISTRIBUTION CABLE
- ┃  ┗ 📂 SLACK HANGER
+ ┃  ┣ 📂 SLACK HANGER
+ ┃  ┗ 📂 SLING WIRE
  ┣ 📂 LINE B
  ┃  ┗ ... (struktur sama)
  ┗ 📂 OTHERS (Item yang tidak dikenali)
@@ -175,8 +186,18 @@ Aplikasi akan memaksa struktur folder menjadi seperti ini agar rapi:
 ```text
 📂 SUBFEEDER ID
  ┣ 📂 JOINT CLOSURE
- ┣ 📂 CABLE (Feeder)
+ ┣ 📂 EXISTING POLE EMR 7-2.5
+ ┣ 📂 EXISTING POLE EMR 7-3
+ ┣ 📂 EXISTING POLE EMR 7-4
+ ┣ 📂 EXISTING POLE EMR 7-5
+ ┣ 📂 EXISTING POLE EMR 9-5
+ ┣ 📂 EXISTING POLE EMR 9-4
+ ┣ 📂 EXISTING POLE PARTNER 7-4
+ ┣ 📂 EXISTING POLE PARTNER 9-4
+ ┣ 📂 NEW POLE 9-5
+ ┣ 📂 NEW POLE 7-4
  ┣ 📂 NEW POLE 9-4
+ ┣ 📂 CABLE
  ┗ 📂 SLACK HANGER
 
 ```
@@ -197,3 +218,4 @@ A: CSV Generator membutuhkan folder bernama `FAT` dan `HP COVER`. Pastikan nama 
 ---
 
 *Dokumentasi diperbarui untuk KMZ Styler V36 (Multi-Line Support).*
+
