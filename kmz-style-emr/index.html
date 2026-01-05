@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler - Subfeeder Calc V9</title>
+    <title>KMZ Styler - V10 (Fix Cluster Desc & Color)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -118,7 +118,7 @@
     <div class="container">
         <header>
             <h1>KMZ Style EMR by xsanosaurus</h1>
-            <p class="subtitle">AutoCAD Logic V9 (Calc & Rename)</p>
+            <p class="subtitle">AutoCAD Logic V10 (Fix Cluster Desc & Color)</p>
         </header>
 
         <div class="card">
@@ -227,6 +227,7 @@
             { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
         ];
 
+        // --- UPDATED SUBFEEDER STRUCTURE ---
         const STRUCTURE_SUBFEEDER = [
             'FDT', 'JOINT CLOSURE', 'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 
             'EXISTING POLE EMR 7-5', 'EXISTING POLE EMR 9-5', 'EXISTING POLE EMR 9-4', 
@@ -870,8 +871,8 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                     }
                 }
 
-                // --- V9: PRESERVE DESC for FDT, CABLE, BOUNDARY ---
-                const PRESERVE_DESC = ['BOUNDARY FAT', 'DISTRIBUTION CABLE', 'FDT', 'CABLE'];
+                // --- V10 FIX: Added 'FDT_GLOBAL' to whitelist ---
+                const PRESERVE_DESC = ['BOUNDARY FAT', 'DISTRIBUTION CABLE', 'FDT', 'CABLE', 'FDT_GLOBAL'];
                 if (!PRESERVE_DESC.includes(targetType)) {
                     const descTag = pm.querySelector('description');
                     if (descTag) descTag.remove();
@@ -970,14 +971,16 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                     else if (folderName === 'FDT') {
                         const coreMatch = fullText.match(/\b(\d+)C\b/);
                         const core = coreMatch ? coreMatch[0] : '48C';
-                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        // --- V10 FIX: 72C color is now Blue ---
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
                         const color = coreMap[core] || '#AA00FF';
                         rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
                     }
                     else if (folderName === 'JOINT CLOSURE') {
                         const coreMatch = fullText.match(/\b(\d+)C\b/);
                         const core = coreMatch ? coreMatch[0] : '48C';
-                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        // --- V10 FIX: 72C color is now Blue ---
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
                         const color = coreMap[core] || '#AA00FF';
                         rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
                     }
