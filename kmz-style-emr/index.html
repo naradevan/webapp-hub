@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler - V10 (Fix Cluster Desc & Color)</title>
+    <title>KMZ Styler - V13 (Fix Line Grouping)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -118,7 +118,7 @@
     <div class="container">
         <header>
             <h1>KMZ Style EMR by xsanosaurus</h1>
-            <p class="subtitle">AutoCAD Logic V10 (Fix Cluster Desc & Color)</p>
+            <p class="subtitle">AutoCAD Logic V13 (Preserve Line Structure)</p>
         </header>
 
         <div class="card">
@@ -298,7 +298,7 @@
                 displayTree(tree);
 
                 if (CURRENT_MODE === 'cluster') {
-                    processedHPDB = generateHPDB(xmlDoc);
+                    processedHPDB = generateHPDB(xmlDoc, tree.rootName);
                 }
 
                 const serializer = new XMLSerializer();
@@ -351,8 +351,8 @@
 
         document.getElementById('resetBtn').addEventListener('click', () => location.reload());
 
-        // --- HPDB GENERATOR ---
-        function generateHPDB(xmlDoc) {
+        // --- HPDB GENERATOR V11 (SCOPE FIX) ---
+        function generateHPDB(xmlDoc, rootNameRaw) {
             const headers = [
                 'Pole ID', 'Pole Latitude', 'Pole Longitude', 'FAT Address', 'Province', 
                 'regency_city', 'district', 'subdistrict', 'postalcode', 'Roll_Out_ID', 
@@ -365,72 +365,89 @@
             ];
             
             let csvContent = headers.join(',') + '\n';
-            const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
             
-            const poleFolders = allFolders.filter(f => {
-                const n = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
-                return n.includes('POLE') || n.includes('TIANG');
-            });
-            const polePoints = [];
-            poleFolders.forEach(pf => {
-                pf.querySelectorAll('Placemark').forEach(pm => {
-                    const pt = pm.querySelector('Point coordinates');
-                    if(pt) {
-                        const name = pm.querySelector('name')?.textContent.trim() || 'Unknown';
-                        const [lon, lat] = pt.textContent.trim().split(',').map(Number);
-                        polePoints.push({ name, lon, lat });
-                    }
-                });
+            // 1. Get Root Folder (Detected ID)
+            const rootFolder = Array.from(xmlDoc.querySelectorAll('Folder')).find(f => {
+                const n = f.querySelector('name');
+                return n && n.textContent === rootNameRaw;
             });
 
-            const fatFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'FAT');
-            const fatPoints = [];
-            fatFolders.forEach(ff => {
-                ff.querySelectorAll('Placemark').forEach(pm => {
-                    const pt = pm.querySelector('Point coordinates');
-                    if(pt) {
-                        const name = pm.querySelector('name')?.textContent.trim() || 'FAT';
-                        const [lon, lat] = pt.textContent.trim().split(',').map(Number);
-                        fatPoints.push({ name, lon, lat });
-                    }
-                });
-            });
+            if (!rootFolder) return csvContent; 
 
-            const hpFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'HP COVER');
-            hpFolders.forEach(hpFolder => {
-                const subFolders = Array.from(hpFolder.querySelectorAll('Folder'))
-                    .sort((a, b) => {
-                        const na = a.querySelector('name').textContent;
-                        const nb = b.querySelector('name').textContent;
-                        return na.localeCompare(nb, undefined, {numeric: true, sensitivity: 'base'});
-                    });
+            // 2. Iterate each LINE folder (Immediate Children of Root)
+            const lineFolders = Array.from(rootFolder.children).filter(child => child.tagName === 'Folder' && child.querySelector('name')?.textContent !== 'OTHERS' && child.querySelector('name')?.textContent !== 'FDT');
 
-                subFolders.forEach(sub => {
-                    const subName = sub.querySelector('name').textContent.trim(); 
-                    const fatCode = subName.slice(-3); 
-                    let anchorFat = fatPoints.find(f => f.name.toUpperCase().includes(fatCode.toUpperCase()));
-                    let anchorPole = { name: '', lon: '', lat: '' };
-                    if (anchorFat && polePoints.length > 0) {
-                        const exactMatch = polePoints.find(p => haversine(p, anchorFat) < 0.5);
-                        if (exactMatch) { anchorPole = exactMatch; } 
-                        else { anchorPole = polePoints.sort((a, b) => haversine(a, anchorFat) - haversine(b, anchorFat))[0]; }
-                    }
+            lineFolders.forEach(lineFolder => {
+                const lineName = lineFolder.querySelector('name').textContent.trim(); 
 
-                    sub.querySelectorAll('Placemark').forEach(hp => {
-                        const pt = hp.querySelector('Point coordinates');
-                        if (pt) {
-                            const hpName = hp.querySelector('name')?.textContent.trim() || '';
-                            const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
-                            const row = [
-                                `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
-                                'JLN.', '', '', '', '', '', '', `"${hpName}"`, '', '', '', '', '', '', '', '', '', 
-                                `"${fatCode}"`, '', hpLat, hpLon, ''
-                            ];
-                            csvContent += row.join(',') + '\n';
+                // 3. Localize Data Collecting within THIS Line Folder
+                // FATs
+                const fatFolder = Array.from(lineFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === 'FAT');
+                const localFatPoints = [];
+                if (fatFolder) {
+                    fatFolder.querySelectorAll('Placemark').forEach(pm => {
+                        const pt = pm.querySelector('Point coordinates');
+                        if(pt) {
+                            const name = pm.querySelector('name')?.textContent.trim() || 'FAT';
+                            const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                            localFatPoints.push({ name, lon, lat });
                         }
                     });
+                }
+
+                // POLES (Search in all pole folders within this line)
+                const localPolePoints = [];
+                const subFolders = Array.from(lineFolder.querySelectorAll('Folder'));
+                subFolders.forEach(f => {
+                    const n = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
+                    if (n.includes('POLE') || n.includes('TIANG')) {
+                        f.querySelectorAll('Placemark').forEach(pm => {
+                            const pt = pm.querySelector('Point coordinates');
+                            if(pt) {
+                                const name = pm.querySelector('name')?.textContent.trim() || 'Unknown';
+                                const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                                localPolePoints.push({ name, lon, lat });
+                            }
+                        });
+                    }
                 });
+
+                // HP COVER
+                const hpCoverFolder = Array.from(lineFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === 'HP COVER');
+                if (hpCoverFolder) {
+                    const fatSubFolders = Array.from(hpCoverFolder.querySelectorAll('Folder')); // Subfolders like "FAT A01"
+                    
+                    fatSubFolders.forEach(sub => {
+                        const subName = sub.querySelector('name').textContent.trim(); 
+                        const fatCode = subName.slice(-3); // "A01"
+                        
+                        // Find Anchor FAT (Strict Local Scope)
+                        let anchorFat = localFatPoints.find(f => f.name.toUpperCase().includes(fatCode.toUpperCase()));
+                        
+                        let anchorPole = { name: '', lon: '', lat: '' };
+                        if (anchorFat && localPolePoints.length > 0) {
+                            const exactMatch = localPolePoints.find(p => haversine(p, anchorFat) < 0.5);
+                            if (exactMatch) { anchorPole = exactMatch; } 
+                            else { anchorPole = localPolePoints.sort((a, b) => haversine(a, anchorFat) - haversine(b, anchorFat))[0]; }
+                        }
+
+                        sub.querySelectorAll('Placemark').forEach(hp => {
+                            const pt = hp.querySelector('Point coordinates');
+                            if (pt) {
+                                const hpName = hp.querySelector('name')?.textContent.trim() || '';
+                                const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
+                                const row = [
+                                    `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
+                                    'JLN.', '', '', '', '', '', '', `"${hpName}"`, '', '', '', '', '', '', '', '', '', 
+                                    `"${lineName}"`, `"${fatCode}"`, '', hpLat, hpLon, ''
+                                ];
+                                csvContent += row.join(',') + '\n';
+                            }
+                        });
+                    });
+                }
             });
+
             return csvContent;
         }
 
@@ -750,41 +767,32 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
             }
         }
 
-        function getLineContext(placemarkNode) {
-            const regex = /(?:LINE|LN|KABEL)[\s\-_]+([A-Z0-9]+)/i;
-            const ignoreKeywords = ['DISTRIBUTION', 'DISTRIBUSI', 'SLACK', 'SLING', 'HANGER', 'FAT', 'FDT', 'POLE', 'TIANG', 'COVER', 'ODP', 'SPLITTER'];
-            let curr = placemarkNode.parentElement;
-            while (curr) {
-                let name = '';
-                for(let i=0; i<curr.children.length; i++) { if(curr.children[i].tagName === 'name') { name = curr.children[i].textContent.trim(); break; } }
-                if (name) {
-                    const upperName = name.toUpperCase();
-                    const match = name.match(regex);
-                    const isBlacklisted = ignoreKeywords.some(bad => upperName.includes(bad));
-                    if (!isBlacklisted && match) return `LINE ${match[1].toUpperCase()}`;
+        // --- NEW LOGIC: DETERMINE LINE NAME FROM FOLDER STRUCTURE ---
+        function determineLineName(pm, rootName, structureList) {
+            let curr = pm.parentElement;
+            let foundLine = null;
+            
+            // Traverse up
+            while (curr && curr.tagName === 'Folder') {
+                const name = curr.querySelector('name')?.textContent.trim() || '';
+                
+                // If we hit the Document or the Root, stop.
+                if (name === rootName) break;
+                
+                // Check if this folder is one of the Standard Categories (FAT, POLE, etc.)
+                // If it IS NOT a standard category, it's likely our Line Folder.
+                // We also need to ignore "OTHERS" or "BOUNDARY CLUSTER"
+                const isStandard = structureList.includes(name) || 
+                                   name === 'FDT' || 
+                                   name === 'BOUNDARY CLUSTER' ||
+                                   name === 'OTHERS';
+                                   
+                if (!isStandard && name !== '') {
+                    foundLine = name;
                 }
-                if (curr.tagName === 'Document') break;
                 curr = curr.parentElement;
             }
-            return null;
-        }
-
-        function findFallbackGroupName(placemarkNode, structureList) {
-            const ignoreList = [...structureList, 'DISTRIBUTION', 'ODP', 'SPLITTER', 'CLUSTER ID'];
-            let bestName = 'LINE A'; 
-            let curr = placemarkNode.parentElement;
-            while (curr) {
-                 let name = '';
-                for(let i=0; i<curr.children.length; i++) { if(curr.children[i].tagName === 'name') { name = curr.children[i].textContent.trim(); break; } }
-                if (name && curr.tagName === 'Folder') {
-                    const upper = name.toUpperCase();
-                    const isStandard = ignoreList.some(s => upper.includes(s));
-                    if (!isStandard) bestName = name; 
-                }
-                if (curr.tagName === 'Document' || (name && name.toUpperCase().includes('CLUSTER ID'))) break;
-                curr = curr.parentElement;
-            }
-            return bestName;
+            return foundLine || 'MAIN'; // Default to MAIN if no intermediate folder found
         }
 
         function restructureKML(xmlDoc) {
@@ -794,6 +802,23 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
             let boundaryClusterNode = null;
             const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
             const boundaryOriginal = allFolders.find(f => f.querySelector('name')?.textContent?.toUpperCase().includes('BOUNDARY CLUSTER'));
+            
+            // --- DYNAMIC ROOT DETECTION ---
+            let detectedRootName = (CURRENT_MODE === 'subfeeder') ? 'SUBFEEDER ID' : 'CLUSTER ID';
+            
+            if (boundaryOriginal && boundaryOriginal.parentElement && boundaryOriginal.parentElement.tagName === 'Folder') {
+                const parentName = boundaryOriginal.parentElement.querySelector('name');
+                if (parentName) detectedRootName = parentName.textContent.trim();
+            } 
+            else {
+                const fdtOriginal = allFolders.find(f => f.querySelector('name')?.textContent?.trim() === 'FDT');
+                if (fdtOriginal && fdtOriginal.parentElement && fdtOriginal.parentElement.tagName === 'Folder') {
+                    const parentName = fdtOriginal.parentElement.querySelector('name');
+                    if (parentName) detectedRootName = parentName.textContent.trim();
+                }
+            }
+            // ---------------------------------
+
             if (boundaryOriginal) boundaryClusterNode = boundaryOriginal.cloneNode(true);
 
             const allPlacemarks = Array.from(xmlDoc.querySelectorAll('Placemark')).filter(pm => {
@@ -824,10 +849,10 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                 const fullText = name + ' ' + desc;
                 const isLine = pm.querySelector('LineString') !== null;
                 
+                // --- V13: USE FOLDER STRUCTURE FOR LINE NAME ---
                 let lineName = 'MAIN';
                 if (CURRENT_MODE === 'cluster') {
-                    lineName = getLineContext(pm);
-                    if (!lineName) lineName = findFallbackGroupName(pm, targetStructure);
+                    lineName = determineLineName(pm, detectedRootName, targetStructure);
                 }
 
                 let targetType = 'UNKNOWN';
@@ -871,7 +896,6 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                     }
                 }
 
-                // --- V10 FIX: Added 'FDT_GLOBAL' to whitelist ---
                 const PRESERVE_DESC = ['BOUNDARY FAT', 'DISTRIBUTION CABLE', 'FDT', 'CABLE', 'FDT_GLOBAL'];
                 if (!PRESERVE_DESC.includes(targetType)) {
                     const descTag = pm.querySelector('description');
@@ -886,7 +910,7 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
 
             while (kmlDoc.firstChild) kmlDoc.removeChild(kmlDoc.firstChild);
             const root = xmlDoc.createElement('Folder');
-            root.appendChild(createName(xmlDoc, (CURRENT_MODE === 'subfeeder') ? 'SUBFEEDER ID' : 'CLUSTER ID'));
+            root.appendChild(createName(xmlDoc, detectedRootName)); 
 
             if (boundaryClusterNode) root.appendChild(boundaryClusterNode);
             if (fdtBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'FDT', fdtBucket));
@@ -905,8 +929,18 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                 });
             } else {
                 Object.keys(lineBuckets).sort().forEach(ln => {
-                    const lnFolder = xmlDoc.createElement('Folder');
-                    lnFolder.appendChild(createName(xmlDoc, ln));
+                    // IF lineName is 'MAIN', it means the items were directly under Root (or no Line folder). 
+                    // To prevent flattening, if it is 'MAIN', we attach directly to root.
+                    // BUT, if the user had "LINE A", we create "LINE A".
+                    
+                    let targetContainer = root;
+                    if (ln !== 'MAIN') {
+                        const lnFolder = xmlDoc.createElement('Folder');
+                        lnFolder.appendChild(createName(xmlDoc, ln));
+                        root.appendChild(lnFolder);
+                        targetContainer = lnFolder;
+                    }
+
                     targetStructure.forEach(folderName => {
                         const subData = lineBuckets[ln][folderName];
                         if (subData) {
@@ -914,15 +948,14 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
                             folder.appendChild(createName(xmlDoc, folderName));
                             if (subData['MAIN']) subData['MAIN'].forEach(i => folder.appendChild(i));
                             Object.keys(subData).forEach(k => { if (k !== 'MAIN') folder.appendChild(createFolder(xmlDoc, k, subData[k])); });
-                            lnFolder.appendChild(folder);
-                        } else { lnFolder.appendChild(createFolder(xmlDoc, folderName, [])); }
+                            targetContainer.appendChild(folder);
+                        } else { targetContainer.appendChild(createFolder(xmlDoc, folderName, [])); }
                     });
-                    root.appendChild(lnFolder);
                 });
             }
             if (othersBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'OTHERS', othersBucket));
             kmlDoc.appendChild(root);
-            return { mode: CURRENT_MODE, lines: Object.keys(lineBuckets) };
+            return { mode: CURRENT_MODE, lines: Object.keys(lineBuckets), rootName: detectedRootName };
         }
 
         function createName(xml, text) { const n = xml.createElement('name'); n.textContent = text; return n; }
@@ -1032,12 +1065,15 @@ Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
             const mode = result.mode;
             let html = `<div class="tree-item"><span class="tree-folder" style="color:#aaa">BOUNDARY CLUSTER</span></div>`;
             if (result.lines.includes('FDT') || mode === 'cluster') html += `<div class="tree-item"><span class="tree-folder">FDT</span></div>`;
-            if (mode === 'subfeeder') {
-                html += `<div class="tree-item"><span class="tree-folder">SUBFEEDER ID</span></div>`;
-                STRUCTURE_SUBFEEDER.forEach(f => { html += `<div class="tree-item" style="margin-left:20px; font-size:0.9em; color:#888">${f}</div>`; });
-            } else {
-                result.lines.forEach(l => { html += `<div class="tree-item"><span class="tree-folder">${l}</span></div>`; });
-            }
+            
+            html += `<div class="tree-item"><span class="tree-folder" style="color:#fff; border-bottom:1px solid #333; display:inline-block; margin-bottom:5px;">ROOT: ${result.rootName}</span></div>`;
+            
+            result.lines.forEach(l => { 
+                if (l !== 'FDT' && l !== 'MAIN') {
+                    html += `<div class="tree-item"><span class="tree-folder">${l}</span></div>`; 
+                }
+            });
+            
             list.innerHTML = html;
             document.getElementById('preview').classList.remove('hidden');
         }
