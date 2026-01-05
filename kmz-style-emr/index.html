@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Style xsanosaurus</title>
+    <title>KMZ Styler - Subfeeder Calc V9</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <script>
@@ -15,7 +14,6 @@
         script.async = true;
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-T12DERDD3M';
         document.head.appendChild(script);
-        
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
@@ -66,25 +64,18 @@
         .top-right-btn { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 100; }
         .btn-readme { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .btn-readme:hover { border-color: var(--primary); color: var(--text-main); background: rgba(59, 130, 246, 0.1); }
-        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.open { opacity: 1; visibility: visible; }
-        
         .modal-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); width: 90%; max-width: 800px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s ease; }
         .modal-overlay.open .modal-box { transform: translateY(0); }
-        
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #111; border-radius: var(--radius) var(--radius) 0 0; }
         .modal-header h2 { font-size: 1.2rem; margin: 0; color: var(--text-main); }
-        
         .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
         .close-modal:hover { color: var(--error); }
-        
         .modal-body { padding: 2rem; overflow-y: auto; font-size: 0.95rem; line-height: 1.6; color: #ccc; }
         .modal-body::-webkit-scrollbar { width: 8px; }
         .modal-body::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
         .modal-body::-webkit-scrollbar-track { background: #111; }
-
-        /* Styles khusus untuk konten Markdown yang dirender */
         .md-content h1, .md-content h2 { color: var(--text-main); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
         .md-content h3 { color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.75rem; }
         .md-content ul, .md-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
@@ -127,7 +118,7 @@
     <div class="container">
         <header>
             <h1>KMZ Style EMR by xsanosaurus</h1>
-            <p class="subtitle">Update: 04-01-2026 16:09:45</p>
+            <p class="subtitle">AutoCAD Logic V9 (Calc & Rename)</p>
         </header>
 
         <div class="card">
@@ -162,54 +153,33 @@
     <script>
         // --- README LOADER LOGIC ---
         let readmeLoaded = false;
-
         async function openReadme() {
             toggleModal(true);
-            
-            // Cek apakah sudah pernah diload agar tidak fetch berulang kali
             if (readmeLoaded) return;
-
             const container = document.getElementById('mdContainer');
-            
             try {
-                // Fetch file README.md yang ada di folder yang sama
                 const response = await fetch('README.md');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 const markdownText = await response.text();
-                
-                // Gunakan Marked.js untuk convert Markdown ke HTML
                 container.innerHTML = marked.parse(markdownText);
                 readmeLoaded = true;
-
             } catch (error) {
                 console.error("Gagal load README:", error);
                 container.innerHTML = `
                     <div style="text-align:center; color: var(--error); padding: 20px;">
                         <p><strong>Gagal memuat dokumentasi.</strong></p>
-                        <p style="font-size:0.9em; color:#888;">Pastikan file <code>README.md</code> ada di folder yang sama dengan file ini.</p>
+                        <p style="font-size:0.9em; color:#888;">Pastikan file <code>README.md</code> ada.</p>
                         <p style="font-size:0.8em; margin-top:10px;">Error: ${error.message}</p>
                     </div>
                 `;
             }
         }
-
         function toggleModal(show) {
             const modal = document.getElementById('readmeModal');
-            if (show) {
-                modal.classList.add('open');
-                document.body.style.overflow = 'hidden'; 
-            } else {
-                modal.classList.remove('open');
-                document.body.style.overflow = '';
-            }
+            if (show) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; } 
+            else { modal.classList.remove('open'); document.body.style.overflow = ''; }
         }
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') toggleModal(false);
-        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleModal(false); });
 
         // --- CONFIGURATION ---
         let CURRENT_MODE = 'cluster'; 
@@ -227,7 +197,7 @@
 
         const RULES_CLUSTER = [
             { folder: '-', placemark: '288C', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
-            { folder: '-', placemark: '144C', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '144C', line: '-', polygon: '-', colorCode: '#AAFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
             { folder: '-', placemark: '96C', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
             { folder: '-', placemark: '72C', line: '-', polygon: '-', colorCode: '#0000FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
             { folder: '-', placemark: '48C', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
@@ -258,7 +228,7 @@
         ];
 
         const STRUCTURE_SUBFEEDER = [
-            'JOINT CLOSURE', 'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 
+            'FDT', 'JOINT CLOSURE', 'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 
             'EXISTING POLE EMR 7-5', 'EXISTING POLE EMR 9-5', 'EXISTING POLE EMR 9-4', 
             'EXISTING POLE PARTNER 7-4', 'EXISTING POLE PARTNER 9-4', 'NEW POLE 7-5', 'NEW POLE 9-5', 
             'NEW POLE 7-4', 'NEW POLE 9-4', 'CABLE', 'SLACK HANGER'
@@ -315,24 +285,17 @@
                     xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
                 }
 
-                // 1. Restructure
                 const tree = restructureKML(xmlDoc);
                 
                 if (CURRENT_MODE === 'cluster') {
-                    // 2. Spatial Grouping HP (V31)
                     organizeHpByBoundary(xmlDoc);
-                    // 3. Auto Reposition (V30)
                     autoRepositionPoints(xmlDoc);
                 }
 
-                // 4. Apply Styling
                 applyStyles(xmlDoc);
-                // 5. Inject Descriptions & Calc
                 injectDescriptionsAndCalc(xmlDoc);
-                // 6. Display Tree
                 displayTree(tree);
 
-                // 7. Generate HPDB CSV (V36 Fix: Support ALL Lines)
                 if (CURRENT_MODE === 'cluster') {
                     processedHPDB = generateHPDB(xmlDoc);
                 }
@@ -387,8 +350,7 @@
 
         document.getElementById('resetBtn').addEventListener('click', () => location.reload());
 
-        // --- HPDB GENERATOR (V36 - MULTI LINE SUPPORT) ---
-
+        // --- HPDB GENERATOR ---
         function generateHPDB(xmlDoc) {
             const headers = [
                 'Pole ID', 'Pole Latitude', 'Pole Longitude', 'FAT Address', 'Province', 
@@ -402,11 +364,8 @@
             ];
             
             let csvContent = headers.join(',') + '\n';
-
-            // 1. Gather ALL resources regardless of LINE folder (Flattening the search space)
             const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
             
-            // Collect ALL Pole Folders
             const poleFolders = allFolders.filter(f => {
                 const n = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
                 return n.includes('POLE') || n.includes('TIANG');
@@ -423,7 +382,6 @@
                 });
             });
 
-            // Collect ALL FAT Folders
             const fatFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'FAT');
             const fatPoints = [];
             fatFolders.forEach(ff => {
@@ -437,12 +395,8 @@
                 });
             });
 
-            // Collect ALL HP COVER Folders
             const hpFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'HP COVER');
-
-            // 2. Iterate Through ALL Found HP COVER Folders (Line A, Line B, etc.)
             hpFolders.forEach(hpFolder => {
-                // Get subfolders (Clusters like A01, B01) inside this HP folder
                 const subFolders = Array.from(hpFolder.querySelectorAll('Folder'))
                     .sort((a, b) => {
                         const na = a.querySelector('name').textContent;
@@ -451,53 +405,31 @@
                     });
 
                 subFolders.forEach(sub => {
-                    const subName = sub.querySelector('name').textContent.trim(); // e.g., "A01"
-                    const fatCode = subName.slice(-3); // e.g., "A01"
-
-                    // A. Find Anchor FAT (By Name Matching)
+                    const subName = sub.querySelector('name').textContent.trim(); 
+                    const fatCode = subName.slice(-3); 
                     let anchorFat = fatPoints.find(f => f.name.toUpperCase().includes(fatCode.toUpperCase()));
-                    
-                    // B. Find Anchor Pole (Strict Coordinate Match first)
                     let anchorPole = { name: '', lon: '', lat: '' };
                     if (anchorFat && polePoints.length > 0) {
                         const exactMatch = polePoints.find(p => haversine(p, anchorFat) < 0.5);
-                        if (exactMatch) {
-                            anchorPole = exactMatch;
-                        } else {
-                            anchorPole = polePoints.sort((a, b) => haversine(a, anchorFat) - haversine(b, anchorFat))[0];
-                        }
+                        if (exactMatch) { anchorPole = exactMatch; } 
+                        else { anchorPole = polePoints.sort((a, b) => haversine(a, anchorFat) - haversine(b, anchorFat))[0]; }
                     }
 
-                    // C. Process HPs
                     sub.querySelectorAll('Placemark').forEach(hp => {
                         const pt = hp.querySelector('Point coordinates');
                         if (pt) {
                             const hpName = hp.querySelector('name')?.textContent.trim() || '';
                             const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
-
                             const row = [
-                                `"${anchorPole.name}"`, 
-                                anchorPole.lat,
-                                anchorPole.lon,
-                                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
-                                'JLN.', 
-                                '', '', '', '', '', '', 
-                                `"${hpName}"`, 
-                                '', '', '', '', '', '', '',
-                                '', 
-                                '', 
-                                `"${fatCode}"`, 
-                                '',
-                                hpLat,
-                                hpLon,
-                                ''
+                                `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
+                                'JLN.', '', '', '', '', '', '', `"${hpName}"`, '', '', '', '', '', '', '', '', '', 
+                                `"${fatCode}"`, '', hpLat, hpLon, ''
                             ];
                             csvContent += row.join(',') + '\n';
                         }
                     });
                 });
             });
-
             return csvContent;
         }
 
@@ -507,9 +439,7 @@
             const R = 6371000; 
             const dLat = toRad(pt2.lat - pt1.lat);
             const dLon = toRad(pt2.lon - pt1.lon);
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(toRad(pt1.lat)) * Math.cos(toRad(pt2.lat)) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(pt1.lat)) * Math.cos(toRad(pt2.lat)) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
         function isPointInPolygon(p, vs) {
@@ -517,14 +447,11 @@
             for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
                 const xi = vs[i].lon, yi = vs[i].lat;
                 const xj = vs[j].lon, yj = vs[j].lat;
-                const intersect = ((yi > p.lat) !== (yj > p.lat)) &&
-                    (p.lon < (xj - xi) * (p.lat - yi) / (yj - yi) + xi);
+                const intersect = ((yi > p.lat) !== (yj > p.lat)) && (p.lon < (xj - xi) * (p.lat - yi) / (yj - yi) + xi);
                 if (intersect) inside = !inside;
             }
             return inside;
         }
-
-        // --- DISTANCE UTILS ---
         function distToSegment(p, v, w) {
             const l2 = ((v.lon - w.lon)**2 + (v.lat - w.lat)**2);
             if (l2 == 0) return haversine(p, v);
@@ -544,97 +471,104 @@
             return minD;
         }
 
-        // --- LOGIC FUNCTIONS ---
+        // --- LOGIC FUNCTIONS (V6 - Multi-Line Iteration) ---
         function organizeHpByBoundary(xmlDoc) {
-            const folders = Array.from(xmlDoc.querySelectorAll('Folder'));
-            const hpFolder = folders.find(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'HP COVER');
-            const boundaryFolder = folders.find(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'BOUNDARY FAT');
-            if (!hpFolder || !boundaryFolder) return;
+            const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
+            const boundaryFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'BOUNDARY FAT');
 
-            const boundaries = [];
-            const boundaryPlacemarks = boundaryFolder.querySelectorAll('Placemark');
-            boundaryPlacemarks.forEach(pm => {
-                const name = pm.querySelector('name')?.textContent.trim() || 'Unknown';
-                let coordsText = '';
-                const polygon = pm.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
-                const lineString = pm.querySelector('LineString coordinates');
-                if (polygon) coordsText = polygon.textContent;
-                else if (lineString) coordsText = lineString.textContent;
+            boundaryFolders.forEach(boundaryFolder => {
+                const parent = boundaryFolder.parentElement;
+                if (!parent) return;
 
-                if (coordsText) {
-                    const coords = coordsText.trim().split(/\s+/).map(pair => {
-                        const [lon, lat] = pair.split(',').map(Number);
-                        return { lon, lat };
-                    });
-                    boundaries.push({ name: name, polygon: coords, hpCount: 0, element: pm });
-                }
-            });
+                const siblings = Array.from(parent.children).filter(c => c.tagName === 'Folder');
+                const hpFolder = siblings.find(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'HP COVER');
+                if (!hpFolder) return;
 
-            const hpPlacemarks = Array.from(hpFolder.getElementsByTagName('Placemark'));
-            const categorizedHPs = {}; 
-            const uncategorizedHPs = [];
-            boundaries.forEach(b => categorizedHPs[b.name] = []);
+                const boundaries = [];
+                boundaryFolder.querySelectorAll('Placemark').forEach(pm => {
+                    const name = pm.querySelector('name')?.textContent.trim() || 'Unknown';
+                    let coordsText = '';
+                    const polygon = pm.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
+                    const lineString = pm.querySelector('LineString coordinates');
+                    if (polygon) coordsText = polygon.textContent;
+                    else if (lineString) coordsText = lineString.textContent;
 
-            hpPlacemarks.forEach(pm => {
-                const pt = pm.querySelector('Point coordinates');
-                if (pt) {
-                    const [lon, lat] = pt.textContent.trim().split(',').map(Number);
-                    const point = { lon, lat };
-                    let matched = false;
-                    for (const b of boundaries) {
-                        if (isPointInPolygon(point, b.polygon)) {
-                            categorizedHPs[b.name].push(pm);
-                            b.hpCount++;
-                            matched = true;
-                            break; 
-                        }
+                    if (coordsText) {
+                        const coords = coordsText.trim().split(/\s+/).map(pair => {
+                            const [lon, lat] = pair.split(',').map(Number);
+                            return { lon, lat };
+                        });
+                        boundaries.push({ name: name, polygon: coords, hpCount: 0, element: pm });
                     }
-                    if (!matched) uncategorizedHPs.push(pm);
-                } else {
-                    uncategorizedHPs.push(pm); 
-                }
-            });
+                });
 
-            while (hpFolder.firstChild) hpFolder.removeChild(hpFolder.firstChild);
-            
-            const fname = xmlDoc.createElement('name');
-            fname.textContent = 'HP COVER';
-            hpFolder.appendChild(fname);
+                const hpPlacemarks = Array.from(hpFolder.getElementsByTagName('Placemark'));
+                const categorizedHPs = {}; 
+                const uncategorizedHPs = [];
+                boundaries.forEach(b => categorizedHPs[b.name] = []);
 
-            boundaries.forEach(b => {
-                if (categorizedHPs[b.name].length > 0) {
-                    const subFolder = xmlDoc.createElement('Folder');
-                    const subName = xmlDoc.createElement('name');
-                    subName.textContent = b.name;
-                    subFolder.appendChild(subName);
-                    categorizedHPs[b.name].forEach(pm => subFolder.appendChild(pm));
-                    hpFolder.appendChild(subFolder);
-                }
-            });
+                hpPlacemarks.forEach(pm => {
+                    const pt = pm.querySelector('Point coordinates');
+                    if (pt) {
+                        const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                        const point = { lon, lat };
+                        let matched = false;
+                        for (const b of boundaries) {
+                            if (isPointInPolygon(point, b.polygon)) {
+                                categorizedHPs[b.name].push(pm);
+                                b.hpCount++;
+                                matched = true;
+                                break; 
+                            }
+                        }
+                        if (!matched) uncategorizedHPs.push(pm);
+                    } else { uncategorizedHPs.push(pm); }
+                });
 
-            if (uncategorizedHPs.length > 0) {
-                uncategorizedHPs.forEach(pm => hpFolder.appendChild(pm));
-            }
+                while (hpFolder.firstChild) hpFolder.removeChild(hpFolder.firstChild);
+                const fname = xmlDoc.createElement('name');
+                fname.textContent = 'HP COVER';
+                hpFolder.appendChild(fname);
 
-            boundaries.forEach(b => {
-                let descTag = Array.from(b.element.children).find(c => c.tagName === 'description');
-                if (!descTag) {
-                    descTag = xmlDoc.createElement('description');
+                boundaries.forEach(b => {
+                    if (categorizedHPs[b.name].length > 0) {
+                        const subFolder = xmlDoc.createElement('Folder');
+                        const subName = xmlDoc.createElement('name');
+                        subName.textContent = b.name;
+                        subFolder.appendChild(subName);
+                        categorizedHPs[b.name].forEach(pm => subFolder.appendChild(pm));
+                        hpFolder.appendChild(subFolder);
+                    }
+                });
+
+                boundaries.forEach(b => {
+                    let oldDesc = b.element.querySelector('description');
+                    if (oldDesc) oldDesc.remove();
+                    let descTag = xmlDoc.createElement('description');
+                    descTag.textContent = `${b.hpCount} HP`;
                     b.element.appendChild(descTag);
+                });
+
+                if (uncategorizedHPs.length > 0) {
+                    let othersFolder = Array.from(parent.children).find(el => el.tagName === 'Folder' && el.querySelector('name')?.textContent === 'OTHERS');
+                    if (!othersFolder) {
+                        othersFolder = xmlDoc.createElement('Folder');
+                        const oname = xmlDoc.createElement('name');
+                        oname.textContent = 'OTHERS';
+                        othersFolder.appendChild(oname);
+                        parent.appendChild(othersFolder); 
+                    }
+                    uncategorizedHPs.forEach(pm => othersFolder.appendChild(pm));
                 }
-                descTag.textContent = `${b.hpCount} HP`;
             });
         }
 
         function autoRepositionPoints(xmlDoc) {
-            const points = [];
-            const cables = [];
+            const points = []; const cables = [];
             const placemarks = xmlDoc.querySelectorAll('Placemark');
-
             placemarks.forEach(pm => {
                 const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
                 const parentFolder = pm.parentElement.querySelector('name')?.textContent?.toUpperCase() || '';
-                
                 const ls = pm.querySelector('LineString coordinates');
                 if (ls && parentFolder === 'DISTRIBUTION CABLE') {
                     const coords = ls.textContent.trim().split(/\s+/).map(pair => {
@@ -643,7 +577,6 @@
                     });
                     cables.push(coords);
                 }
-
                 const pt = pm.querySelector('Point coordinates');
                 if (pt) {
                     const [lon, lat] = pt.textContent.trim().split(',').map(Number);
@@ -651,35 +584,24 @@
                     if (parentFolder === 'FAT') type = 'FAT';
                     else if (parentFolder === 'SLACK HANGER') type = 'SLACK';
                     else if (parentFolder.includes('POLE') || name.includes('POLE') || name.includes('TIANG')) type = 'POLE';
-
-                    if (type) {
-                        points.push({ element: pt, lon, lat, type, parent: parentFolder, id: Math.random() });
-                    }
+                    if (type) { points.push({ element: pt, lon, lat, type, parent: parentFolder, id: Math.random() }); }
                 }
             });
 
             if (cables.length === 0 || points.length === 0) return;
-
             const processed = new Set();
             points.forEach(p1 => {
                 if (processed.has(p1.id)) return;
-
                 const cluster = [p1];
                 processed.add(p1.id);
-
                 points.forEach(p2 => {
                     if (!processed.has(p2.id)) {
                         const dist = haversine(p1, p2);
-                        if (dist <= SNAP_TOLERANCE_METERS) {
-                            cluster.push(p2);
-                            processed.add(p2.id);
-                        }
+                        if (dist <= SNAP_TOLERANCE_METERS) { cluster.push(p2); processed.add(p2.id); }
                     }
                 });
-
                 let anchor = null;
                 const poles = cluster.filter(p => p.type === 'POLE');
-
                 if (poles.length > 0) {
                     poles.sort((a, b) => getMinDistToCables(a, cables) - getMinDistToCables(b, cables));
                     anchor = poles[0];
@@ -687,12 +609,7 @@
                     cluster.sort((a, b) => getMinDistToCables(a, cables) - getMinDistToCables(b, cables));
                     anchor = cluster[0];
                 }
-
-                cluster.forEach(p => {
-                    if (p !== anchor) {
-                        p.element.textContent = `${anchor.lon},${anchor.lat},0`;
-                    }
-                });
+                cluster.forEach(p => { if (p !== anchor) { p.element.textContent = `${anchor.lon},${anchor.lat},0`; } });
             });
         }
 
@@ -706,83 +623,132 @@
         }
 
         function injectDescriptionsAndCalc(xmlDoc) {
-            if (CURRENT_MODE !== 'cluster') return; 
             const folders = xmlDoc.querySelectorAll('Folder');
-            folders.forEach(folder => {
-                let folderName = '';
-                const nameNode = Array.from(folder.children).find(c => c.tagName === 'name');
-                if (nameNode) folderName = nameNode.textContent.trim().toUpperCase();
+            
+            // --- SUBFEEDER MODE LOGIC ---
+            if (CURRENT_MODE === 'subfeeder') {
+                const cableFolders = Array.from(folders).filter(f => {
+                    const n = f.querySelector('name');
+                    return n && n.textContent.trim() === 'CABLE';
+                });
 
-                if (folderName === 'SLING WIRE') {
-                    let totalMeters = 0;
-                    const placemarks = folder.querySelectorAll('Placemark');
-                    placemarks.forEach(pm => {
-                        const ls = pm.querySelector('LineString coordinates');
-                        if (ls) {
-                            const len = calculateLineLength(ls.textContent);
-                            totalMeters += len;
-                            let nameTag = Array.from(pm.children).find(c => c.tagName === 'name');
-                            if (!nameTag) { nameTag = xmlDoc.createElement('name'); pm.appendChild(nameTag); }
-                            nameTag.textContent = `LineString — ${len} meters`;
-                        }
-                    });
-                    if (totalMeters > 0) {
-                        let descTag = Array.from(folder.children).find(c => c.tagName === 'description');
-                        if (!descTag) { descTag = xmlDoc.createElement('description'); folder.appendChild(descTag); }
-                        descTag.textContent = `${totalMeters} m`;
-                    }
-                }
-                else if (folderName === 'DISTRIBUTION CABLE') {
-                    let fatCount = 0;
-                    const parentFolder = folder.parentElement;
-                    if (parentFolder) {
-                        const siblings = Array.from(parentFolder.children);
-                        const fatFolder = siblings.find(el => el.tagName === 'Folder' && el.querySelector('name')?.textContent.trim() === 'FAT');
-                        if (fatFolder) fatCount = fatFolder.getElementsByTagName('Placemark').length;
-                    }
-                    const b = 1; const c = fatCount; const a = b + c; const d = a * 20;
-                    const placemarks = folder.querySelectorAll('Placemark');
-                    placemarks.forEach(pm => {
+                cableFolders.forEach(cableFolder => {
+                    const parentLine = cableFolder.parentElement;
+                    if (!parentLine) return;
+
+                    // Get Counts from siblings
+                    const siblings = Array.from(parentLine.children).filter(c => c.tagName === 'Folder');
+                    const fdtFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'FDT');
+                    const jcFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'JOINT CLOSURE');
+
+                    const a = fdtFolder ? fdtFolder.getElementsByTagName('Placemark').length : 0;
+                    const b = jcFolder ? jcFolder.getElementsByTagName('Placemark').length : 0;
+                    
+                    const y = a + b;
+                    const c = a + b; // User definition: c = FDT + JC
+                    const d = y * 20;
+
+                    cableFolder.querySelectorAll('Placemark').forEach(pm => {
                         const ls = pm.querySelector('LineString coordinates');
                         if (ls) {
                             const x = calculateLineLength(ls.textContent);
                             const e = Math.ceil((x + d) * 1.05);
-                            let nameTag = Array.from(pm.children).find(child => child.tagName === 'name');
+
+                            // Update Description
+                            const descTag = pm.querySelector('description') || pm.appendChild(xmlDoc.createElement('description'));
+                            descTag.textContent = `Deskripsi :
+
+Total Route\t: ${x} m
+Total Slack\t: ${y} unit (${a} FDT, ${b} JC, ${c} NEW) @20 m
+Toleransi\t: 5%
+
+Total Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
+
+                            // Update Name: "Original Name - e m"
+                            const nameTag = pm.querySelector('name');
                             if (nameTag) {
-                                const oldName = nameTag.textContent.trim();
-                                const regex = /(\d+)(\s*M)$/i;
-                                if (regex.test(oldName)) { nameTag.textContent = oldName.replace(regex, e + "$2"); }
+                                let oldName = nameTag.textContent.trim();
+                                // Clean up any existing suffix to prevent duplication
+                                oldName = oldName.replace(/\s*-\s*\d+\s*m(eters)?$/i, '');
+                                nameTag.textContent = `${oldName} - ${e} m`;
                             }
-                            const descText = `Deskripsi :\n\nTotal Route \t : ${x} m\nTotal Slack\t : ${a} unit (${b} slack FDT & ${c} slack FAT) @20 m\nToleransi\t : 5%\n\n Total Length Cable  : ${x} + ${d} ( x 5%) = ${e} m`;
-                            let descTag = Array.from(pm.children).find(child => child.tagName === 'description');
-                            if (!descTag) { descTag = xmlDoc.createElement('description'); pm.appendChild(descTag); }
-                            descTag.textContent = descText;
                         }
                     });
-                }
-                else {
-                    let suffix = null;
-                    if (folderName === 'FAT') suffix = ' FAT';
-                    else if (folderName === 'HP COVER') suffix = ' HP';
-                    else if (folderName === 'HP UNCOVER') suffix = ' HP';
-                    else if (folderName.includes('EXISTING POLE')) suffix = ' EXT POLE';
-                    else if (folderName.includes('NEW POLE')) suffix = ' POLE';
+                });
+            }
 
-                    if (suffix) {
-                        // V36: Count subfolder items too for HP COVER
-                        const placemarks = folder.getElementsByTagName('Placemark');
-                        const count = placemarks.length;
-                        if (count > 0) {
+            // --- CLUSTER MODE LOGIC ---
+            if (CURRENT_MODE === 'cluster') {
+                folders.forEach(folder => {
+                    let folderName = '';
+                    const nameNode = Array.from(folder.children).find(c => c.tagName === 'name');
+                    if (nameNode) folderName = nameNode.textContent.trim().toUpperCase();
+
+                    if (folderName === 'SLING WIRE') {
+                        let totalMeters = 0;
+                        folder.querySelectorAll('Placemark').forEach(pm => {
+                            const ls = pm.querySelector('LineString coordinates');
+                            if (ls) {
+                                const len = calculateLineLength(ls.textContent);
+                                totalMeters += len;
+                                let nameTag = Array.from(pm.children).find(c => c.tagName === 'name');
+                                if (!nameTag) { nameTag = xmlDoc.createElement('name'); pm.appendChild(nameTag); }
+                                nameTag.textContent = `LineString — ${len} meters`;
+                            }
+                        });
+                        if (totalMeters > 0) {
                             let descTag = Array.from(folder.children).find(c => c.tagName === 'description');
                             if (!descTag) { descTag = xmlDoc.createElement('description'); folder.appendChild(descTag); }
-                            descTag.textContent = `${count}${suffix}`;
+                            descTag.textContent = `${totalMeters} m`;
                         }
                     }
-                }
-            });
+                    else if (folderName === 'DISTRIBUTION CABLE') {
+                        let fatCount = 0;
+                        const parentFolder = folder.parentElement;
+                        if (parentFolder) {
+                            const siblings = Array.from(parentFolder.children);
+                            const fatFolder = siblings.find(el => el.tagName === 'Folder' && el.querySelector('name')?.textContent.trim() === 'FAT');
+                            if (fatFolder) fatCount = fatFolder.getElementsByTagName('Placemark').length;
+                        }
+                        const b = 1; const c = fatCount; const a = b + c; const d = a * 20;
+                        folder.querySelectorAll('Placemark').forEach(pm => {
+                            const ls = pm.querySelector('LineString coordinates');
+                            if (ls) {
+                                const x = calculateLineLength(ls.textContent);
+                                const e = Math.ceil((x + d) * 1.05);
+                                let nameTag = Array.from(pm.children).find(child => child.tagName === 'name');
+                                if (nameTag) {
+                                    const oldName = nameTag.textContent.trim();
+                                    const regex = /(\d+)(\s*M)$/i;
+                                    if (regex.test(oldName)) { nameTag.textContent = oldName.replace(regex, e + "$2"); }
+                                }
+                                const descText = `Deskripsi :\n\nTotal Route \t : ${x} m\nTotal Slack\t : ${a} unit (${b} slack FDT & ${c} slack FAT) @20 m\nToleransi\t : 5%\n\n Total Length Cable  : ${x} + ${d} ( x 5%) = ${e} m`;
+                                let descTag = Array.from(pm.children).find(child => child.tagName === 'description');
+                                if (!descTag) { descTag = xmlDoc.createElement('description'); pm.appendChild(descTag); }
+                                descTag.textContent = descText;
+                            }
+                        });
+                    }
+                    else {
+                        let suffix = null;
+                        if (folderName === 'FAT') suffix = ' FAT';
+                        else if (folderName === 'HP COVER') suffix = ' HP';
+                        else if (folderName === 'HP UNCOVER') suffix = ' HP';
+                        else if (folderName.includes('EXISTING POLE')) suffix = ' EXT POLE';
+                        else if (folderName.includes('NEW POLE')) suffix = ' POLE';
+                        if (suffix) {
+                            const count = folder.getElementsByTagName('Placemark').length;
+                            if (count > 0) {
+                                let descTag = Array.from(folder.children).find(c => c.tagName === 'description');
+                                if (!descTag) { descTag = xmlDoc.createElement('description'); folder.appendChild(descTag); }
+                                descTag.textContent = `${count}${suffix}`;
+                            }
+                        }
+                    }
+                });
+            }
         }
 
-        // --- CORE RESTRUCTURE LOGIC ---
         function getLineContext(placemarkNode) {
             const regex = /(?:LINE|LN|KABEL)[\s\-_]+([A-Z0-9]+)/i;
             const ignoreKeywords = ['DISTRIBUTION', 'DISTRIBUSI', 'SLACK', 'SLING', 'HANGER', 'FAT', 'FDT', 'POLE', 'TIANG', 'COVER', 'ODP', 'SPLITTER'];
@@ -845,13 +811,17 @@
             const strictCableRegex = /\b\d{2,3}C\/\d{1,2}T\b/i;
 
             allPlacemarks.forEach(pm => {
+                const internalStyle = pm.querySelector('Style');
+                if(internalStyle) internalStyle.remove();
+
                 const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
-                const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                let desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                const parentFolder = pm.parentElement;
+                const parentName = (parentFolder.querySelector('name')?.textContent || '').toUpperCase().trim();
+                const grandParentName = (parentFolder.parentElement?.querySelector('name')?.textContent || '').toUpperCase().trim();
+                
                 const fullText = name + ' ' + desc;
                 const isLine = pm.querySelector('LineString') !== null;
-                const parentFolder = pm.parentElement;
-                const parentName = (parentFolder.querySelector('name')?.textContent || '').toUpperCase();
-                const grandParentName = (parentFolder.parentElement?.querySelector('name')?.textContent || '').toUpperCase();
                 
                 let lineName = 'MAIN';
                 if (CURRENT_MODE === 'cluster') {
@@ -869,17 +839,23 @@
                 
                 if (targetType === 'UNKNOWN') {
                     if (CURRENT_MODE === 'subfeeder') {
-                        if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE'))) { targetType = 'CABLE'; }
-                        else if (!isLine && (name.includes('JC') || fullText.includes('JOINT CLOSURE') || /\b(288C|144C|96C|72C|48C)\b/.test(fullText))) { targetType = 'JOINT CLOSURE'; }
-                        else {
-                            const poleMatch = targetStructure.find(type => type.includes('POLE') && (name.includes(type) || parentName.includes(type)));
-                            if (poleMatch) targetType = poleMatch;
+                        if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE') || parentName.includes('CABLE'))) { targetType = 'CABLE'; }
+                        else if (!isLine) {
+                            if (name.includes('JC') || fullText.includes('JOINT CLOSURE')) { 
+                                targetType = 'JOINT CLOSURE'; 
+                            } else if (/\b(288C|144C|96C|72C|48C)\b/.test(fullText)) { 
+                                targetType = 'FDT'; 
+                            }
+                        }
+                        if (targetType === 'UNKNOWN') {
+                             const poleMatch = targetStructure.find(type => type.includes('POLE') && (name.includes(type) || parentName.includes(type) || desc.includes(type)));
+                             if (poleMatch) targetType = poleMatch;
                         }
                     } else {
-                        if (!isLine && (name.includes('FDT') || desc.includes('FDT') || (/\b(288C|144C|96C|72C|48C)\b/.test(fullText) && !strictCableRegex.test(fullText)))) { targetType = 'FDT_GLOBAL'; }
-                        else if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE'))) targetType = 'DISTRIBUTION CABLE';
+                        if (!isLine && (name.includes('FDT') || desc.includes('FDT') || parentName.includes('FDT') || (/\b(288C|144C|96C|72C|48C)\b/.test(fullText) && !strictCableRegex.test(fullText)))) { targetType = 'FDT_GLOBAL'; }
+                        else if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE') || parentName.includes('DISTRIBUTION'))) { targetType = 'DISTRIBUTION CABLE'; }
                         else {
-                             const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
+                             const match = targetStructure.find(type => name.includes(type) || parentName.includes(type) || desc.includes(type));
                              if (match) targetType = match;
                         }
                     }
@@ -887,11 +863,18 @@
 
                 if (targetType === 'UNKNOWN') {
                     if (name.includes('SLING')) targetType = (CURRENT_MODE === 'subfeeder') ? 'UNKNOWN' : 'SLING WIRE';
-                    else if (name.includes('SLACK')) targetType = 'SLACK HANGER';
+                    else if (name.includes('SLACK') || parentName.includes('SLACK')) targetType = 'SLACK HANGER';
                     else {
                         const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
                         if(match) targetType = match;
                     }
+                }
+
+                // --- V9: PRESERVE DESC for FDT, CABLE, BOUNDARY ---
+                const PRESERVE_DESC = ['BOUNDARY FAT', 'DISTRIBUTION CABLE', 'FDT', 'CABLE'];
+                if (!PRESERVE_DESC.includes(targetType)) {
+                    const descTag = pm.querySelector('description');
+                    if (descTag) descTag.remove();
                 }
 
                 pm.remove();
@@ -980,19 +963,23 @@
                     }
                 } else {
                     if (folderName === 'CABLE') {
-                        const coreColors = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '48C': '#AA00FF' };
+                        const coreColors = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '48C': '#AA00FF', '24C': '#00FF00' };
                         const match = Object.keys(coreColors).find(k => fullText.includes(k));
                         rule = { colorCode: match ? coreColors[match] : '#00AAFF', styleLink: '-', placemark: '-' };
                     }
-                    else if (folderName === 'JOINT CLOSURE') {
-                        const isJC = name.includes('JC');
+                    else if (folderName === 'FDT') {
                         const coreMatch = fullText.match(/\b(\d+)C\b/);
                         const core = coreMatch ? coreMatch[0] : '48C';
-                        const coreMap = { '288C': '#FFAA00', '144C': '#FFFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
                         const color = coreMap[core] || '#AA00FF';
-                        
-                        if (isJC) rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
-                        else rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
+                        rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
+                    }
+                    else if (folderName === 'JOINT CLOSURE') {
+                        const coreMatch = fullText.match(/\b(\d+)C\b/);
+                        const core = coreMatch ? coreMatch[0] : '48C';
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#550000', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const color = coreMap[core] || '#AA00FF';
+                        rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
                     }
                     else if (folderName.includes('POLE')) {
                         let pColor = '#550000';
@@ -1029,9 +1016,12 @@
         }
 
         function setStyle(pm, id) {
-            let url = pm.querySelector('styleUrl');
-            if (!url) { url = pm.ownerDocument.createElement('styleUrl'); pm.appendChild(url); }
+            let oldUrl = pm.querySelector('styleUrl');
+            if(oldUrl) oldUrl.remove();
+
+            let url = pm.ownerDocument.createElement('styleUrl'); 
             url.textContent = '#' + id;
+            pm.appendChild(url);
         }
 
         function displayTree(result) {
@@ -1051,5 +1041,3 @@
     </script>
 </body>
 </html>
-
-
