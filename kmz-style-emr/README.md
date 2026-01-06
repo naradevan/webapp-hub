@@ -1,53 +1,80 @@
 # KMZ Styler EMR V17 - Dokumentasi Teknis
 
-**KMZ Styler EMR** adalah aplikasi berbasis web (Modular JS) untuk memproses, merestrukturisasi, dan memberikan styling otomatis pada file desain jaringan FTTH (KMZ/KML). Aplikasi ini mendukung dua mode utama: **Cluster Mode** (Jaringan Distribusi/Akses) dan **Subfeeder Mode** (Jaringan Feeder/Backbone).
+**KMZ Styler EMR** adalah aplikasi web modern untuk memproses, merestrukturisasi, dan memberikan styling otomatis pada desain jaringan FTTH (KMZ/KML). Aplikasi ini dirancang untuk mempercepat pekerjaan drafter dengan fitur otomatisasi cerdas.
 
-Versi ini (V17) telah dilengkapi dengan fitur **Smart Snap**, **Auto Slack Generator**, dan **Logic FDT Unik**.
+Versi ini (V17) sudah dilengkapi dengan **Smart Snap**, **Auto Slack**, **Unique FDT**, dan **Spatial Grouping**.
 
 ---
 
-## 📖 Panduan Penggunaan (Cara Pakai)
+## 📖 Panduan Penggunaan
 
-1.  **Buka Aplikasi:**
-    Buka file `index.html` menggunakan browser modern (Chrome, Edge, Firefox). Disarankan menggunakan *Live Server* jika menjalankannya dari VS Code, atau hosting statis.
+Aplikasi ini sudah berbasis web (Hosted), sehingga Anda tidak perlu instalasi apa pun.
 
+1.  **Buka Aplikasi:** Akses URL web app melalui browser Anda.
 2.  **Pilih Mode:**
-    * Klik **CLUSTER MODE** untuk desain distribusi (FAT ke Rumah).
-    * Klik **SUBFEEDER MODE** untuk desain feeder (ODC ke ODP/FAT).
+    * **CLUSTER MODE:** Untuk desain distribusi (FAT ke Rumah).
+    * **SUBFEEDER MODE:** Untuk desain feeder/backbone (ODC ke ODP).
+3.  **Upload File:** Drag & drop file `.kmz` atau `.kml` ke area upload.
+4.  **Proses:** Klik tombol **Process File** dan tunggu hingga selesai.
+5.  **Download:**
+    * **KMZ Result:** File hasil styling visual.
+    * **HPDB Result:** Laporan CSV (Database Homepass).
 
-3.  **Upload File:**
-    * Klik area kotak putus-putus atau *Drag & Drop* file `.kml` atau `.kmz` Anda ke area tersebut.
-    * Pastikan ukuran file wajar (< 10MB disarankan agar browser tidak *lag*).
+---
 
-4.  **Proses Data:**
-    * Klik tombol biru **Process File**.
-    * Tunggu hingga indikator berputar berhenti dan muncul status "✅ Done!".
-    * Anda bisa melihat *preview* struktur folder baru di bagian bawah.
+## 🚀 Fitur Unggulan & Otomatisasi
 
-5.  **Download Hasil:**
-    * Klik **Download KMZ Result** untuk mendapatkan file visual (peta).
-    * Klik **Download HPDB Result** (hanya Cluster Mode) untuk mendapatkan laporan data Homepass dalam format CSV.
+### 1. Export HPDB (FAT-Pole Mapping)
+Tidak sekadar export koordinat, fitur ini menghasilkan file CSV yang **Cerdas**:
+* **Relasi Otomatis:** Sistem secara otomatis mendeteksi dan memetakan **FAT** mana yang melayani **Tiang (Pole)** mana berdasarkan kedekatan dan struktur jaringan.
+* **Data Lengkap:** Output CSV mencakup Pole ID, Koordinat, FAT Name, dan detail lainnya siap pakai.
+
+### 2. Spatial Grouping (Auto Folder HP Cover)
+Anda tidak perlu lagi memilah homepass secara manual!
+* **Auto-Folder:** Sistem akan membaca polygon yang ada di folder `BOUNDARY FAT`.
+* **Logic:** Setiap titik Homepass (HP) akan dicek posisinya. Jika berada di dalam area polygon tertentu, titik tersebut akan **otomatis dipindahkan** ke dalam sub-folder dengan nama yang sama dengan Polygon tersebut.
+* **Auto-Description:** Jumlah HP dalam satu area boundary akan dihitung dan ditampilkan di deskripsi polygon.
+
+### 3. Auto Count & Sling Wire Calculation
+* **Placemark Counter:** Sistem otomatis menghitung jumlah aset (Tiang, FAT, HP) dalam satu folder dan menuliskannya di deskripsi folder induk (Contoh: *"24 EXT POLE"*).
+* **Sling Wire:** Menghitung total panjang jalur `SLING WIRE` secara akumulatif dan menampilkannya di deskripsi.
+
+### 4. Smart Snap (Pole Anchor)
+* Jika aset seperti **FAT** atau **SLACK HANGER** berada < 15 meter dari tiang, aset tersebut akan **digeser otomatis (Snap)** agar menempel persis di titik tiang.
+* **Pole-Safe:** Sesama tiang tidak akan saling snap/bergeser untuk menjaga akurasi titik survey.
+
+### 5. Auto Slack Generator
+* Jika folder `SLACK HANGER` kosong, sistem otomatis membuatnya dengan menyalin titik FAT dan mengambil referensi FDT yang sesuai (Unique Logic).
+* Deskripsi sampah pada hasil copy otomatis dibersihkan.
+
+### 6. Kalkulasi Material Kabel
+Pada folder `DISTRIBUTION CABLE`, sistem menyuntikkan deskripsi perhitungan:
+* **Rumus:** `(Panjang Drawing + (Total Slack x 20m)) * 1.05`
+* Menghitung estimasi kebutuhan kabel fisik termasuk toleransi 5% dan slack loop.
 
 ---
 
 ## ⚠️ Aturan Penulisan (Wajib)
 
-Sistem menggunakan *String Matching* yang sensitif terhadap spasi dan angka. Ikuti aturan ini agar styling berhasil:
+Agar fitur otomatisasi berjalan lancar, pastikan input KMZ mengikuti standar ini:
 
 ### 1. Format Kapasitas (Kabel & Perangkat)
-Penulisan kapasitas **DILARANG** menggunakan spasi antara angka dan huruf "C".
+Jangan gunakan spasi antara angka dan huruf "C".
 
 | ✅ BENAR | ❌ SALAH |
 | :--- | :--- |
-| `288C` | `288 C` (Spasi), `288Core` |
+| `288C` | `288 C`, `288Core` |
 | `144C` | `144-C` |
 | `96C` | `96 c` |
 | `48C` | `48 Core` |
 
 ### 2. Penamaan Tiang (Pole)
-Gunakan format: `STATUS` + `TIPE` + `TINGGI`.
-* **Benar:** `NEW POLE 7-4`, `EXISTING POLE EMR 9-4`.
-* **Salah:** `Tiang Baru 7m`, `Pole 7m`.
+Format: `STATUS` + `TIPE` + `TINGGI`.
+* **Contoh:** `NEW POLE 7-4`, `EXISTING POLE EMR 9-4`.
+
+### 3. Boundary Polygon
+Untuk fitur *Spatial Grouping*, pastikan polygon batas area berada di dalam folder bernama:
+* `BOUNDARY FAT` atau `BOUNDARY CLUSTER`
 
 ---
 
@@ -90,50 +117,74 @@ Warna ikon tiang membedakan tinggi dan jenisnya.
 
 ---
 
-## 🛠️ Fitur Otomatisasi (V17 Logic)
+## Struktur Folder Output (Hasil Restrukturisasi)
 
-### 1. Smart Snap (Pole-Safe)
-Fitur ini merapikan titik koordinat yang berantakan.
-* **Logika:** Jika ada aset `FAT` atau `SLACK HANGER` yang berjarak **kurang dari 15 meter** dari sebuah `POLE` (Tiang), maka aset tersebut akan **digeser otomatis** menempel persis ke koordinat tiang.
-* **Penting:** Sesama Tiang (`POLE`) **TIDAK AKAN** saling menempel/bergeser satu sama lain, menjaga akurasi data lapangan.
+Aplikasi akan memaksa struktur folder menjadi seperti ini agar rapi:
 
-### 2. Auto Slack Generator
-Jika folder `SLACK HANGER` kosong, sistem akan otomatis membuatnya:
-* **Copy FAT:** Semua FAT di dalam Line tersebut di-copy ke folder Slack.
-* **Copy FDT:** Sistem mencari FDT Global yang namanya cocok dengan FAT di Line tersebut (misal `ADBL-1.141`), lalu meng-copy-nya ke folder Slack Line tersebut.
-* **Clean Description:** Deskripsi/atribut sampah pada hasil copy otomatis dihapus agar bersih.
-
-### 3. Unique FDT (Prioritas Line)
-Untuk menghindari duplikasi FDT di banyak folder Line:
-* FDT hanya akan dicopy ke **Line Pertama** yang ditemukan (First-Come-First-Serve).
-* Contoh: Jika `FDT-01` terhubung ke `LINE A` dan `LINE C`, maka Slack FDT hanya akan muncul di `LINE A`.
-
-### 4. Kalkulasi Material
-Menambahkan deskripsi otomatis pada `DISTRIBUTION CABLE`.
-* **Rumus:** `(Panjang Drawing + (Total Slack x 20m)) * 1.05`
-* **Toleransi:** 5%.
-* **Slack:** Menghitung jumlah FAT dan FDT dalam satu jalur kabel.
-
----
-
-## 📂 Struktur Folder Output
-
-Hasil proses akan merapikan KML Anda menjadi struktur berikut:
+### Cluster Mode
 
 ```text
-📂 CLUSTER ID / ROOT
+📂 CLUSTER ID / JUDUL PROJECT
  ┣ 📂 BOUNDARY CLUSTER
- ┣ 📂 FDT (Global Folder)
+ ┣ 📂 FDT (Global)
  ┣ 📂 LINE A
  ┃  ┣ 📂 BOUNDARY FAT
  ┃  ┣ 📂 FAT
- ┃  ┣ 📂 HP COVER (Dikelompokkan per Boundary)
+ ┃  ┣ 📂 HP COVER (Berisi subfolder per FAT)
  ┃  ┣ 📂 HP UNCOVER
- ┃  ┣ 📂 EXISTING POLE ... (Sesuai Ukuran)
- ┃  ┣ 📂 NEW POLE ... (Sesuai Ukuran)
- ┃  ┣ 📂 DISTRIBUTION CABLE (Berisi kalkulasi panjang)
- ┃  ┣ 📂 SLACK HANGER (Auto-generated & Snapped)
+ ┃  ┣ 📂 EXISTING POLE EMR 7-2.5
+ ┃  ┣ 📂 EXISTING POLE EMR 7-3
+ ┃  ┣ 📂 EXISTING POLE EMR 7-4
+ ┃  ┣ 📂 EXISTING POLE EMR 9-4
+ ┃  ┣ 📂 EXISTING POLE PARTNER 7-4
+ ┃  ┣ 📂 EXISTING POLE PARTNER 9-4
+ ┃  ┣ 📂 NEW POLE 7-2.5
+ ┃  ┣ 📂 NEW POLE 7-3
+ ┃  ┣ 📂 NEW POLE 7-4
+ ┃  ┣ 📂 NEW POLE 9-4
+ ┃  ┣ 📂 DISTRIBUTION CABLE
+ ┃  ┣ 📂 SLACK HANGER
  ┃  ┗ 📂 SLING WIRE
  ┣ 📂 LINE B
- ┃  ┗ ... (Struktur serupa)
- ┗ 📂 OTHERS (Item tidak dikenal / Salah format nama)
+ ┃  ┗ ... (struktur sama)
+ ┗ 📂 OTHERS (Item yang tidak dikenali)
+
+```
+
+### Subfeeder Mode
+
+```text
+📂 SUBFEEDER ID
+ ┣ 📂 JOINT CLOSURE
+ ┣ 📂 EXISTING POLE EMR 7-2.5
+ ┣ 📂 EXISTING POLE EMR 7-3
+ ┣ 📂 EXISTING POLE EMR 7-4
+ ┣ 📂 EXISTING POLE EMR 7-5
+ ┣ 📂 EXISTING POLE EMR 9-5
+ ┣ 📂 EXISTING POLE EMR 9-4
+ ┣ 📂 EXISTING POLE PARTNER 7-4
+ ┣ 📂 EXISTING POLE PARTNER 9-4
+ ┣ 📂 NEW POLE 9-5
+ ┣ 📂 NEW POLE 7-4
+ ┣ 📂 NEW POLE 9-4
+ ┣ 📂 CABLE
+ ┗ 📂 SLACK HANGER
+
+```
+
+---
+
+## Troubleshooting
+
+**Q: Mengapa kabel saya masuk ke folder "OTHERS"?**
+A: Kemungkinan penulisan kapasitas kabel salah (misal `48 C` pakai spasi), atau tidak terdeteksi sebagai `LineString`.
+
+**Q: Mengapa Homepass (HP) tidak berwarna Hijau?**
+A: Pastikan poin HP berada secara geografis **di dalam** area polygon `BOUNDARY FAT`. Jika di luar, akan otomatis menjadi `HP UNCOVER` (Merah).
+
+**Q: Mengapa hasil CSV HPDB kosong atau koordinatnya 0?**
+A: CSV Generator membutuhkan folder bernama `FAT` dan `HP COVER`. Pastikan nama folder input Anda sesuai standar.
+
+---
+
+*Dokumentasi untuk KMZ Styler EMR V17.*
