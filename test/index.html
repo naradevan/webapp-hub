@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMZ Styler - V17 (Modular)</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+      window.addEventListener('load', function() {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-T12DERDD3M';
+        document.head.appendChild(script);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-T12DERDD3M');
+      });
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="top-right-btn">
+        <button class="btn-readme" onclick="openReadme()"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Readme / Help
+        </button>
+    </div>
+
+    <div id="readmeModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Dokumentasi & Rules</h2>
+                <button class="close-modal" id="closeModalBtn">×</button>
+            </div>
+            <div class="modal-body md-content" id="mdContainer">
+                <div style="text-align:center; padding: 2rem; color: #888;">
+                    <span class="loading-spinner"></span> Loading documentation...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>KMZ Style EMR by xsanosaurus</h1>
+            <p class="subtitle">V17 (Modular Version)</p>
+        </header>
+
+        <div class="card">
+            <div class="mode-selector">
+                <div class="mode-option active" id="btn-cluster">CLUSTER MODE</div>
+                <div class="mode-option" id="btn-subfeeder">SUBFEEDER MODE</div>
+            </div>
+
+            <label class="file-drop-area" id="dropArea">
+                <span id="fileLabel">Drag & drop KMZ/KML here or click to upload</span>
+                <input type="file" id="kmzFile" accept=".kmz, .kml" />
+            </label>
+
+            <div class="btn-group">
+                <div class="row-btn">
+                    <button id="processBtn" class="primary" disabled>Process File</button>
+                    <button id="resetBtn" class="secondary">Reset</button>
+                </div>
+            </div>
+            
+            <div id="status"></div>
+        </div>
+
+        <div id="preview" class="hidden">
+            <div class="card" style="padding: 1rem;">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Structure Preview</h3>
+                <div class="folder-list" id="folderList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
