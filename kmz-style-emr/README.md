@@ -2,7 +2,7 @@
 
 **KMZ Styler EMR** adalah aplikasi web modern untuk memproses, merestrukturisasi, dan memberikan styling otomatis pada desain jaringan FTTH (KMZ/KML). Aplikasi ini dirancang untuk mempercepat pekerjaan drafter dengan fitur otomatisasi cerdas.
 
-Versi ini (V17) sudah dilengkapi dengan **Export HPDB**, **Spatial Grouping**, **Auto Count & Sling Wire Calculation**, **Smart Snap (Pole Anchor)**, **Auto Slack Generator**, **Kalkulasi Material Kabel**,.
+Versi ini (V17) sudah dilengkapi dengan **Export HPDB**, **Spatial Grouping**, **Auto Count & Sling Wire Calculation**, **Smart Snap (Pole Anchor)**, **Auto Slack Generator**, **Kalkulasi Material Kabel**.
 
 ---
 
@@ -188,4 +188,5 @@ A: CSV Generator membutuhkan folder bernama `FAT` dan `HP COVER`. Pastikan nama 
 ---
 
 *Dokumentasi untuk KMZ Styler EMR V17.*
+
 
