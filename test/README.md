@@ -1,149 +1,119 @@
-# KMZ Styler EMR V36 - Dokumentasi Teknis
+# KMZ Styler EMR V17 - Dokumentasi Teknis
 
-**KMZ Styler EMR V36** adalah aplikasi berbasis web untuk memproses, merestrukturisasi, dan memberikan styling otomatis pada file desain jaringan FTTH (KMZ/KML). Aplikasi ini mendukung dua mode utama: **Cluster Mode** (Jaringan Distribusi/Akses) dan **Subfeeder Mode** (Jaringan Feeder/Backbone), serta mampu menghasilkan output **HPDB (Homepass Database)** dalam format CSV.
+**KMZ Styler EMR** adalah aplikasi web modern untuk memproses, merestrukturisasi, dan memberikan styling otomatis pada desain jaringan FTTH (KMZ/KML). Aplikasi ini dirancang untuk mempercepat pekerjaan drafter dengan fitur otomatisasi cerdas.
+
+Versi ini (V17) sudah dilengkapi dengan **Export HPDB**, **Spatial Grouping**, **Auto Count & Sling Wire Calculation**, **Smart Snap (Pole Anchor)**, **Auto Slack Generator**, **Kalkulasi Material Kabel**.
 
 ---
 
-## ⚠️ Aturan Penulisan (SANGAT PENTING)
+## 📖 Panduan Penggunaan
 
-Sistem ini menggunakan pencocokan teks (String Matching) dan Regular Expression (Regex) yang **Case-Insensitive** (tidak peduli huruf besar/kecil) TETAPI **sangat sensitif terhadap Spasi dan Format Angka**.
+Aplikasi ini sudah berbasis web (Hosted), sehingga Anda tidak perlu instalasi apa pun.
 
-Berikut adalah aturan ketat yang wajib diikuti pada *input* KMZ/KML agar tidak terjadi error atau gagal styling:
+1.  **Buka Aplikasi:** Akses URL web app melalui browser Anda.
+2.  **Pilih Mode:**
+    * **CLUSTER MODE:** Untuk desain distribusi (FAT ke Rumah).
+    * **SUBFEEDER MODE:** Untuk desain feeder/backbone (ODC ke ODP).
+3.  **Upload File:** Drag & drop file `.kmz` atau `.kml` ke area upload.
+4.  **Proses:** Klik tombol **Process File** dan tunggu hingga selesai.
+5.  **Download:**
+    * **KMZ Result:** File hasil styling visual.
+    * **HPDB Result:** Laporan CSV (Database Homepass).
 
-### 1. Format Penulisan Kabel (Core Capacity)
+---
 
-Penulisan kapasitas kabel **DILARANG** menggunakan spasi antara angka dan huruf "C".
+## 🚀 Fitur Unggulan & Otomatisasi
 
-| ✅ BENAR (Terbaca Sistem) | ❌ SALAH (Gagal Styling/Hitung) |
-| --- | --- |
-| `288C` | `288 C` (Ada spasi) |
-| `144C` | `144Core` |
+### 1. Export HPDB (FAT-Pole Mapping)
+Tidak sekadar export koordinat, fitur ini menghasilkan file CSV yang **Cerdas**:
+* **Relasi Otomatis:** Sistem secara otomatis mendeteksi dan memetakan **FAT** mana yang melayani **Tiang (Pole)** mana berdasarkan kedekatan dan struktur jaringan.
+* **Data Lengkap:** Output CSV mencakup Pole ID, Koordinat, FAT Name, dan detail lainnya siap pakai.
+
+### 2. Spatial Grouping (Auto Folder HP Cover)
+Anda tidak perlu lagi memilah homepass secara manual!
+* **Auto-Folder:** Sistem akan membaca polygon yang ada di folder `BOUNDARY FAT`.
+* **Logic:** Setiap titik Homepass (HP) akan dicek posisinya. Jika berada di dalam area polygon tertentu, titik tersebut akan **otomatis dipindahkan** ke dalam sub-folder dengan nama yang sama dengan Polygon tersebut.
+* **Auto-Description:** Jumlah HP dalam satu area boundary akan dihitung dan ditampilkan di deskripsi polygon.
+
+### 3. Auto Count & Sling Wire Calculation
+* **Placemark Counter:** Sistem otomatis menghitung jumlah aset (Tiang, FAT, HP) dalam satu folder dan menuliskannya di deskripsi folder induk (Contoh: *"24 EXT POLE"*).
+* **Sling Wire:** Menghitung total panjang jalur `SLING WIRE` secara akumulatif dan menampilkannya di deskripsi.
+
+### 4. Smart Snap (Pole Anchor)
+* Jika aset seperti **FAT** atau **SLACK HANGER** berada < 15 meter dari tiang, aset tersebut akan **digeser otomatis (Snap)** agar menempel persis di titik tiang.
+* **Pole-Safe:** Sesama tiang tidak akan saling snap/bergeser untuk menjaga akurasi titik survey.
+
+### 5. Auto Slack Generator
+* Jika folder `SLACK HANGER` kosong, sistem otomatis membuatnya dengan menyalin titik FAT dan mengambil referensi FDT yang sesuai (Unique Logic).
+* Deskripsi sampah pada hasil copy otomatis dibersihkan.
+
+### 6. Kalkulasi Material Kabel
+Pada folder `DISTRIBUTION CABLE`, sistem menyuntikkan deskripsi perhitungan:
+* **Rumus:** `(Panjang Drawing + (Total Slack x 20m)) * 1.05`
+* Menghitung estimasi kebutuhan kabel fisik termasuk toleransi 5% dan slack loop.
+
+---
+
+## ⚠️ Aturan Penulisan (Wajib)
+
+Agar fitur otomatisasi berjalan lancar, pastikan input KMZ mengikuti standar ini:
+
+### 1. Format Kapasitas (Kabel & Perangkat)
+Jangan gunakan spasi antara angka dan huruf "C".
+
+| ✅ BENAR | ❌ SALAH |
+| :--- | :--- |
+| `288C` | `288 C`, `288Core` |
+| `144C` | `144-C` |
 | `96C` | `96 c` |
-| `48C` | `48-C` |
-| `24C` | `24 Core` |
+| `48C` | `48 Core` |
 
-> **Catatan:** Untuk kabel distribusi, sistem juga mengenali format spesifikasi lengkap seperti `24C/4T` asalkan format `24C`-nya menyambung.
+### 2. Penamaan Tiang (Pole)
+Format: `STATUS` + `TIPE` + `TINGGI`.
+* **Contoh:** `NEW POLE 7-4`, `EXISTING POLE EMR 9-4`.
 
-### 2. Format Penulisan Tiang (Pole)
-
-Nama folder atau placemark tiang harus mengandung kata kunci spesifik agar warna tiang sesuai dengan spesifikasi (Hijau, Merah, Ungu, dll).
-
-* **Format Wajib:** `STATUS` + `TIPE` + `TINGGI`.
-* **Contoh Valid:**
-* `NEW POLE 7-4` (Otomatis warna Hijau)
-* `NEW POLE 9-4` (Otomatis warna Merah)
-* `EXISTING POLE EMR 7-3`
-
-
-* **Contoh Tidak Valid:** `Tiang Baru 7m` (Akan masuk ke kategori default/Unknown).
-
-### 3. Penandaan Line / Jalur
-
-Agar folder terkelompok otomatis ke dalam `LINE A`, `LINE B`, dst., Placemark harus berada di dalam folder yang namanya mengandung:
-
-* `LINE A` atau `LN A`
-* `LINE B` atau `LN B`
-* **Hindari:** Menamai Line hanya dengan angka (misal: "1", "2") karena bisa tertukar dengan angka pada spesifikasi kabel.
-
-### 4. Polygon Boundary (Untuk Cluster Mode)
-
-Untuk fitur **Spatial Grouping** (Otomatis memasukkan HP ke dalam folder Boundary), nama Folder atau Placemark Polygon harus mengandung kata:
-
+### 3. Boundary Polygon
+Untuk fitur *Spatial Grouping*, pastikan polygon batas area berada di dalam folder bernama:
 * `BOUNDARY FAT` atau `BOUNDARY CLUSTER`
 
 ---
 
-## Fitur Utama
+## 🎨 Standar Warna & Styling
 
-### 1. Mode Proses
+Sistem menerapkan kode warna heksadesimal secara otomatis. Tidak hanya kabel, warna **FDT (ODC)** dan **Joint Closure (JC)** juga mengikuti kapasitasnya.
 
-* **Cluster Mode:** Fokus pada desain distribusi (FAT, ODP, Tiang, Kabel Distribusi 24C-48C, Homepass).
-* **Subfeeder Mode:** Fokus pada desain feeder (Joint Closure, Kabel Kapasitas Besar 96C-288C, Tiang).
+### 1. Kabel, FDT, & Joint Closure
+Warna ditentukan berdasarkan kapasitas *core* terbesar yang terdeteksi pada nama/deskripsi aset.
 
-### 2. Otomatisasi
+| Kapasitas Core | Warna Visual | Hex Code | Penggunaan |
+| :--- | :--- | :--- | :--- |
+| **288C** | 🟠 Orange | `#FFAA00` | Feeder / Backbone Utama |
+| **144C** | 🟡 Kuning | `#FFFF00` | Feeder / Distribusi Padat |
+| **96C** | 🔴 Merah | `#FF0000` | Feeder / Distribusi |
+| **72C** | 🔵 Biru Tua | `#0000FF` | Distribusi |
+| **48C** | 🟣 Ungu | `#AA00FF` | Distribusi / FDT Kecil |
+| **24C** | 🟢 Hijau | `#00FF00` | Distribusi Ujung |
 
-* **Restructuring:** Merapikan struktur folder yang berantakan menjadi hierarki standar (`LINE` -> `JENIS ASET`).
-* **Styling:** Memberikan warna dan ikon otomatis berdasarkan jenis aset.
-* **Auto-Reposition (Snap):** Jika titik tiang dan titik slack berdekatan (<15m), koordinat slack akan disamakan persis dengan tiang (menghindari *dangling points*).
-* **Calculation:** Menghitung total panjang kabel + toleransi 5% + Slack Loop.
+> **Catatan:**
+> * **FDT/ODC** akan menggunakan ikon *Paddle/Kotak* dengan warna sesuai kapasitas masuk (Input).
+> * **Joint Closure (JC)** akan menggunakan ikon *Bulat/Circle* dengan warna sesuai kapasitas sambungan.
 
----
+### 2. Tiang (Poles)
+Warna ikon tiang membedakan tinggi dan jenisnya.
 
-## Standar Warna & Styling
+| Tipe Tiang | Warna Icon | Kriteria Nama |
+| :--- | :--- | :--- |
+| **Tiang 9 Meter** | 🔴 Merah | `9-4`, `9-5` |
+| **Tiang 7M (Standard)** | 🟢 Hijau | `7-4`, `7-5` |
+| **Tiang 7M (Kecil)** | 🔵 Biru Muda | `7-3` |
+| **Tiang 7M (Mini)** | 🟣 Ungu | `7-2.5` |
+| **Existing (Semua Ukuran)** | 🟤 Coklat | `EXISTING` |
 
-Sistem akan menerapkan kode warna heksadesimal berikut secara otomatis:
-
-### Kabel (LineString)
-
-Warna kabel ditentukan berdasarkan kapasitas core yang terdeteksi dalam nama/deskripsi:
-
-| Kapasitas | Warna | Hex Code |
-| --- | --- | --- |
-| **288C** | 🟠 Orange | `#FFAA00` |
-| **144C** | 🟡 Kuning | `#FFFF00` |
-| **96C** | 🔴 Merah | `#FF0000` |
-| **72C** | 🔵 Biru Tua | `#0000FF` / `#550000` |
-| **48C** | 🟣 Ungu | `#AA00FF` |
-| **24C** | 🟢 Hijau | `#00FF00` |
-
-### Tiang (Poles)
-
-Styling tiang didasarkan pada nama tiang/folder:
-
-| Tipe Tiang | Kriteria Nama | Warna Icon |
-| --- | --- | --- |
-| **Tiang 9m** | `9-4` / `9-5` | 🔴 Merah |
-| **Tiang 7m (Standard)** | `7-4` / `7-5` | 🟢 Hijau |
-| **Tiang 7m (Kecil)** | `7-3` | 🔵 Cyan/Biru Muda |
-| **Tiang 7m (Mini)** | `7-2.5` | 🟣 Ungu |
-| **Existing** | `EXISTING` | 🟤 Coklat Gelap |
-
-### Aset Lainnya
-
-* **FAT/ODP:** Ikon Kuning.
-* **HP COVER:** Ikon Hijau (Dalam area Boundary).
-* **HP UNCOVER:** Ikon Merah (Di luar area Boundary).
-* **SLACK:** Ikon Merah (Simbol lingkaran/target).
-
----
-
-## Kalkulasi Material (Cluster Mode)
-
-Aplikasi akan otomatis menyuntikkan data perhitungan ke dalam **Description** pada setiap segmen kabel `DISTRIBUTION CABLE`.
-
-**Rumus Kalkulasi:**
-
-```text
-Total Panjang = (Panjang Drawing + (Jumlah Slack * 20m)) * 105%
-
-```
-
-* **Slack:** Diasumsikan 1 Slack FDT dan 1 Slack FAT (Total 2 titik) per segmen jika terhubung ke folder FAT.
-* **Toleransi:** 5% (Faktor pengali 1.05).
-* **Output:** Ditulis otomatis di deskripsi KMZ, contoh: `Total Length Cable : 150 + 40 (x 5%) = 199.5 m`.
-
----
-
-## Panduan Penggunaan
-
-1. **Siapkan File:** Pastikan file Anda berformat `.kml` atau `.kmz`.
-2. **Pilih Mode:**
-* Klik **CLUSTER MODE** untuk desain distribusi ke rumah.
-* Klik **SUBFEEDER MODE** untuk desain jalur utama/backbone.
-
-
-3. **Upload:** Drag & drop file ke area kotak putus-putus.
-4. **Proses:** Klik tombol biru **Process File**.
-5. **Review:**
-* Lihat "Structure Preview" di bagian bawah untuk memastikan folder `LINE A`, `LINE B`, dll terbentuk.
-* Cek status "Done".
-
-
-6. **Download:**
-* **Download KMZ Result:** Untuk file hasil styling.
-* **Download HPDB Result:** Untuk file CSV database Homepass (Hanya di Cluster Mode).
-
-
+### 3. Aset Lainnya
+* **BOUNDARY:** Garis Putih Transparan.
+* **HP COVER:** Ikon Hijau (Rumah dalam area Boundary).
+* **HP UNCOVER:** Ikon Merah (Rumah di luar area Boundary).
+* **SLACK HANGER:** Ikon Merah (Target/Lingkaran).
 
 ---
 
@@ -217,6 +187,7 @@ A: CSV Generator membutuhkan folder bernama `FAT` dan `HP COVER`. Pastikan nama 
 
 ---
 
-*Dokumentasi diperbarui untuk KMZ Styler V36 (Multi-Line Support).*
+*Dokumentasi untuk KMZ Styler EMR V17.*
+
 
 
