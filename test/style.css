@@ -193,6 +193,36 @@ button.success:hover {
     filter: brightness(1.1);
 }
 
+/* --- OPTIONS (CHECKBOX) --- */
+.options-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.checkbox-container:hover {
+    color: var(--text-main);
+}
+
+.checkbox-container input {
+    accent-color: var(--primary); /* Warna kotak centang */
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    display: block; /* Pastikan display block agar tidak kena display:none global */
+}
+
 /* --- UTILS & STATUS --- */
 #status {
     margin-top: 1.5rem;
@@ -472,4 +502,5 @@ button.success:hover {
 
 .md-content a:hover {
     text-decoration: underline;
+
 }
