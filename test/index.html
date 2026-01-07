@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler - V17 (Modular + Single File)</title>
+    <title>KMZ Styler - V17 (Smart Sort FDT)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -204,7 +204,7 @@
     <div class="container">
         <header>
             <h1>KMZ Style EMR by xsanosaurus</h1>
-            <p class="subtitle">V17 (Modular Version)</p>
+            <p class="subtitle">V17 (Modular + Smart Sort)</p>
         </header>
 
         <div class="card">
@@ -365,14 +365,7 @@
         // ==========================================
         function generateHPDB(xmlDoc, rootNameRaw) {
             const headers = [
-                'Pole ID', 'Pole Latitude', 'Pole Longitude', 'FAT Address', 'Province', 
-                'regency_city', 'district', 'subdistrict', 'postalcode', 'Roll_Out_ID', 
-                'acquisition_class', 'acquisition_tier', 'competition', 'project_id', 'Area', 
-                'Complex_name', 'Clustername', 'Commercial_name', 'Rw', 'Rt', 'address_prefix', 
-                'street', 'address_suffix', 'sub_address_prefix', 'sub_address', 'sub_address_suffix', 
-                'block', 'homenumber', 'dwelling_type', 'building_type', 'building_property_name', 
-                'building_property_location', 'floor', 'unit', 'homepass_source', 'oltcode', 
-                'fdtcode', 'fatcode', 'RFSDate', 'Latitude_homepass', 'Longitude_homepass', 'residential_service_ready'
+                'Pole ID', 'Pole Latitude', 'Pole Longitude', 'homenumber', 'LineFDT', 'fatCode', 'Latitude_homepass', 'Longitude_homepass'
             ];
             
             let csvContent = headers.join(',') + '\n';
@@ -440,10 +433,10 @@
                             if (pt) {
                                 const hpName = hp.querySelector('name')?.textContent.trim() || '';
                                 const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
+                                // Updated row without trailing empty string
                                 const row = [
-                                    `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
-                                    'JLN.', '', '', '', '', '', '', `"${hpName}"`, '', '', '', '', '', '', '', '', '', 
-                                    `"${lineName}"`, `"${fatCode}"`, '', hpLat, hpLon, ''
+                                    `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, `"${hpName}"`, 
+                                    `"${lineName}"`, `"${fatCode}"`, hpLat, hpLon
                                 ];
                                 csvContent += row.join(',') + '\n';
                             }
@@ -458,6 +451,31 @@
         // ==========================================
         // 4. CORE.JS (Restructure, Helpers)
         // ==========================================
+        
+        // --- HELPER UNTUK SORTING FDT 1, 2, 3... ---
+        function sortFDTLines(a, b) {
+            // Regex buat ambil angka setelah tulisan FDT
+            // Contoh "LINE A FDT 12" -> dapat "12"
+            const regex = /FDT\s*(\d+)/i;
+            const matchA = a.match(regex);
+            const matchB = b.match(regex);
+
+            if (matchA && matchB) {
+                const numA = parseInt(matchA[1], 10);
+                const numB = parseInt(matchB[1], 10);
+
+                // 1. Bandingkan Angka FDT nya dulu (1 vs 2)
+                if (numA !== numB) {
+                    return numA - numB;
+                }
+                // 2. Kalau angkanya sama (misal sama2 FDT 1), baru urut abjad (A vs B)
+                return a.localeCompare(b);
+            }
+
+            // Kalau gak ada tulisan FDT nya, urut abjad biasa
+            return a.localeCompare(b);
+        }
+
         function restructureKML(xmlDoc, mode) {
             const kmlDoc = xmlDoc.querySelector('Document');
             const targetStructure = (mode === 'subfeeder') ? STRUCTURE_SUBFEEDER : STRUCTURE_CLUSTER;
@@ -581,7 +599,8 @@
                     } else { root.appendChild(createFolder(xmlDoc, folderName, [])); }
                 });
             } else {
-                Object.keys(lineBuckets).sort().forEach(ln => {
+                // APPLY CUSTOM SORT HERE
+                Object.keys(lineBuckets).sort(sortFDTLines).forEach(ln => {
                     let targetContainer = root;
                     if (ln !== 'MAIN') {
                         const lnFolder = xmlDoc.createElement('Folder');
@@ -602,7 +621,7 @@
             }
             if (othersBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'OTHERS', othersBucket));
             kmlDoc.appendChild(root);
-            return { mode: mode, lines: Object.keys(lineBuckets), rootName: detectedRootName };
+            return { mode: mode, lines: Object.keys(lineBuckets).sort(sortFDTLines), rootName: detectedRootName };
         }
 
         function determineLineName(pm, rootName, structureList) {
@@ -1159,7 +1178,7 @@
                 <h1>Panduan Singkat V17</h1>
                 <ul>
                     <li><strong>Checkbox Hitung Material:</strong> Jika dicentang, sistem akan menghitung total route, slack, dan toleransi (5%) pada kabel di folder <code>DISTRIBUTION CABLE</code> (Cluster) atau <code>CABLE</code> (Subfeeder).</li>
-                    <li><strong>Styling:</strong> Tetap berjalan meskipun kalkulasi dimatikan.</li>
+                    <li><strong>Smart Sorting:</strong> Urutan folder LINE akan diprioritaskan berdasarkan nomor FDT (1, 2, 3...) terlebih dahulu, kemudian urutan abjad (LINE A, LINE B).</li>
                     <li><strong>Mode:</strong> Cluster (Default) atau Subfeeder.</li>
                 </ul>
                 <p>Silakan drag & drop file KMZ Anda untuk memulai.</p>
