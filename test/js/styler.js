@@ -86,7 +86,7 @@ export function applyStyles(xmlDoc, mode) {
                 
                 if (folderName === 'BOUNDARY FAT') lineWidth = 3;       // Tebal garis Boundary
                 if (folderName === 'DISTRIBUTION CABLE') lineWidth = 4; // Tebal kabel Distribusi
-                if (folderName === 'SLING WIRE') lineWidth = 1;         // Tebal Sling Wire (tipis aja)
+                if (folderName === 'SLING WIRE') lineWidth = 4;         // Tebal Sling Wire (tipis aja)
             }
 
             // --- 3. BUAT ID STYLE UNIK ---
@@ -125,3 +125,4 @@ function setStyle(pm, id) {
     url.textContent = '#' + id;
     pm.appendChild(url);
 }
+
