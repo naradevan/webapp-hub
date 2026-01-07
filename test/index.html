@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler - V17 (Modular)</title>
+    <title>KMZ Styler - V17 (Modular + Single File)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -21,12 +21,168 @@
       });
     </script>
     
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- VARIABLE & RESET --- */
+        :root {
+            --bg-body: #0d0d0d;
+            --bg-surface: #171717;
+            --bg-surface-hover: #222;
+            --border: #333;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #ededed;
+            --text-muted: #888;
+            --success: #22c55e;
+            --error: #ef4444;
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-top: 5vh;
+        }
+
+        /* --- LAYOUT --- */
+        .container { width: 100%; max-width: 680px; padding: 0 1.5rem; }
+        header { margin-bottom: 2rem; text-align: center; }
+        h1 {
+            font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 0.5rem;
+            background: linear-gradient(to bottom right, #fff, #888);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+        .card {
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- MODE SELECTOR --- */
+        .mode-selector { display: flex; background: #222; padding: 4px; border-radius: 8px; margin-bottom: 1.5rem; }
+        .mode-option {
+            flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+            color: var(--text-muted); border-radius: 6px; transition: all 0.2s;
+        }
+        .mode-option.active { color: #fff; background: var(--primary); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+
+        /* --- UPLOAD AREA --- */
+        .file-drop-area {
+            border: 2px dashed var(--border); border-radius: var(--radius); height: 140px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease; background: rgba(255, 255, 255, 0.01);
+            margin-bottom: 1.5rem; color: var(--text-muted);
+        }
+        .file-drop-area:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); color: var(--text-main); }
+        .file-drop-area.active { border-color: var(--success); background: rgba(34, 197, 94, 0.05); }
+        #fileLabel { font-size: 0.95rem; pointer-events: none; transition: color 0.2s; }
+        input[type="file"] { display: none; }
+
+        /* --- CHECKBOX CUSTOM --- */
+        .checkbox-wrapper {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 1.5rem; color: var(--text-main); font-size: 0.9rem;
+            user-select: none;
+        }
+        .checkbox-wrapper input { cursor: pointer; margin-right: 5px; accent-color: var(--primary); transform: scale(1.2); }
+
+        /* --- BUTTONS --- */
+        .btn-group { display: flex; gap: 10px; justify-content: center; flex-direction: column; }
+        .row-btn { display: flex; gap: 10px; justify-content: center; }
+        button {
+            padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; border: none;
+        }
+        button.primary { background: var(--primary); color: white; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2); }
+        button.primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+        button.primary:disabled { background: var(--bg-surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
+        button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        button.secondary:hover { border-color: var(--text-muted); background: var(--bg-surface-hover); }
+        button.success { background: var(--success); color: white; margin-top: 10px; }
+        button.success:hover { filter: brightness(1.1); }
+
+        /* --- UTILS & STATUS --- */
+        #status { margin-top: 1.5rem; font-size: 0.9rem; text-align: center; min-height: 24px; }
+        .hidden { display: none; }
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+            border-top-color: #fff; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: text-bottom;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* --- FOLDER PREVIEW TREE --- */
+        .folder-list {
+            background: #111; border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1rem; max-height: 400px; overflow-y: auto;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 0.85rem;
+        }
+        .tree-item { margin-left: 1.5rem; border-left: 1px solid #333; padding-left: 0.75rem; margin-bottom: 0.25rem; position: relative; }
+        .tree-folder { color: #fbbf24; font-weight: 600; }
+        .tree-subfolder { color: #4ade80; }
+        .tree-info { color: #666; font-size: 0.8em; margin-left: 0.5rem; }
+
+        /* --- README BUTTON & MODAL --- */
+        .top-right-btn { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 100; }
+        .btn-readme {
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-readme:hover { border-color: var(--primary); color: var(--text-main); background: rgba(59, 130, 246, 0.1); }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); z-index: 1000;
+            display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
+            width: 90%; max-width: 800px; max-height: 85vh; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.open .modal-box { transform: translateY(0); }
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+            align-items: center; background: #111; border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .modal-header h2 { font-size: 1.2rem; margin: 0; color: var(--text-main); }
+        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+        .close-modal:hover { color: var(--error); }
+        .modal-body { padding: 2rem; overflow-y: auto; font-size: 0.95rem; line-height: 1.6; color: #ccc; }
+        
+        /* Markdown Styles */
+        .md-content h1, .md-content h2 { color: var(--text-main); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .md-content h3 { color: var(--primary); margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .md-content ul, .md-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        .md-content li { margin-bottom: 0.5rem; }
+        .md-content code { background: #222; padding: 2px 6px; border-radius: 4px; color: #fbbf24; font-family: monospace; border: 1px solid #333; }
+        .md-content pre { background: #111; padding: 1rem; border-radius: 6px; border: 1px solid #333; overflow-x: auto; margin-bottom: 1rem; }
+        .md-content blockquote { border-left: 3px solid var(--primary); background: rgba(59, 130, 246, 0.1); padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+        .md-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        .md-content th, .md-content td { border: 1px solid #444; padding: 10px; text-align: left; }
+        .md-content th { background: #222; color: #fff; font-weight: 600; }
+        .md-content tr:nth-child(even) { background: #1a1a1a; }
+        .md-content a { color: var(--primary); text-decoration: none; }
+        .md-content a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
 
     <div class="top-right-btn">
-        <button class="btn-readme" onclick="openReadme()"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        <button class="btn-readme" onclick="openReadme()"> 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             Readme / Help
         </button>
     </div>
@@ -62,13 +218,10 @@
                 <input type="file" id="kmzFile" accept=".kmz, .kml" />
             </label>
 
-            <div class="options-wrapper">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="calcOption" checked>
-                    <span class="checkmark"></span>
-                    Enable Cable Calculation
-                </label>
-            </div>
+            <label class="checkbox-wrapper" title="Uncheck untuk mematikan kalkulasi otomatis (Slack, Total, Toleransi) pada kabel">
+                <input type="checkbox" id="calcCableCheck" checked>
+                <span>Hitung Material Kabel (Slack & Route)</span>
+            </label>
 
             <div class="btn-group">
                 <div class="row-btn">
@@ -88,8 +241,945 @@
         </div>
     </div>
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module">
+        // ==========================================
+        // 1. CONFIG.JS
+        // ==========================================
+        const TEXT_SIZE = 1.0;
+        const SNAP_TOLERANCE_METERS = 15;
+
+        const STRUCTURE_CLUSTER = [
+            'BOUNDARY FAT', 'FAT', 'HP COVER', 'HP UNCOVER',
+            'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 'EXISTING POLE EMR 9-4',
+            'EXISTING POLE PARTNER 7-4', 'EXISTING POLE PARTNER 9-4',
+            'NEW POLE 7-2.5', 'NEW POLE 7-3', 'NEW POLE 7-4', 'NEW POLE 9-4',
+            'DISTRIBUTION CABLE', 'SLACK HANGER', 'SLING WIRE'
+        ];
+
+        const STRUCTURE_SUBFEEDER = [
+            'FDT', 'JOINT CLOSURE', 'EXISTING POLE EMR 7-2.5', 'EXISTING POLE EMR 7-3', 'EXISTING POLE EMR 7-4', 
+            'EXISTING POLE EMR 7-5', 'EXISTING POLE EMR 9-5', 'EXISTING POLE EMR 9-4', 
+            'EXISTING POLE PARTNER 7-4', 'EXISTING POLE PARTNER 9-4', 'NEW POLE 7-5', 'NEW POLE 9-5', 
+            'NEW POLE 7-4', 'NEW POLE 9-4', 'CABLE', 'SLACK HANGER'
+        ];
+
+        const RULES_CLUSTER = [
+            { folder: '-', placemark: '288C', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '144C', line: '-', polygon: '-', colorCode: '#AAFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '96C', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '72C', line: '-', polygon: '-', colorCode: '#0000FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: '-', placemark: '48C', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: 'BOUNDARY FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#009999', styleLink: '-' },
+            { folder: 'FAT', placemark: '-', line: '-', polygon: '-', colorCode: '#FFFF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/triangle.png' },
+            { folder: 'HP COVER', placemark: '-', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            { folder: 'HP UNCOVER', placemark: '-', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png' },
+            { folder: 'NEW POLE 9-4', placemark: 'NEW POLE 9-4', line: '-', polygon: '-', colorCode: '#FF0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-4', placemark: 'NEW POLE 7-4', line: '-', polygon: '-', colorCode: '#00FF00', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-3', placemark: 'NEW POLE 7-3', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'NEW POLE 7-2.5', placemark: 'NEW POLE 7-2.5', line: '-', polygon: '-', colorCode: '#AA00FF', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-2.5', placemark: 'EXISTING POLE EMR 7-2.5', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-3', placemark: 'EXISTING POLE EMR 7-3', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 7-4', placemark: 'EXISTING POLE EMR 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE EMR 9-4', placemark: 'EXISTING POLE EMR 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 7-4', placemark: 'EXISTING POLE PARTNER 7-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'EXISTING POLE PARTNER 9-4', placemark: 'EXISTING POLE PARTNER 9-4', line: '-', polygon: '-', colorCode: '#550000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '24C', polygon: '-', colorCode: '#00FF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '36C', polygon: '-', colorCode: '#FF00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '48C', polygon: '-', colorCode: '#AA00FF', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '72C', polygon: '-', colorCode: '#550000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '96C', polygon: '-', colorCode: '#FF0000', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '144C', polygon: '-', colorCode: '#FFFF00', styleLink: '-' },
+            { folder: 'DISTRIBUTION CABLE', placemark: '-', line: '288C', polygon: '-', colorCode: '#FFAA00', styleLink: '-' },
+            { folder: 'SLING WIRE', placemark: '-', line: '-', polygon: '-', colorCode: '#00FFFF', styleLink: '-' },
+            { folder: 'FDT', placemark: 'FDT', line: '-', polygon: '-', colorCode: '#AA0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png' },
+            { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
+        ];
+
+        const RULES_SUBFEEDER = [
+            { folder: 'SLACK HANGER', placemark: 'SLACK', line: '-', polygon: '-', colorCode: '#ff0000', styleLink: 'http://maps.google.com/mapfiles/kml/shapes/target.png' }
+        ];
+
+        // ==========================================
+        // 2. UTILS.JS
+        // ==========================================
+        function toRad(val) { return val * Math.PI / 180; }
+
+        function haversine(pt1, pt2) {
+            const R = 6371000; 
+            const dLat = toRad(pt2.lat - pt1.lat);
+            const dLon = toRad(pt2.lon - pt1.lon);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(pt1.lat)) * Math.cos(toRad(pt2.lat)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function isPointInPolygon(p, vs) {
+            let inside = false;
+            for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                const xi = vs[i].lon, yi = vs[i].lat;
+                const xj = vs[j].lon, yj = vs[j].lat;
+                const intersect = ((yi > p.lat) !== (yj > p.lat)) && (p.lon < (xj - xi) * (p.lat - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function distToSegment(p, v, w) {
+            const l2 = ((v.lon - w.lon)**2 + (v.lat - w.lat)**2);
+            if (l2 == 0) return haversine(p, v);
+            let t = ((p.lon - v.lon) * (w.lon - v.lon) + (p.lat - v.lat) * (w.lat - v.lat)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            const projection = { lon: v.lon + t * (w.lon - v.lon), lat: v.lat + t * (w.lat - v.lat) };
+            return haversine(p, projection);
+        }
+
+        function getMinDistToCables(point, cables) {
+            let minD = Infinity;
+            cables.forEach(cable => {
+                for (let i = 0; i < cable.length - 1; i++) {
+                    const d = distToSegment(point, cable[i], cable[i+1]);
+                    if (d < minD) minD = d;
+                }
+            });
+            return minD;
+        }
+
+        function calculateLineLength(coordString) {
+            const parts = coordString.trim().split(/\s+/);
+            if (parts.length < 2) return 0;
+            const points = parts.map(p => { const [lon, lat] = p.split(',').map(Number); return { lon, lat }; });
+            let totalDist = 0;
+            for (let i = 0; i < points.length - 1; i++) { totalDist += haversine(points[i], points[i+1]); }
+            return Math.ceil(totalDist);
+        }
+
+        function createName(xml, text) { const n = xml.createElement('name'); n.textContent = text; return n; }
+        function createFolder(xml, name, items) { 
+            const f = xml.createElement('Folder'); 
+            f.appendChild(createName(xml, name)); 
+            items.forEach(i => f.appendChild(i)); 
+            return f; 
+        }
+
+        // ==========================================
+        // 3. HPDB.JS
+        // ==========================================
+        function generateHPDB(xmlDoc, rootNameRaw) {
+            const headers = [
+                'Pole ID', 'Pole Latitude', 'Pole Longitude', 'FAT Address', 'Province', 
+                'regency_city', 'district', 'subdistrict', 'postalcode', 'Roll_Out_ID', 
+                'acquisition_class', 'acquisition_tier', 'competition', 'project_id', 'Area', 
+                'Complex_name', 'Clustername', 'Commercial_name', 'Rw', 'Rt', 'address_prefix', 
+                'street', 'address_suffix', 'sub_address_prefix', 'sub_address', 'sub_address_suffix', 
+                'block', 'homenumber', 'dwelling_type', 'building_type', 'building_property_name', 
+                'building_property_location', 'floor', 'unit', 'homepass_source', 'oltcode', 
+                'fdtcode', 'fatcode', 'RFSDate', 'Latitude_homepass', 'Longitude_homepass', 'residential_service_ready'
+            ];
+            
+            let csvContent = headers.join(',') + '\n';
+            
+            const rootFolder = Array.from(xmlDoc.querySelectorAll('Folder')).find(f => {
+                const n = f.querySelector('name');
+                return n && n.textContent === rootNameRaw;
+            });
+
+            if (!rootFolder) return csvContent; 
+
+            const lineFolders = Array.from(rootFolder.children).filter(child => child.tagName === 'Folder' && child.querySelector('name')?.textContent !== 'OTHERS' && child.querySelector('name')?.textContent !== 'FDT');
+
+            lineFolders.forEach(lineFolder => {
+                const lineName = lineFolder.querySelector('name').textContent.trim(); 
+
+                const fatFolder = Array.from(lineFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === 'FAT');
+                const localFatPoints = [];
+                if (fatFolder) {
+                    fatFolder.querySelectorAll('Placemark').forEach(pm => {
+                        const pt = pm.querySelector('Point coordinates');
+                        if(pt) {
+                            const name = pm.querySelector('name')?.textContent.trim() || 'FAT';
+                            const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                            localFatPoints.push({ name, lon, lat });
+                        }
+                    });
+                }
+
+                const localPolePoints = [];
+                const subFolders = Array.from(lineFolder.querySelectorAll('Folder'));
+                subFolders.forEach(f => {
+                    const n = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
+                    if (n.includes('POLE') || n.includes('TIANG')) {
+                        f.querySelectorAll('Placemark').forEach(pm => {
+                            const pt = pm.querySelector('Point coordinates');
+                            if(pt) {
+                                const name = pm.querySelector('name')?.textContent.trim() || 'Unknown';
+                                const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                                localPolePoints.push({ name, lon, lat });
+                            }
+                        });
+                    }
+                });
+
+                const hpCoverFolder = Array.from(lineFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === 'HP COVER');
+                if (hpCoverFolder) {
+                    const fatSubFolders = Array.from(hpCoverFolder.querySelectorAll('Folder')); 
+                    
+                    fatSubFolders.forEach(sub => {
+                        const subName = sub.querySelector('name').textContent.trim(); 
+                        const fatCode = subName.slice(-3); 
+                        
+                        let anchorFat = localFatPoints.find(f => f.name.toUpperCase().includes(fatCode.toUpperCase()));
+                        
+                        let anchorPole = { name: '', lon: '', lat: '' };
+                        if (anchorFat && localPolePoints.length > 0) {
+                            const exactMatch = localPolePoints.find(p => haversine(p, anchorFat) < 0.5);
+                            if (exactMatch) { anchorPole = exactMatch; } 
+                            else { anchorPole = localPolePoints.sort((a, b) => haversine(a, anchorFat) - haversine(b, anchorFat))[0]; }
+                        }
+
+                        sub.querySelectorAll('Placemark').forEach(hp => {
+                            const pt = hp.querySelector('Point coordinates');
+                            if (pt) {
+                                const hpName = hp.querySelector('name')?.textContent.trim() || '';
+                                const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
+                                const row = [
+                                    `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
+                                    'JLN.', '', '', '', '', '', '', `"${hpName}"`, '', '', '', '', '', '', '', '', '', 
+                                    `"${lineName}"`, `"${fatCode}"`, '', hpLat, hpLon, ''
+                                ];
+                                csvContent += row.join(',') + '\n';
+                            }
+                        });
+                    });
+                }
+            });
+
+            return csvContent;
+        }
+
+        // ==========================================
+        // 4. CORE.JS (Restructure, Helpers)
+        // ==========================================
+        function restructureKML(xmlDoc, mode) {
+            const kmlDoc = xmlDoc.querySelector('Document');
+            const targetStructure = (mode === 'subfeeder') ? STRUCTURE_SUBFEEDER : STRUCTURE_CLUSTER;
+
+            let boundaryClusterNode = null;
+            const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
+            const boundaryOriginal = allFolders.find(f => f.querySelector('name')?.textContent?.toUpperCase().includes('BOUNDARY CLUSTER'));
+            
+            let detectedRootName = (mode === 'subfeeder') ? 'SUBFEEDER ID' : 'CLUSTER ID';
+            if (boundaryOriginal && boundaryOriginal.parentElement && boundaryOriginal.parentElement.tagName === 'Folder') {
+                detectedRootName = boundaryOriginal.parentElement.querySelector('name').textContent.trim();
+            } else {
+                const fdtOriginal = allFolders.find(f => f.querySelector('name')?.textContent?.trim() === 'FDT');
+                if (fdtOriginal && fdtOriginal.parentElement && fdtOriginal.parentElement.tagName === 'Folder') {
+                    detectedRootName = fdtOriginal.parentElement.querySelector('name').textContent.trim();
+                }
+            }
+
+            if (boundaryOriginal) boundaryClusterNode = boundaryOriginal.cloneNode(true);
+
+            const allPlacemarks = Array.from(xmlDoc.querySelectorAll('Placemark')).filter(pm => {
+                if (boundaryOriginal && boundaryOriginal.contains(pm)) return false;
+                return true;
+            });
+
+            const fdtBucket = []; 
+            const lineBuckets = {}; 
+            const othersBucket = [];
+
+            const addToLineBucket = (lineName, folderName, item) => {
+                if (!lineBuckets[lineName]) lineBuckets[lineName] = {};
+                if (!lineBuckets[lineName][folderName]) lineBuckets[lineName][folderName] = { 'MAIN': [] };
+                lineBuckets[lineName][folderName]['MAIN'].push(item);
+            };
+
+            const strictCableRegex = /\b\d{2,3}C\/\d{1,2}T\b/i;
+
+            allPlacemarks.forEach(pm => {
+                const internalStyle = pm.querySelector('Style');
+                if(internalStyle) internalStyle.remove();
+
+                const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
+                let desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                const parentFolder = pm.parentElement;
+                const parentName = (parentFolder.querySelector('name')?.textContent || '').toUpperCase().trim();
+                const grandParentName = (parentFolder.parentElement?.querySelector('name')?.textContent || '').toUpperCase().trim();
+                const fullText = name + ' ' + desc;
+                const isLine = pm.querySelector('LineString') !== null;
+                
+                let lineName = 'MAIN';
+                if (mode === 'cluster') {
+                    lineName = determineLineName(pm, detectedRootName, targetStructure);
+                }
+
+                let targetType = 'UNKNOWN';
+                if (parentName.includes('HP COVER')) { targetType = 'HP COVER'; } 
+                else if (parentName.includes('HP UNCOVER')) targetType = 'HP UNCOVER';
+                else if (grandParentName.includes('HP COVER')) { targetType = 'HP COVER'; } 
+                else if (grandParentName.includes('HP UNCOVER')) { targetType = 'HP UNCOVER'; } 
+                
+                if (targetType === 'UNKNOWN') {
+                    if (mode === 'subfeeder') {
+                        if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE'))) targetType = 'CABLE';
+                        else if (!isLine && name.includes('JC')) targetType = 'JOINT CLOSURE';
+                        else if (/\b(288C|144C|96C|72C|48C)\b/.test(fullText)) targetType = 'FDT';
+                        if (targetType === 'UNKNOWN') {
+                            const poleMatch = targetStructure.find(type => type.includes('POLE') && (name.includes(type) || parentName.includes(type)));
+                            if (poleMatch) targetType = poleMatch;
+                        }
+                    } else {
+                        if (!isLine && (name.includes('FDT') || parentName.includes('FDT'))) targetType = 'FDT_GLOBAL';
+                        else if (isLine && (strictCableRegex.test(fullText) || name.includes('CABLE') || parentName.includes('DISTRIBUTION'))) targetType = 'DISTRIBUTION CABLE';
+                        else {
+                            const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
+                            if (match) targetType = match;
+                        }
+                    }
+                }
+
+                if (targetType === 'UNKNOWN') {
+                    if (name.includes('SLING')) targetType = (mode === 'subfeeder') ? 'UNKNOWN' : 'SLING WIRE';
+                    else if (name.includes('SLACK') || parentName.includes('SLACK')) targetType = 'SLACK HANGER';
+                    else {
+                        const match = targetStructure.find(type => name.includes(type) || parentName.includes(type));
+                        if(match) targetType = match;
+                    }
+                }
+
+                const PRESERVE_DESC = ['BOUNDARY FAT', 'DISTRIBUTION CABLE', 'FDT', 'CABLE', 'FDT_GLOBAL'];
+                if (!PRESERVE_DESC.includes(targetType)) {
+                    const descTag = pm.querySelector('description');
+                    if (descTag) descTag.remove();
+                }
+
+                pm.remove();
+                if (targetType === 'FDT_GLOBAL' && mode === 'cluster') fdtBucket.push(pm);
+                else if (targetType !== 'UNKNOWN') addToLineBucket(lineName, targetType, pm);
+                else othersBucket.push(pm);
+            });
+
+            if (mode === 'cluster') {
+                generateAutoSlack(lineBuckets, fdtBucket);
+            }
+
+            while (kmlDoc.firstChild) kmlDoc.removeChild(kmlDoc.firstChild);
+            const root = xmlDoc.createElement('Folder');
+            root.appendChild(createName(xmlDoc, detectedRootName)); 
+
+            if (boundaryClusterNode) root.appendChild(boundaryClusterNode);
+            if (fdtBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'FDT', fdtBucket));
+
+            if (mode === 'subfeeder') {
+                const mainData = lineBuckets['MAIN'] || {};
+                targetStructure.forEach(folderName => {
+                    const subData = mainData[folderName];
+                    if (subData) {
+                        const folder = xmlDoc.createElement('Folder');
+                        folder.appendChild(createName(xmlDoc, folderName));
+                        if (subData['MAIN']) subData['MAIN'].forEach(i => folder.appendChild(i));
+                        root.appendChild(folder);
+                    } else { root.appendChild(createFolder(xmlDoc, folderName, [])); }
+                });
+            } else {
+                Object.keys(lineBuckets).sort().forEach(ln => {
+                    let targetContainer = root;
+                    if (ln !== 'MAIN') {
+                        const lnFolder = xmlDoc.createElement('Folder');
+                        lnFolder.appendChild(createName(xmlDoc, ln));
+                        root.appendChild(lnFolder);
+                        targetContainer = lnFolder;
+                    }
+                    targetStructure.forEach(folderName => {
+                        const subData = lineBuckets[ln][folderName];
+                        if (subData) {
+                            const folder = xmlDoc.createElement('Folder');
+                            folder.appendChild(createName(xmlDoc, folderName));
+                            if (subData['MAIN']) subData['MAIN'].forEach(i => folder.appendChild(i));
+                            targetContainer.appendChild(folder);
+                        } else { targetContainer.appendChild(createFolder(xmlDoc, folderName, [])); }
+                    });
+                });
+            }
+            if (othersBucket.length > 0) root.appendChild(createFolder(xmlDoc, 'OTHERS', othersBucket));
+            kmlDoc.appendChild(root);
+            return { mode: mode, lines: Object.keys(lineBuckets), rootName: detectedRootName };
+        }
+
+        function determineLineName(pm, rootName, structureList) {
+            let curr = pm.parentElement;
+            let foundLine = null;
+            while (curr && curr.tagName === 'Folder') {
+                const name = curr.querySelector('name')?.textContent.trim() || '';
+                if (name === rootName) break;
+                const isStandard = structureList.includes(name) || name === 'FDT' || name === 'BOUNDARY CLUSTER' || name === 'OTHERS';
+                if (!isStandard && name !== '') { foundLine = name; }
+                curr = curr.parentElement;
+            }
+            return foundLine || 'MAIN';
+        }
+
+        function generateAutoSlack(lineBuckets, fdtBucket) {
+            const usedFDTs = new Set();
+            const sortedLineKeys = Object.keys(lineBuckets).sort();
+
+            for (const lineName of sortedLineKeys) {
+                if (!lineBuckets[lineName]['SLACK HANGER']) lineBuckets[lineName]['SLACK HANGER'] = { 'MAIN': [] };
+                
+                if (lineBuckets[lineName]['SLACK HANGER']['MAIN'].length === 0) {
+                    const fats = lineBuckets[lineName]['FAT'] ? lineBuckets[lineName]['FAT']['MAIN'] : [];
+                    fats.forEach(fat => {
+                        const clone = fat.cloneNode(true);
+                        const desc = clone.querySelector('description');
+                        if (desc) desc.remove();
+                        lineBuckets[lineName]['SLACK HANGER']['MAIN'].push(clone);
+                    });
+
+                    if (fats.length > 0 && fdtBucket.length > 0) {
+                        const firstFatName = fats[0].querySelector('name')?.textContent.trim() || '';
+                        const matchKey = firstFatName.replace(/\.[A-Z0-9]+$/i, '').trim();
+
+                        if (matchKey.length > 3) { 
+                            const matchedFDT = fdtBucket.find(fdt => {
+                                const fName = fdt.querySelector('name')?.textContent || '';
+                                return fName.includes(matchKey);
+                            });
+
+                            if (matchedFDT) {
+                                const fdtID = matchedFDT.querySelector('name')?.textContent || matchKey;
+                                if (!usedFDTs.has(fdtID)) {
+                                    const fdtClone = matchedFDT.cloneNode(true);
+                                    const desc = fdtClone.querySelector('description');
+                                    if (desc) desc.remove();
+                                    lineBuckets[lineName]['SLACK HANGER']['MAIN'].push(fdtClone);
+                                    usedFDTs.add(fdtID);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function organizeHpByBoundary(xmlDoc) {
+            const boundaryPlacemarks = [];
+            const allFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
+            const boundaryFolders = allFolders.filter(f => f.querySelector('name')?.textContent.trim().toUpperCase() === 'BOUNDARY FAT');
+            
+            boundaryFolders.forEach(bf => {
+                bf.querySelectorAll('Placemark').forEach(pm => {
+                    let coordsText = '';
+                    const polygon = pm.querySelector('Polygon outerBoundaryIs LinearRing coordinates');
+                    const lineString = pm.querySelector('LineString coordinates');
+                    if (polygon) coordsText = polygon.textContent;
+                    else if (lineString) coordsText = lineString.textContent;
+
+                    if (coordsText) {
+                        const coords = coordsText.trim().split(/\s+/).map(pair => {
+                            const [lon, lat] = pair.split(',').map(Number);
+                            return { lon, lat };
+                        });
+                        const bName = pm.querySelector('name')?.textContent.trim() || 'Unknown';
+                        boundaryPlacemarks.push({ name: bName, polygon: coords, hpCount: 0, element: pm });
+                    }
+                });
+            });
+
+            if (boundaryPlacemarks.length === 0) return;
+
+            const hpItems = [];
+            allFolders.forEach(f => {
+                const fName = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
+                if (fName === 'HP COVER') {
+                        f.querySelectorAll('Placemark').forEach(pm => {
+                            const pt = pm.querySelector('Point coordinates');
+                            if (pt) {
+                                const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                                hpItems.push({ lon, lat, element: pm, parentFolder: f });
+                            }
+                        });
+                }
+            });
+
+            hpItems.forEach(hp => {
+                for (const b of boundaryPlacemarks) {
+                    if (isPointInPolygon(hp, b.polygon)) {
+                        b.hpCount++;
+                        let targetSub = Array.from(hp.parentFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === b.name);
+                        if (!targetSub) {
+                            targetSub = xmlDoc.createElement('Folder');
+                            targetSub.appendChild(createName(xmlDoc, b.name));
+                            hp.parentFolder.appendChild(targetSub);
+                        }
+                        targetSub.appendChild(hp.element);
+                        break; 
+                    }
+                }
+            });
+
+            boundaryPlacemarks.forEach(b => {
+                let d = b.element.querySelector('description');
+                if (d) d.remove();
+                d = xmlDoc.createElement('description');
+                d.textContent = `${b.hpCount} HP`;
+                b.element.appendChild(d);
+            });
+        }
+
+        function autoRepositionPoints(xmlDoc) {
+            const anchors = []; 
+            const movables = []; 
+
+            const placemarks = xmlDoc.querySelectorAll('Placemark');
+            placemarks.forEach(pm => {
+                const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
+                const parentFolder = pm.parentElement.querySelector('name')?.textContent?.toUpperCase() || '';
+                const pt = pm.querySelector('Point coordinates');
+                
+                if (pt) {
+                    const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+                    const item = { element: pt, lon, lat, parent: parentFolder, name: name };
+
+                    if (parentFolder.includes('POLE') || name.includes('POLE') || name.includes('TIANG')) {
+                        anchors.push(item);
+                    } else if (parentFolder === 'FAT' || parentFolder === 'SLACK HANGER') {
+                        movables.push(item);
+                    }
+                }
+            });
+
+            if (anchors.length === 0 || movables.length === 0) return;
+
+            movables.forEach(mov => {
+                let nearestAnchor = null;
+                let minDst = Infinity;
+
+                anchors.forEach(anc => {
+                    const d = haversine(mov, anc);
+                    if (d < minDst) {
+                        minDst = d;
+                        nearestAnchor = anc;
+                    }
+                });
+
+                if (nearestAnchor && minDst <= SNAP_TOLERANCE_METERS) {
+                    mov.element.textContent = `${nearestAnchor.lon},${nearestAnchor.lat},0`;
+                }
+            });
+        }
+
+        // --- UPDATED INJECT FUNCTION WITH CHECKBOX LOGIC ---
+        function injectDescriptionsAndCalc(xmlDoc, mode, doCalcCable) {
+            const folders = xmlDoc.querySelectorAll('Folder');
+            
+            if (mode === 'subfeeder') {
+                const cableFolders = Array.from(folders).filter(f => f.querySelector('name')?.textContent.trim() === 'CABLE');
+                cableFolders.forEach(cableFolder => {
+                    // JIKA CHECKBOX DICENTANG, JALANKAN KALKULASI
+                    if (doCalcCable) {
+                        const parentLine = cableFolder.parentElement;
+                        if (!parentLine) return;
+                        const siblings = Array.from(parentLine.children).filter(c => c.tagName === 'Folder');
+                        const fdtFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'FDT');
+                        const jcFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'JOINT CLOSURE');
+                        const a = fdtFolder ? fdtFolder.getElementsByTagName('Placemark').length : 0;
+                        const b = jcFolder ? jcFolder.getElementsByTagName('Placemark').length : 0;
+                        const y = a + b; const c = a + b; const d = y * 20;
+
+                        cableFolder.querySelectorAll('Placemark').forEach(pm => {
+                            const ls = pm.querySelector('LineString coordinates');
+                            if (ls) {
+                                const x = calculateLineLength(ls.textContent);
+                                const e = Math.ceil((x + d) * 1.05);
+                                let descTag = pm.querySelector('description') || pm.appendChild(xmlDoc.createElement('description'));
+                                descTag.textContent = `Deskripsi :\nTotal Route\t: ${x} m\nTotal Slack\t: ${y} unit (${a} FDT, ${b} JC, ${c} NEW) @20 m\nToleransi\t: 5%\nTotal Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
+                                const nameTag = pm.querySelector('name');
+                                if (nameTag) {
+                                    let oldName = nameTag.textContent.trim();
+                                    oldName = oldName.replace(/\s*-\s*\d+\s*m(eters)?$/i, '');
+                                    nameTag.textContent = `${oldName} - ${e} m`;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            if (mode === 'cluster') {
+                folders.forEach(folder => {
+                    let folderName = folder.querySelector('name')?.textContent.trim().toUpperCase() || '';
+                    if (folderName === 'SLING WIRE') {
+                        let totalMeters = 0;
+                        folder.querySelectorAll('Placemark').forEach(pm => {
+                            const ls = pm.querySelector('LineString coordinates');
+                            if (ls) {
+                                const len = calculateLineLength(ls.textContent);
+                                totalMeters += len;
+                                let nameTag = Array.from(pm.children).find(c => c.tagName === 'name');
+                                if (!nameTag) { nameTag = xmlDoc.createElement('name'); pm.appendChild(nameTag); }
+                                nameTag.textContent = `LineString — ${len} meters`;
+                            }
+                        });
+                        if (totalMeters > 0) {
+                            let descTag = Array.from(folder.children).find(c => c.tagName === 'description');
+                            if (!descTag) { descTag = xmlDoc.createElement('description'); folder.appendChild(descTag); }
+                            descTag.textContent = `${totalMeters} m`;
+                        }
+                    }
+                    else if (folderName === 'DISTRIBUTION CABLE') {
+                        // JIKA CHECKBOX DICENTANG, JALANKAN KALKULASI
+                        if (doCalcCable) {
+                            let fatCount = 0;
+                            const parentFolder = folder.parentElement;
+                            if (parentFolder) {
+                                const siblings = Array.from(parentFolder.children);
+                                const fatFolder = siblings.find(el => el.tagName === 'Folder' && el.querySelector('name')?.textContent.trim() === 'FAT');
+                                if (fatFolder) fatCount = fatFolder.getElementsByTagName('Placemark').length;
+                            }
+                            const b = 1; const c = fatCount; const a = b + c; const d = a * 20;
+                            folder.querySelectorAll('Placemark').forEach(pm => {
+                                const ls = pm.querySelector('LineString coordinates');
+                                if (ls) {
+                                    const x = calculateLineLength(ls.textContent);
+                                    const e = Math.ceil((x + d) * 1.05);
+                                    let nameTag = Array.from(pm.children).find(child => child.tagName === 'name');
+                                    if (nameTag) {
+                                        const oldName = nameTag.textContent.trim();
+                                        const regex = /(\d+)(\s*M)$/i;
+                                        if (regex.test(oldName)) { nameTag.textContent = oldName.replace(regex, e + "$2"); }
+                                    }
+                                    const descText = `Deskripsi :\n\nTotal Route \t : ${x} m\nTotal Slack\t : ${a} unit (${b} slack FDT & ${c} slack FAT) @20 m\nToleransi\t : 5%\n\n Total Length Cable  : ${x} + ${d} ( x 5%) = ${e} m`;
+                                    let descTag = Array.from(pm.children).find(child => child.tagName === 'description');
+                                    if (!descTag) { descTag = xmlDoc.createElement('description'); pm.appendChild(descTag); }
+                                    descTag.textContent = descText;
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        let suffix = null;
+                        if (folderName === 'FAT') suffix = ' FAT';
+                        else if (folderName === 'HP COVER') suffix = ' HP';
+                        else if (folderName === 'HP UNCOVER') suffix = ' HP';
+                        else if (folderName.includes('EXISTING POLE')) suffix = ' EXT POLE';
+                        else if (folderName.includes('NEW POLE')) suffix = ' POLE';
+                        if (suffix) {
+                            const count = folder.getElementsByTagName('Placemark').length;
+                            if (count > 0) {
+                                let descTag = Array.from(folder.children).find(c => c.tagName === 'description');
+                                if (!descTag) { descTag = xmlDoc.createElement('description'); folder.appendChild(descTag); }
+                                descTag.textContent = `${count}${suffix}`;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // 5. STYLER.JS
+        // ==========================================
+        function applyStyles(xmlDoc, mode) {
+            const placemarks = xmlDoc.querySelectorAll('Placemark');
+            const doc = xmlDoc.querySelector('Document');
+            const stylesCreated = new Set();
+            
+            const styleB = xmlDoc.createElement('Style'); styleB.id = 'style_boundary';
+            styleB.innerHTML = `<LineStyle><color>4dffffff</color><width>2</width></LineStyle><PolyStyle><color>4dffffff</color></PolyStyle>`;
+            doc.appendChild(styleB);
+
+            placemarks.forEach(pm => {
+                const name = (pm.querySelector('name')?.textContent || '').toUpperCase();
+                const desc = (pm.querySelector('description')?.textContent || '').toUpperCase();
+                const fullText = name + ' ' + desc;
+                const folderName = pm.parentElement.querySelector('name')?.textContent || '';
+                const grandParentName = pm.parentElement.parentElement?.querySelector('name')?.textContent || '';
+
+                if (folderName.includes('BOUNDARY CLUSTER')) { setStyle(pm, 'style_boundary'); return; }
+                
+                let rule = null;
+
+                if (mode === 'cluster') {
+                    rule = RULES_CLUSTER.find(r => {
+                        if (r.folder !== '-' && r.folder === folderName) return true;
+                        if (folderName === 'DISTRIBUTION CABLE' && r.line !== '-' && fullText.includes(r.line)) return true;
+                        if (r.placemark !== '-' && fullText.includes(r.placemark)) return true;
+                        return false;
+                    });
+                    if (!rule) {
+                        if (grandParentName.includes('HP COVER') || folderName.includes('HP COVER')) rule = RULES_CLUSTER.find(r => r.folder === 'HP COVER');
+                        else if (grandParentName.includes('HP UNCOVER') || folderName.includes('HP UNCOVER')) rule = RULES_CLUSTER.find(r => r.folder === 'HP UNCOVER');
+                    }
+                } else {
+                    if (folderName === 'CABLE') {
+                        const coreColors = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '48C': '#AA00FF', '24C': '#00FF00' };
+                        const match = Object.keys(coreColors).find(k => fullText.includes(k));
+                        rule = { colorCode: match ? coreColors[match] : '#00AAFF', styleLink: '-', placemark: '-' };
+                    }
+                    else if (folderName === 'FDT') {
+                        const coreMatch = fullText.match(/\b(\d+)C\b/);
+                        const core = coreMatch ? coreMatch[0] : '48C';
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const color = coreMap[core] || '#AA00FF';
+                        rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/cross-hairs.png', placemark: 'FDT_' + core };
+                    }
+                    else if (folderName === 'JOINT CLOSURE') {
+                        const coreMatch = fullText.match(/\b(\d+)C\b/);
+                        const core = coreMatch ? coreMatch[0] : '48C';
+                        const coreMap = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '72C': '#0000FF', '48C': '#AA00FF', '36C': '#FF00FF', '24C': '#00FF00' };
+                        const color = coreMap[core] || '#AA00FF';
+                        rule = { colorCode: color, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/forbidden.png', placemark: 'JC_' + core };
+                    }
+                    else if (folderName.includes('POLE')) {
+                        let pColor = '#550000';
+                        const upperFolder = folderName.toUpperCase();
+                        if (upperFolder.includes('NEW')) {
+                            if (upperFolder.includes('9-')) pColor = '#FF0000';
+                            else if (upperFolder.includes('7-5') || upperFolder.includes('7-4')) pColor = '#00FF00';
+                            else if (upperFolder.includes('7-3')) pColor = '#00FFFF';
+                            else if (upperFolder.includes('7-2.5')) pColor = '#AA00FF';
+                        }
+                        rule = { colorCode: pColor, styleLink: 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png', placemark: '-' };
+                    }
+                    else {
+                        rule = RULES_SUBFEEDER.find(r => r.folder === folderName);
+                    }
+                }
+
+                if (rule) {
+                    let iconScale = 1.1; 
+                    let lineWidth = 2;   
+
+                    if (folderName.includes('HP COVER') || folderName.includes('HP UNCOVER') || grandParentName.includes('HP ')) {
+                        iconScale = 0.6; 
+                    }
+
+                    if (folderName === 'BOUNDARY FAT' || folderName === 'DISTRIBUTION CABLE' || folderName === 'SLING WIRE') {
+                        if (folderName === 'BOUNDARY FAT') lineWidth = 3;       
+                        if (folderName === 'DISTRIBUTION CABLE') lineWidth = 4; 
+                        if (folderName === 'SLING WIRE') lineWidth = 4;         
+                    }
+
+                    const safeName = rule.placemark !== '-' ? rule.placemark : folderName;
+                    const styleId = `style_${rule.colorCode.replace('#','')}_${safeName.replace(/[^a-z0-9]/gi,'')}_S${iconScale}_W${lineWidth}`;
+
+                    if (!stylesCreated.has(styleId)) {
+                        const style = xmlDoc.createElement('Style'); style.id = styleId;
+                        const kmlColor = 'ff' + rule.colorCode.replace('#', '').match(/.{2}/g).reverse().join('');
+                        
+                        let styleContent = `<LabelStyle><color>${kmlColor}</color><scale>${TEXT_SIZE}</scale></LabelStyle>`;
+                        
+                        if (rule.styleLink !== '-') {
+                            styleContent += `<IconStyle><color>${kmlColor}</color><scale>${iconScale}</scale><Icon><href>${rule.styleLink}</href></Icon></IconStyle>`;
+                        }
+                        
+                        styleContent += `<LineStyle><color>${kmlColor}</color><width>${lineWidth}</width></LineStyle><PolyStyle><color>66${kmlColor.substring(2)}</color></PolyStyle>`;
+                        
+                        style.innerHTML = styleContent;
+                        doc.appendChild(style);
+                        stylesCreated.add(styleId);
+                    }
+                    setStyle(pm, styleId);
+                }
+            });
+        }
+
+        function setStyle(pm, id) {
+            let oldUrl = pm.querySelector('styleUrl');
+            if(oldUrl) oldUrl.remove();
+
+            let url = pm.ownerDocument.createElement('styleUrl'); 
+            url.textContent = '#' + id;
+            pm.appendChild(url);
+        }
+
+        // ==========================================
+        // 6. MAIN.JS (UI LOGIC)
+        // ==========================================
+        let CURRENT_MODE = 'cluster'; 
+        let kmzFile = null;
+        let processedKMZ = null;
+        let processedHPDB = null;
+
+        const kmzInput = document.getElementById('kmzFile');
+        const processBtn = document.getElementById('processBtn');
+        const statusDiv = document.getElementById('status');
+        const fileLabel = document.getElementById('fileLabel');
+        const dropArea = document.getElementById('dropArea');
+        const btnCluster = document.getElementById('btn-cluster');
+        const btnSubfeeder = document.getElementById('btn-subfeeder');
+        const calcCableCheck = document.getElementById('calcCableCheck'); // GET CHECKBOX
+
+        function setMode(mode) {
+            CURRENT_MODE = mode;
+            document.querySelectorAll('.mode-option').forEach(el => el.classList.remove('active'));
+            document.getElementById(`btn-${mode}`).classList.add('active');
+        }
+
+        btnCluster.addEventListener('click', () => setMode('cluster'));
+        btnSubfeeder.addEventListener('click', () => setMode('subfeeder'));
+
+        dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('active'); });
+        dropArea.addEventListener('dragleave', () => dropArea.classList.remove('active'));
+        dropArea.addEventListener('drop', (e) => { e.preventDefault(); dropArea.classList.remove('active'); if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        kmzInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+        function handleFile(file) {
+            if(!file.name.toLowerCase().endsWith('.kmz') && !file.name.toLowerCase().endsWith('.kml')) { alert('File harus .KMZ atau .KML'); return; }
+            kmzFile = file;
+            fileLabel.textContent = `${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+            fileLabel.style.color = 'var(--primary)';
+            processBtn.disabled = false;
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!kmzFile) return;
+            processBtn.disabled = true;
+            statusDiv.innerHTML = '<span class="loading-spinner"></span>Processing...';
+            
+            // CEK STATUS CHECKBOX
+            const doCalc = calcCableCheck.checked; 
+
+            try {
+                let xmlDoc;
+                if (kmzFile.name.toLowerCase().endsWith('.kmz')) {
+                    const zip = new JSZip();
+                    const contents = await zip.loadAsync(kmzFile);
+                    const kmlName = Object.keys(contents.files).find(n => n.endsWith('.kml'));
+                    const kmlString = await contents.files[kmlName].async('string');
+                    xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
+                } else {
+                    const kmlString = await kmzFile.text();
+                    xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
+                }
+
+                // 1. Core Logic
+                const tree = restructureKML(xmlDoc, CURRENT_MODE);
+                
+                if (CURRENT_MODE === 'cluster') {
+                    organizeHpByBoundary(xmlDoc);
+                    autoRepositionPoints(xmlDoc);
+                }
+
+                // 2. Styling & Calc
+                applyStyles(xmlDoc, CURRENT_MODE);
+                
+                // PASS CHECKBOX STATE TO INJECT FUNCTION
+                injectDescriptionsAndCalc(xmlDoc, CURRENT_MODE, doCalc);
+                
+                // 3. UI Update
+                displayTree(tree);
+
+                // 4. Generate Outputs
+                if (CURRENT_MODE === 'cluster') {
+                    processedHPDB = generateHPDB(xmlDoc, tree.rootName);
+                }
+
+                const serializer = new XMLSerializer();
+                const newKml = serializer.serializeToString(xmlDoc);
+                const zipOut = new JSZip();
+                zipOut.file("doc.kml", newKml);
+                processedKMZ = await zipOut.generateAsync({ type: 'blob' });
+
+                // 5. Create Buttons
+                statusDiv.innerHTML = '<span style="color:var(--success)">✅ Done!</span>';
+                
+                const dlBtn = document.createElement('button');
+                dlBtn.className = 'success';
+                dlBtn.textContent = `Download KMZ Result`;
+                dlBtn.onclick = () => {
+                    const url = URL.createObjectURL(processedKMZ);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `STYLED_${CURRENT_MODE.toUpperCase()}_${kmzFile.name.replace(/\.kml$/i, '.kmz')}`;
+                    a.click();
+                };
+
+                const btnGroup = document.querySelector('.btn-group');
+                const oldBtns = btnGroup.querySelectorAll('.success');
+                oldBtns.forEach(b => b.remove());
+                btnGroup.appendChild(dlBtn);
+
+                if (processedHPDB) {
+                    const csvBtn = document.createElement('button');
+                    csvBtn.className = 'success';
+                    csvBtn.style.background = '#8b5cf6';
+                    csvBtn.textContent = `Download HPDB Result (CSV)`;
+                    csvBtn.onclick = () => {
+                        const blob = new Blob([processedHPDB], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `HPDB_${kmzFile.name.replace(/\.k?mz|\.kml/i, '')}.csv`;
+                        a.click();
+                    };
+                    btnGroup.appendChild(csvBtn);
+                }
+
+            } catch (err) {
+                statusDiv.innerHTML = `<span style="color:var(--error)">Error: ${err.message}</span>`;
+                console.error(err);
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => location.reload());
+
+        function displayTree(result) {
+            const list = document.getElementById('folderList');
+            const mode = result.mode;
+            let html = `<div class="tree-item"><span class="tree-folder" style="color:#aaa">BOUNDARY CLUSTER</span></div>`;
+            if (result.lines.includes('FDT') || mode === 'cluster') html += `<div class="tree-item"><span class="tree-folder">FDT</span></div>`;
+            
+            html += `<div class="tree-item"><span class="tree-folder" style="color:#fff; border-bottom:1px solid #333; display:inline-block; margin-bottom:5px;">ROOT: ${result.rootName}</span></div>`;
+            
+            if (mode === 'subfeeder') {
+                STRUCTURE_SUBFEEDER.forEach(f => { html += `<div class="tree-item" style="margin-left:20px; font-size:0.9em; color:#888">${f}</div>`; });
+            } else {
+                result.lines.forEach(l => { 
+                    if (l !== 'FDT' && l !== 'MAIN') {
+                        html += `<div class="tree-item"><span class="tree-folder">${l}</span></div>`; 
+                    }
+                });
+            }
+            
+            list.innerHTML = html;
+            document.getElementById('preview').classList.remove('hidden');
+        }
+
+        // --- README MODAL ---
+        let readmeLoaded = false;
+        window.openReadme = async function() {
+            toggleModal(true);
+            if (readmeLoaded) return;
+            const container = document.getElementById('mdContainer');
+            // Hardcode readme content or keep file fetch. 
+            // Fallback since single file doesn't have README.md implicitly
+            container.innerHTML = `
+                <h1>Panduan Singkat V17</h1>
+                <ul>
+                    <li><strong>Checkbox Hitung Material:</strong> Jika dicentang, sistem akan menghitung total route, slack, dan toleransi (5%) pada kabel di folder <code>DISTRIBUTION CABLE</code> (Cluster) atau <code>CABLE</code> (Subfeeder).</li>
+                    <li><strong>Styling:</strong> Tetap berjalan meskipun kalkulasi dimatikan.</li>
+                    <li><strong>Mode:</strong> Cluster (Default) atau Subfeeder.</li>
+                </ul>
+                <p>Silakan drag & drop file KMZ Anda untuk memulai.</p>
+            `;
+            readmeLoaded = true;
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('readmeModal');
+            if (show) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; } 
+            else { modal.classList.remove('open'); document.body.style.overflow = ''; }
+        }
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => toggleModal(false));
+        document.getElementById('readmeModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('readmeModal')) toggleModal(false);
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleModal(false); });
+
+    </script>
 
 </body>
-
 </html>
