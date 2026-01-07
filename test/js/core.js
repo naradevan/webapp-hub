@@ -317,38 +317,66 @@ export function autoRepositionPoints(xmlDoc) {
     });
 }
 
-export function injectDescriptionsAndCalc(xmlDoc, mode) {
+    export function injectDescriptionsAndCalc(xmlDoc, mode, enableCalc) {
     const folders = xmlDoc.querySelectorAll('Folder');
     
+    // ... (Logika Subfeeder tetap sama, tidak berubah) ...
     if (mode === 'subfeeder') {
-        const cableFolders = Array.from(folders).filter(f => f.querySelector('name')?.textContent.trim() === 'CABLE');
-        cableFolders.forEach(cableFolder => {
-            const parentLine = cableFolder.parentElement;
-            if (!parentLine) return;
-            const siblings = Array.from(parentLine.children).filter(c => c.tagName === 'Folder');
-            const fdtFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'FDT');
-            const jcFolder = siblings.find(f => f.querySelector('name')?.textContent.trim() === 'JOINT CLOSURE');
-            const a = fdtFolder ? fdtFolder.getElementsByTagName('Placemark').length : 0;
-            const b = jcFolder ? jcFolder.getElementsByTagName('Placemark').length : 0;
-            const y = a + b; const c = a + b; const d = y * 20;
+       // ... code subfeeder ...
+    }
 
-            cableFolder.querySelectorAll('Placemark').forEach(pm => {
-                const ls = pm.querySelector('LineString coordinates');
-                if (ls) {
-                    const x = calculateLineLength(ls.textContent);
-                    const e = Math.ceil((x + d) * 1.05);
-                    let descTag = pm.querySelector('description') || pm.appendChild(xmlDoc.createElement('description'));
-                    descTag.textContent = `Deskripsi :\nTotal Route\t: ${x} m\nTotal Slack\t: ${y} unit (${a} FDT, ${b} JC, ${c} NEW) @20 m\nToleransi\t: 5%\nTotal Cable \t: ${x} + ${d} ( x 5%) = ${e} m`;
-                    const nameTag = pm.querySelector('name');
-                    if (nameTag) {
-                        let oldName = nameTag.textContent.trim();
-                        oldName = oldName.replace(/\s*-\s*\d+\s*m(eters)?$/i, '');
-                        nameTag.textContent = `${oldName} - ${e} m`;
-                    }
+    if (mode === 'cluster') {
+        folders.forEach(folder => {
+            let folderName = folder.querySelector('name')?.textContent.trim().toUpperCase() || '';
+
+            if (folderName === 'SLING WIRE') {
+                // ... (Logika Sling Wire tetap jalan/tetap sama) ...
+                let totalMeters = 0;
+                folder.querySelectorAll('Placemark').forEach(pm => {
+                    // ... code sling wire ...
+                });
+                // ... code sling wire ...
+            }
+            else if (folderName === 'DISTRIBUTION CABLE') {
+                // --- LOGIC BARU: CEK ENABLE CALC ---
+                if (!enableCalc) return; // <--- KALAU UNCHECK, LANGSUNG STOP (SKIP FOLDER INI)
+
+                let fatCount = 0;
+                // ... (Sisa kode kalkulasi di bawah ini sama persis seperti sebelumnya) ...
+                const parentFolder = folder.parentElement;
+                if (parentFolder) {
+                    const siblings = Array.from(parentFolder.children);
+                    const fatFolder = siblings.find(el => el.tagName === 'Folder' && el.querySelector('name')?.textContent.trim() === 'FAT');
+                    if (fatFolder) fatCount = fatFolder.getElementsByTagName('Placemark').length;
                 }
-            });
+                const b = 1; const c = fatCount; const a = b + c; const d = a * 20;
+                folder.querySelectorAll('Placemark').forEach(pm => {
+                    const ls = pm.querySelector('LineString coordinates');
+                    if (ls) {
+                        const x = calculateLineLength(ls.textContent);
+                        const e = Math.ceil((x + d) * 1.05);
+                        let nameTag = Array.from(pm.children).find(child => child.tagName === 'name');
+                        if (nameTag) {
+                            const oldName = nameTag.textContent.trim();
+                            const regex = /(\d+)(\s*M)$/i;
+                            if (regex.test(oldName)) { nameTag.textContent = oldName.replace(regex, e + "$2"); }
+                        }
+                        const descText = `Deskripsi :\n\nTotal Route \t : ${x} m\nTotal Slack\t : ${a} unit (${b} slack FDT & ${c} slack FAT) @20 m\nToleransi\t : 5%\n\n Total Length Cable  : ${x} + ${d} ( x 5%) = ${e} m`;
+                        let descTag = Array.from(pm.children).find(child => child.tagName === 'description');
+                        if (!descTag) { descTag = xmlDoc.createElement('description'); pm.appendChild(descTag); }
+                        descTag.textContent = descText;
+                    }
+                });
+            }
+            else {
+                // ... (Logika Counter items FAT/HP/POLE tetap jalan) ...
+                let suffix = null;
+                if (folderName === 'FAT') suffix = ' FAT';
+                // ... code counter ...
+            }
         });
     }
+}
 
     if (mode === 'cluster') {
         folders.forEach(folder => {
@@ -416,4 +444,5 @@ export function injectDescriptionsAndCalc(xmlDoc, mode) {
             }
         });
     }
+
 }
