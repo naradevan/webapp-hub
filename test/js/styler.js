@@ -4,6 +4,8 @@ export function applyStyles(xmlDoc, mode) {
     const placemarks = xmlDoc.querySelectorAll('Placemark');
     const doc = xmlDoc.querySelector('Document');
     const stylesCreated = new Set();
+    
+    // Style default untuk Boundary Cluster (Pagar Putih)
     const styleB = xmlDoc.createElement('Style'); styleB.id = 'style_boundary';
     styleB.innerHTML = `<LineStyle><color>4dffffff</color><width>2</width></LineStyle><PolyStyle><color>4dffffff</color></PolyStyle>`;
     doc.appendChild(styleB);
@@ -16,8 +18,10 @@ export function applyStyles(xmlDoc, mode) {
         const grandParentName = pm.parentElement.parentElement?.querySelector('name')?.textContent || '';
 
         if (folderName.includes('BOUNDARY CLUSTER')) { setStyle(pm, 'style_boundary'); return; }
+        
         let rule = null;
 
+        // --- 1. CARI RULE (Sama seperti V17) ---
         if (mode === 'cluster') {
             rule = RULES_CLUSTER.find(r => {
                 if (r.folder !== '-' && r.folder === folderName) return true;
@@ -30,6 +34,7 @@ export function applyStyles(xmlDoc, mode) {
                 else if (grandParentName.includes('HP UNCOVER') || folderName.includes('HP UNCOVER')) rule = RULES_CLUSTER.find(r => r.folder === 'HP UNCOVER');
             }
         } else {
+            // Logic Subfeeder (Sama seperti V17)
             if (folderName === 'CABLE') {
                 const coreColors = { '288C': '#FFAA00', '144C': '#AAFF00', '96C': '#FF0000', '48C': '#AA00FF', '24C': '#00FF00' };
                 const match = Object.keys(coreColors).find(k => fullText.includes(k));
@@ -66,14 +71,43 @@ export function applyStyles(xmlDoc, mode) {
         }
 
         if (rule) {
+            // --- 2. CUSTOM SIZE CONFIG (Area Hardcode Di Sini) ---
+            let iconScale = 1.1; // Ukuran Default Icon
+            let lineWidth = 2;   // Ukuran Default Garis
+
+            // A. Khusus HP COVER & UNCOVER (Ubah ukuran Icon)
+            if (folderName.includes('HP COVER') || folderName.includes('HP UNCOVER') || grandParentName.includes('HP ')) {
+                iconScale = 0.6; // <--- GANTI ANGKA INI (Makin kecil makin imut)
+            }
+
+            // B. Khusus LINE/KABEL TERTENTU (Ubah tebal Garis)
+            // Note: Tambahkan 'SLING WIRE', 'DISTRIBUTION CABLE', 'BOUNDARY FAT'
+            if (folderName === 'BOUNDARY FAT' || folderName === 'DISTRIBUTION CABLE' || folderName === 'SLING WIRE') {
+                
+                if (folderName === 'BOUNDARY FAT') lineWidth = 3;       // Tebal garis Boundary
+                if (folderName === 'DISTRIBUTION CABLE') lineWidth = 4; // Tebal kabel Distribusi
+                if (folderName === 'SLING WIRE') lineWidth = 1;         // Tebal Sling Wire (tipis aja)
+            }
+
+            // --- 3. BUAT ID STYLE UNIK ---
+            // Kita tambahkan scale dan width ke ID supaya tidak bentrok dengan style default
             const safeName = rule.placemark !== '-' ? rule.placemark : folderName;
-            const styleId = `style_${rule.colorCode.replace('#','')}_${safeName.replace(/[^a-z0-9]/gi,'')}_${Math.floor(Math.random()*1000)}`;
+            const styleId = `style_${rule.colorCode.replace('#','')}_${safeName.replace(/[^a-z0-9]/gi,'')}_S${iconScale}_W${lineWidth}`;
+
             if (!stylesCreated.has(styleId)) {
                 const style = xmlDoc.createElement('Style'); style.id = styleId;
                 const kmlColor = 'ff' + rule.colorCode.replace('#', '').match(/.{2}/g).reverse().join('');
+                
                 let styleContent = `<LabelStyle><color>${kmlColor}</color><scale>${TEXT_SIZE}</scale></LabelStyle>`;
-                if (rule.styleLink !== '-') styleContent += `<IconStyle><color>${kmlColor}</color><scale>1.1</scale><Icon><href>${rule.styleLink}</href></Icon></IconStyle>`;
-                styleContent += `<LineStyle><color>${kmlColor}</color><width>2</width></LineStyle><PolyStyle><color>66${kmlColor.substring(2)}</color></PolyStyle>`;
+                
+                // Terapkan Icon Scale Custom
+                if (rule.styleLink !== '-') {
+                    styleContent += `<IconStyle><color>${kmlColor}</color><scale>${iconScale}</scale><Icon><href>${rule.styleLink}</href></Icon></IconStyle>`;
+                }
+                
+                // Terapkan Line Width Custom
+                styleContent += `<LineStyle><color>${kmlColor}</color><width>${lineWidth}</width></LineStyle><PolyStyle><color>66${kmlColor.substring(2)}</color></PolyStyle>`;
+                
                 style.innerHTML = styleContent;
                 doc.appendChild(style);
                 stylesCreated.add(styleId);
