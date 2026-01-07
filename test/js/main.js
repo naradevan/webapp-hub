@@ -69,9 +69,14 @@ processBtn.addEventListener('click', async () => {
             autoRepositionPoints(xmlDoc);
         }
 
+        // Ambil status checkbox (true/false)
+        const enableCalc = document.getElementById('calcOption').checked;
+
         // 2. Styling & Calc
         applyStyles(xmlDoc, CURRENT_MODE);
-        injectDescriptionsAndCalc(xmlDoc, CURRENT_MODE);
+        
+        // Kirim parameter enableCalc ke fungsi core
+        injectDescriptionsAndCalc(xmlDoc, CURRENT_MODE, enableCalc)
         
         // 3. UI Update
         displayTree(tree);
@@ -189,4 +194,5 @@ document.getElementById('closeModalBtn').addEventListener('click', () => toggleM
 document.getElementById('readmeModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('readmeModal')) toggleModal(false);
 });
+
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleModal(false); });
