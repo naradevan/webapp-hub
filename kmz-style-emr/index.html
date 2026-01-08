@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMZ Styler - V17 (Smart Sort FDT)</title>
+    <title>KMZ Styler - V20 (Final Fix)</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -204,7 +204,7 @@
     <div class="container">
         <header>
             <h1>KMZ Style EMR by xsanosaurus</h1>
-            <p class="subtitle">V17 (Modular + Smart Sort)</p>
+            <p class="subtitle">V20 (Features: Auto Uncover, Robust FDT, Calc Toggle)</p>
         </header>
 
         <div class="card">
@@ -433,7 +433,6 @@
                             if (pt) {
                                 const hpName = hp.querySelector('name')?.textContent.trim() || '';
                                 const [hpLon, hpLat] = pt.textContent.trim().split(',').map(Number);
-                                // Updated row without trailing empty string
                                 const row = [
                                     `"${anchorPole.name}"`, anchorPole.lat, anchorPole.lon, `"${hpName}"`, 
                                     `"${lineName}"`, `"${fatCode}"`, hpLat, hpLon
@@ -449,30 +448,18 @@
         }
 
         // ==========================================
-        // 4. CORE.JS (Restructure, Helpers)
+        // 4. CORE.JS
         // ==========================================
-        
-        // --- HELPER UNTUK SORTING FDT 1, 2, 3... ---
         function sortFDTLines(a, b) {
-            // Regex buat ambil angka setelah tulisan FDT
-            // Contoh "LINE A FDT 12" -> dapat "12"
             const regex = /FDT\s*(\d+)/i;
             const matchA = a.match(regex);
             const matchB = b.match(regex);
-
             if (matchA && matchB) {
                 const numA = parseInt(matchA[1], 10);
                 const numB = parseInt(matchB[1], 10);
-
-                // 1. Bandingkan Angka FDT nya dulu (1 vs 2)
-                if (numA !== numB) {
-                    return numA - numB;
-                }
-                // 2. Kalau angkanya sama (misal sama2 FDT 1), baru urut abjad (A vs B)
+                if (numA !== numB) return numA - numB;
                 return a.localeCompare(b);
             }
-
-            // Kalau gak ada tulisan FDT nya, urut abjad biasa
             return a.localeCompare(b);
         }
 
@@ -599,7 +586,6 @@
                     } else { root.appendChild(createFolder(xmlDoc, folderName, [])); }
                 });
             } else {
-                // APPLY CUSTOM SORT HERE
                 Object.keys(lineBuckets).sort(sortFDTLines).forEach(ln => {
                     let targetContainer = root;
                     if (ln !== 'MAIN') {
@@ -640,6 +626,7 @@
         function generateAutoSlack(lineBuckets, fdtBucket) {
             const usedFDTs = new Set();
             const sortedLineKeys = Object.keys(lineBuckets).sort();
+            const corePattern = /([A-Z]+-\d+\.\d+)/i; 
 
             for (const lineName of sortedLineKeys) {
                 if (!lineBuckets[lineName]['SLACK HANGER']) lineBuckets[lineName]['SLACK HANGER'] = { 'MAIN': [] };
@@ -655,16 +642,18 @@
 
                     if (fats.length > 0 && fdtBucket.length > 0) {
                         const firstFatName = fats[0].querySelector('name')?.textContent.trim() || '';
-                        const matchKey = firstFatName.replace(/\.[A-Z0-9]+$/i, '').trim();
+                        
+                        const match = firstFatName.match(corePattern);
+                        const searchKey = match ? match[0] : firstFatName.replace(/\.[A-Z0-9]+$/i, '').trim();
 
-                        if (matchKey.length > 3) { 
+                        if (searchKey.length > 3) { 
                             const matchedFDT = fdtBucket.find(fdt => {
                                 const fName = fdt.querySelector('name')?.textContent || '';
-                                return fName.includes(matchKey);
+                                return fName.toUpperCase().includes(searchKey.toUpperCase());
                             });
 
                             if (matchedFDT) {
-                                const fdtID = matchedFDT.querySelector('name')?.textContent || matchKey;
+                                const fdtID = matchedFDT.querySelector('name')?.textContent || searchKey;
                                 if (!usedFDTs.has(fdtID)) {
                                     const fdtClone = matchedFDT.cloneNode(true);
                                     const desc = fdtClone.querySelector('description');
@@ -706,7 +695,8 @@
             if (boundaryPlacemarks.length === 0) return;
 
             const hpItems = [];
-            allFolders.forEach(f => {
+            const currentFolders = Array.from(xmlDoc.querySelectorAll('Folder'));
+            currentFolders.forEach(f => {
                 const fName = f.querySelector('name')?.textContent.trim().toUpperCase() || '';
                 if (fName === 'HP COVER') {
                         f.querySelectorAll('Placemark').forEach(pm => {
@@ -720,8 +710,10 @@
             });
 
             hpItems.forEach(hp => {
+                let isCovered = false;
                 for (const b of boundaryPlacemarks) {
                     if (isPointInPolygon(hp, b.polygon)) {
+                        isCovered = true;
                         b.hpCount++;
                         let targetSub = Array.from(hp.parentFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent === b.name);
                         if (!targetSub) {
@@ -731,6 +723,20 @@
                         }
                         targetSub.appendChild(hp.element);
                         break; 
+                    }
+                }
+                
+                if (!isCovered) {
+                    const lineFolder = hp.parentFolder.parentElement;
+                    if (lineFolder && lineFolder.tagName === 'Folder') {
+                         let uncoverFolder = Array.from(lineFolder.children).find(c => c.tagName === 'Folder' && c.querySelector('name')?.textContent.trim().toUpperCase() === 'HP UNCOVER');
+                         
+                         if (!uncoverFolder) {
+                             uncoverFolder = xmlDoc.createElement('Folder');
+                             uncoverFolder.appendChild(createName(xmlDoc, 'HP UNCOVER'));
+                             lineFolder.appendChild(uncoverFolder);
+                         }
+                         uncoverFolder.appendChild(hp.element);
                     }
                 }
             });
@@ -786,14 +792,15 @@
             });
         }
 
-        // --- UPDATED INJECT FUNCTION WITH CHECKBOX LOGIC ---
+        // ==========================================
+        // 5. STYLER & INJECT
+        // ==========================================
         function injectDescriptionsAndCalc(xmlDoc, mode, doCalcCable) {
             const folders = xmlDoc.querySelectorAll('Folder');
             
             if (mode === 'subfeeder') {
                 const cableFolders = Array.from(folders).filter(f => f.querySelector('name')?.textContent.trim() === 'CABLE');
                 cableFolders.forEach(cableFolder => {
-                    // JIKA CHECKBOX DICENTANG, JALANKAN KALKULASI
                     if (doCalcCable) {
                         const parentLine = cableFolder.parentElement;
                         if (!parentLine) return;
@@ -845,7 +852,6 @@
                         }
                     }
                     else if (folderName === 'DISTRIBUTION CABLE') {
-                        // JIKA CHECKBOX DICENTANG, JALANKAN KALKULASI
                         if (doCalcCable) {
                             let fatCount = 0;
                             const parentFolder = folder.parentElement;
@@ -894,9 +900,6 @@
             }
         }
 
-        // ==========================================
-        // 5. STYLER.JS
-        // ==========================================
         function applyStyles(xmlDoc, mode) {
             const placemarks = xmlDoc.querySelectorAll('Placemark');
             const doc = xmlDoc.querySelector('Document');
@@ -1012,7 +1015,7 @@
         }
 
         // ==========================================
-        // 6. MAIN.JS (UI LOGIC)
+        // 6. MAIN UI LOGIC
         // ==========================================
         let CURRENT_MODE = 'cluster'; 
         let kmzFile = null;
@@ -1026,7 +1029,7 @@
         const dropArea = document.getElementById('dropArea');
         const btnCluster = document.getElementById('btn-cluster');
         const btnSubfeeder = document.getElementById('btn-subfeeder');
-        const calcCableCheck = document.getElementById('calcCableCheck'); // GET CHECKBOX
+        const calcCableCheck = document.getElementById('calcCableCheck');
 
         function setMode(mode) {
             CURRENT_MODE = mode;
@@ -1055,7 +1058,6 @@
             processBtn.disabled = true;
             statusDiv.innerHTML = '<span class="loading-spinner"></span>Processing...';
             
-            // CEK STATUS CHECKBOX
             const doCalc = calcCableCheck.checked; 
 
             try {
@@ -1071,7 +1073,6 @@
                     xmlDoc = new DOMParser().parseFromString(kmlString, 'text/xml');
                 }
 
-                // 1. Core Logic
                 const tree = restructureKML(xmlDoc, CURRENT_MODE);
                 
                 if (CURRENT_MODE === 'cluster') {
@@ -1079,16 +1080,11 @@
                     autoRepositionPoints(xmlDoc);
                 }
 
-                // 2. Styling & Calc
                 applyStyles(xmlDoc, CURRENT_MODE);
-                
-                // PASS CHECKBOX STATE TO INJECT FUNCTION
                 injectDescriptionsAndCalc(xmlDoc, CURRENT_MODE, doCalc);
                 
-                // 3. UI Update
                 displayTree(tree);
 
-                // 4. Generate Outputs
                 if (CURRENT_MODE === 'cluster') {
                     processedHPDB = generateHPDB(xmlDoc, tree.rootName);
                 }
@@ -1099,7 +1095,6 @@
                 zipOut.file("doc.kml", newKml);
                 processedKMZ = await zipOut.generateAsync({ type: 'blob' });
 
-                // 5. Create Buttons
                 statusDiv.innerHTML = '<span style="color:var(--success)">✅ Done!</span>';
                 
                 const dlBtn = document.createElement('button');
@@ -1166,24 +1161,27 @@
             document.getElementById('preview').classList.remove('hidden');
         }
 
-        // --- README MODAL ---
         let readmeLoaded = false;
         window.openReadme = async function() {
             toggleModal(true);
             if (readmeLoaded) return;
             const container = document.getElementById('mdContainer');
-            // Hardcode readme content or keep file fetch. 
-            // Fallback since single file doesn't have README.md implicitly
-            container.innerHTML = `
-                <h1>Panduan Singkat V17</h1>
-                <ul>
-                    <li><strong>Checkbox Hitung Material:</strong> Jika dicentang, sistem akan menghitung total route, slack, dan toleransi (5%) pada kabel di folder <code>DISTRIBUTION CABLE</code> (Cluster) atau <code>CABLE</code> (Subfeeder).</li>
-                    <li><strong>Smart Sorting:</strong> Urutan folder LINE akan diprioritaskan berdasarkan nomor FDT (1, 2, 3...) terlebih dahulu, kemudian urutan abjad (LINE A, LINE B).</li>
-                    <li><strong>Mode:</strong> Cluster (Default) atau Subfeeder.</li>
-                </ul>
-                <p>Silakan drag & drop file KMZ Anda untuk memulai.</p>
-            `;
-            readmeLoaded = true;
+            try {
+                const response = await fetch('README.md');
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const markdownText = await response.text();
+                container.innerHTML = marked.parse(markdownText);
+                readmeLoaded = true;
+            } catch (error) {
+                console.error("Gagal load README:", error);
+                container.innerHTML = `
+                    <div style="text-align:center; color: var(--error); padding: 20px;">
+                        <p><strong>Gagal memuat dokumentasi.</strong></p>
+                        <p style="font-size:0.9em; color:#888;">Pastikan file <code>README.md</code> ada.</p>
+                        <p style="font-size:0.8em; margin-top:10px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
         }
 
         function toggleModal(show) {
