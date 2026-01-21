@@ -39,12 +39,17 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header {
             padding: 40px 0;
             border-bottom: 1px solid #1a1a1a;
             margin-bottom: 40px;
+            text-align: center;
+            width: 100%;
         }
 
         .header h1 {
@@ -63,10 +68,15 @@
 
         .main-content {
             max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
 
         .upload-section {
             margin-bottom: 32px;
+            width: 100%;
         }
 
         .upload-area {
@@ -111,6 +121,7 @@
             display: flex;
             gap: 12px;
             margin-bottom: 32px;
+            align-self: flex-start;
         }
 
         .btn {
@@ -159,6 +170,7 @@
             border-radius: 8px;
             padding: 24px;
             border: 1px solid #1a1a1a;
+            width: 100%;
         }
 
         .preview-header {
